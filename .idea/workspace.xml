@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7478c389-4c7d-463f-a929-9b2a2ff7b6e9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/App/lib/components/AuthGate.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App/lib/components/home_1.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App/lib/components/splash_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App/lib/main_1.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/App/android/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/App/android/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/android/app/src/main/res/values-night/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/App/android/app/src/main/res/values-night/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/App/android/app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/App/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Base.lproj/LaunchScreen.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Base.lproj/LaunchScreen.storyboard" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/App/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/lib/auth_gate.dart" beforeDir="false" afterPath="$PROJECT_DIR$/App/lib/components/auth_gate.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/lib/home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/App/lib/components/home.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/App/lib/main_2.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/App/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/App/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/App/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/App/test/widget_test.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/App/web/index.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2XJ08LAxH9qQyfan8FbJtJidxOJ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "/Users/david_rabensteiner/Documents/FH_Hagenberg/CliqueConnect",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7478c389-4c7d-463f-a929-9b2a2ff7b6e9" name="Changes" comment="" />
+      <created>1698331715345</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698331715345</updated>
+    </task>
+    <servers />
+  </component>
+</project>
