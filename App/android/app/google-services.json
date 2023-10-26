@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "257429087396",
+    "project_id": "cliqueconnect-eb893",
+    "storage_bucket": "cliqueconnect-eb893.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257429087396:android:de9fdcb8400fa449263231",
+        "android_client_info": {
+          "package_name": "clique_connect.com.test_clique_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZyG37MiihBDwndVpRJxAXqTdCLVkpn6I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
