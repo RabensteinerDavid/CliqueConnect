@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final imageName = data["image_data"];
 
         if (imageName != null) {
-          _userImageUrl = imageURL = imageName;
+          imageURL = imageName;
           print("Image Name: $imageName");
         } else {
           print("Image Name not found in the document.");
