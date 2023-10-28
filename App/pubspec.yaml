@@ -41,6 +41,11 @@ dependencies:
   firebase_ui_auth: ^1.9.1
   flutter_native_splash: ^2.3.4
   video_player: ^2.7.2
+  image_picker: ^1.0.4
+  firebase_storage: ^11.4.0
+  image_cropper: ^5.0.0
+  flutter_image_compress: ^2.1.0
+  flutter_profile_picture: ^2.0.0
 
 flutter_native_splash:
   color: "#817FBF"
