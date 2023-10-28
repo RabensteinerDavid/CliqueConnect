@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_1.dart';
+import 'Home.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({Key? key}) : super(key: key);
@@ -17,14 +17,15 @@ class _AuthGateState extends State<AuthGate> {
   bool isLogin = true;
   double formHeightPercentage = 0.4;
   double roundEdges = 20.0;
-  Color primaryColor = Color(0xff26168C);
+  Color primaryColor = const Color(0xff26168C);
   Color textColor = Colors.white;
-  Color textColorBlue = Color(0xff26168C);
+  Color textColorBlue = const Color(0xff26168C);
   Color emailFieldColor = Colors.white;
   Color passwordFieldColor = Colors.white;
-  Color formFieldBackgroundColor =  Color(0xffb4a8e5); // Background color for the input fields
+  Color formFieldBackgroundColor = const Color(0xffb4a8e5);
   Color textInputColor = Colors.white;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -80,30 +81,72 @@ class _AuthGateState extends State<AuthGate> {
               'Continue to Sign In',
               style: TextStyle(
                 color: Colors.grey,
-                fontSize: 14.0, // You can adjust the font size as needed
+                fontSize: 14.0,
+              ),
+            ),
+          if (!isLogin)
+            const Text(
+              'Find your Tribe with CliqueConnect',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14.0,
               ),
             ),
           buildEmailTextField(),
           buildPasswordTextField(),
           if (!isLogin) buildConfirmPasswordTextField(),
           const SizedBox(height: 16),
-          Container(
-            width: double.infinity, // Make the container take the full width
+          SizedBox(
+            width: double.infinity,
             height: 50,
             child: buildSignInUpButton(),
           ),
           buildToggleAuthModeButton(),
+          buildResetPasswordButton(),
         ],
       ),
     );
   }
 
+  Widget buildResetPasswordButton() {
+    return isLogin
+        ? TextButton(
+      onPressed: _resetPassword,
+      child: const Text(
+        'Reset Password',
+        style: TextStyle(color: Colors.grey),
+      ),
+    )
+        : const SizedBox();
+  }
 
+  Future<void> _resetPassword() async {
+    String email = emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter your email address.'),
+      ));
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(
+        email: email,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Password reset email sent. Please check your inbox.'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Error sending password reset email.'),
+      ));
+    }
+  }
 
   Widget buildLogoImage() {
     return Container(
       alignment: Alignment.center,
-      padding: EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Text(
         isLogin ? 'Login' : 'Sign Up',
         style: TextStyle(
@@ -117,104 +160,87 @@ class _AuthGateState extends State<AuthGate> {
 
   Widget buildEmailTextField() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(roundEdges),
-        color: formFieldBackgroundColor, // Background color for the input field
+        color: formFieldBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: TextFormField(
         style: TextStyle(color: textInputColor),
         controller: emailController,
+        autofillHints: const [AutofillHints.email],
         decoration: InputDecoration(
           labelText: 'Email',
           labelStyle: TextStyle(color: emailFieldColor),
           border: InputBorder.none,
         ),
-        onTap: () {
-          setState(() {
-            emailFieldColor = emailFieldColor;
-            passwordFieldColor = emailFieldColor;
-          });
-        },
       ),
     );
   }
 
   Widget buildPasswordTextField() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(roundEdges),
-        color: formFieldBackgroundColor, // Background color for the input field
+        color: formFieldBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: TextFormField(
         style: TextStyle(color: textInputColor),
         controller: passwordController,
-        obscureText: true,
+       /* obscureText: true, // Obscure the password input*/
         decoration: InputDecoration(
           labelText: 'Password',
           labelStyle: TextStyle(color: passwordFieldColor),
           border: InputBorder.none,
         ),
-        onTap: () {
-          setState(() {
-            passwordFieldColor = emailFieldColor;
-            emailFieldColor = emailFieldColor;
-          });
-        },
       ),
     );
   }
 
   Widget buildConfirmPasswordTextField() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(roundEdges),
-        color: formFieldBackgroundColor, // Background color for the input field
+        color: formFieldBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: TextFormField(
         style: TextStyle(color: textInputColor),
         controller: confirmPasswordController,
-        obscureText: true,
+      /*  obscureText: true, // Obscure the password input*/
         decoration: InputDecoration(
           labelText: 'Confirm Password',
           labelStyle: TextStyle(color: emailFieldColor),
           border: InputBorder.none,
         ),
-        onTap: () {
-          setState(() {
-            emailFieldColor = emailFieldColor;
-            passwordFieldColor = emailFieldColor;
-          });
-        },
       ),
     );
   }
@@ -251,15 +277,27 @@ class _AuthGateState extends State<AuthGate> {
     });
   }
 
+
+
   Future<void> _signIn() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter both email and password.'),
+      ));
+      return;
+    }
+
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
       if (userCredential.user != null) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-in.";
@@ -277,7 +315,28 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<void> _signUp() async {
-    if (passwordController.text != confirmPasswordController.text) {
+    String email = emailController.text.trim();
+    String password = passwordController.text;
+    String confirmPassword = confirmPasswordController.text;
+
+    final emailRegExp =
+    RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter email, password, and confirm password.'),
+      ));
+      return;
+    }
+
+    if (!emailRegExp.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter a valid email address.'),
+      ));
+      return;
+    }
+
+    if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Passwords do not match."),
       ));
@@ -285,19 +344,20 @@ class _AuthGateState extends State<AuthGate> {
     }
 
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
       if (userCredential.user != null) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-up.";
       if (e is FirebaseAuthException) {
         if (e.code == 'email-already-in-use') {
-          errorMessage = "The email address is already in use. Please sign in.";
+          errorMessage =
+          "The email address is already in use. Please sign in.";
         }
       }
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

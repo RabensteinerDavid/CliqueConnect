@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-
 import 'AuthGate.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -23,8 +22,8 @@ class _SplashScreenState extends State<SplashScreen> {
     )
       ..initialize().then((_) {
         setState(() {});
-      })
-      ..setVolume(0.0);
+      });
+    /*..setVolume(0.0)*/
 
     _playVideo();
   }
@@ -34,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _controller.play();
 
     // add delay until the video is complete
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 2));
 
     // Navigating to the AuthGate screen with a custom transition
     Navigator.pushReplacement(
@@ -54,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffA8A8A8),
+      backgroundColor: const Color(0xff26168C),
       body: Center(
         child: _controller.value.isInitialized
             ? AspectRatio(
