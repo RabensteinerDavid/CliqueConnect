@@ -35,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
     getImgUrl();
   }
 
-
   Future _cropImage(  File? imageFile) async {
     if (imageFile != null) {
       CroppedFile? cropped = await ImageCropper().cropImage(
@@ -369,7 +368,7 @@ void getImgUrl() async {
             ),
             ElevatedButton(
               onPressed: saveDataToFirestore,
-              child: const Text('Save to Firestore'),
+              child: const Text('Save Profile'),
             ),
             ElevatedButton(
               onPressed: () => _signOut(context), // Call the sign-out function with the correct context

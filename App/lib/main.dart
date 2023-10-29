@@ -32,10 +32,10 @@ class MyApp extends StatelessWidget {
           800: Color(0xff26168C),
           900: Color(0xff26168C),
         }), // Set your primary color
-        backgroundColor: Color(0xff26168C), // Set the background color
+        backgroundColor: const Color(0xff26168C), // Set the background color
       ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }
