@@ -3,13 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:test_clique_connect/components/AuthGate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,25 +18,52 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   final TextEditingController _usernameController = TextEditingController();
   File? _photo;
   final ImagePicker _picker = ImagePicker();
+  final FirebaseAuth auth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
   final firestore = FirebaseFirestore.instance;
 
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
-  String _userImageUrl = '';
-
   @override
   void initState() {
     super.initState();
-    _fetchUserImage();
+    getImgUrl();
   }
 
-  Future<void> _fetchUserImage() async {
-    _userImageUrl = (await getImgUrl());
+
+  Future _cropImage(  File? imageFile) async {
+    if (imageFile != null) {
+      CroppedFile? cropped = await ImageCropper().cropImage(
+          sourcePath: imageFile!.path,
+          aspectRatioPresets:
+          [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+
+          uiSettings: [
+          AndroidUiSettings(
+          toolbarTitle: 'Crop',
+          cropGridColor: Colors.black,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false),
+          IOSUiSettings(title: 'Crop')
+    ]);
+
+    if (cropped != null) {
+    setState(() {
+      _photo = File(cropped.path);
+    });
+    }
+  }
   }
 
   Future imgFromGallery() async {
@@ -46,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
+        _cropImage(File(pickedFile.path));
       } else {
         print('No img selected');
       }
@@ -57,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       if (pickedFile != null) {
          _photo = File(pickedFile.path);
-
+         _cropImage(File(pickedFile.path));
       } else {
         print('No img selected');
       }
@@ -72,8 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final fileName = basename(_photo!.path);
     final destination = 'files/$fileName';
 
-
-
     try {
       final ref = storage.ref(destination);
       await ref.putFile(_photo!);
@@ -81,34 +106,46 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error uploading file: $e');
     }
   }
+  static String imageURL = '';
 
-  Future<String> getImgUrl() async {
-    var userID = user?.uid;
-    String imageURL = "";
+void getImgUrl() async {
+  var userID = user?.uid;
 
-    if (userID != null) {
-      final snapshot = await firestore.collection("users").doc(userID).get();
+  if (userID != null) {
+    final snapshot = await firestore.collection("users").doc(userID).get();
 
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        final imageName = data["image_data"];
+    if (snapshot.exists) {
+      final data = snapshot.data() as Map<String, dynamic>;
+      final imageName = await data["image_data"];
 
-        if (imageName != null) {
-          imageURL = imageName;
-          print("Image Name: $imageName");
-        } else {
-          print("Image Name not found in the document.");
-        }
-      } else {
-        print("Document not found for user with ID: $userID");
+      if (imageName != null) {
+        imageURL = imageName;
+        print("Image Name: $imageName");
+      }
+      else {
+        print("Image Name not found in the document.");
       }
     } else {
-      print("User is not authenticated.");
+
+      print("Document not found for user with ID: $userID");
+      final Reference storageRef = FirebaseStorage.instance.ref('files/cliqueConnect.png');
+
+      try {
+        final imageUrl = await storageRef.getDownloadURL();
+
+        if (imageUrl != null) {
+          imageURL = imageUrl;
+          print("Image URL: $imageUrl");
+          // Now, you can use this URL to display the image in your app.
+        } else {
+          print("Image URL not found.");
+        }
+      } catch (e) {
+        print("Error retrieving image URL: $e");
+      }
     }
-    return imageURL;
   }
-
-
+}
 
   void _showPicker(context) {
     showModalBottomSheet(
@@ -118,16 +155,16 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Gallery'),
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
                 onTap: () {
                   imgFromGallery();
                   Navigator.of(context).pop();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.photo_camera),
-                title: Text('Camera'),
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
                 onTap: () {
                   imgFromCamera();
                   Navigator.of(context).pop();
@@ -181,10 +218,22 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _usernameController.clear();
         _photo = null;
+        getImgUrl();
       });
     }
     else {
       print('No Username to upload');
+    }
+  }
+
+  void _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => AuthGate()), // Replace with your authentication gate screen
+      );
+    } catch (e) {
+      print('Error signing out: $e');
     }
   }
 
@@ -208,26 +257,57 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.of(context).pop();
                       }),
                     ],
-                    children: [
-                      const Divider(),
-                      if (_photo != null)
-                        Image.file(
-                          _photo!,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.fitHeight,
-                        )
-                      else
-                        const AspectRatio(
-                          aspectRatio: 1,
-                          /*child: getImgUrl(),*/
-                        child: ProfilePicture(
-                            name: 'Aditya Dharmawan Saputra',
-                            radius: 5,
-                            fontsize: 5,
-                            img: "https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2Fprofile_Y9OEsvuZINelTsyB2xknxBisDu53.jpg?alt=media&token=b29b3ceb-7b70-412b-996d-a42f60a5925d"
+                      children: [
+                        const Divider(),
+                          // You can conditionally display a local image or a network image
+             /*             if (imageURL == null)
+                            Image.asset(
+                            "assets/cliqueConnect.png",
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.fitHeight,
+                          )*/
+                      /*    else*/
+                        CircleAvatar(
+                          radius: 55,
+                          backgroundColor: Color(0xff8179b4),
+                          child: _photo != null
+                              ? ClipOval(
+                            child: Image.network(
+                              imageURL,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover, // Use 'cover' for best circular fit
+                            ),
                           )
+                              : Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              shape: BoxShape.circle, // Use a circular shape for the container
+                            ),
+                            width: 100,
+                            height: 100,
+                            child: ClipOval(
+                              child: Image.network(
+                                imageURL,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover, // Use 'cover' for best circular fit
+                              ),
+                            ),
+                          ),
                         ),
+
+                        /* AspectRatio(
+                          aspectRatio: 4,
+                          child: Image.network(imageURL),
+                          ),*/
+                         /*ProfilePicture(
+                         name: 'Aditya Dharmawan Saputra',
+                         radius: 20,
+                          fontsize: 1,
+                          img:  imageURL),*/
+                        // Other profile information widgets can be added here.
                     ],
                   ),
                 ),
@@ -237,6 +317,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         automaticallyImplyLeading: false,
       ),
+ /*     floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _signOut();
+        },
+        child: Icon(Icons.logout_rounded),
+        backgroundColor: Colors.green,
+      ),*/
       body: Center(
         child: Column(
           children: [
@@ -284,7 +371,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: saveDataToFirestore,
               child: const Text('Save to Firestore'),
             ),
-            const SignOutButton(),
+            ElevatedButton(
+              onPressed: () => _signOut(context), // Call the sign-out function with the correct context
+              child: const Text('Sign Out'),
+            ),
           ],
         ),
       ),
