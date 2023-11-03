@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:test_clique_connect/components/AuthGate.dart';
+import 'AuthGate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
