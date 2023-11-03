@@ -8,8 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:test_clique_connect/components/LocationPage.dart';
+import 'package:test_clique_connect/save/LocationPage.dart';
+import 'package:test_clique_connect/save/MapScreen.dart';
 import 'AuthGate.dart';
+import 'MapSreenWithCurrentLocation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -371,7 +373,7 @@ void getImgUrl() async {
             // Add the MapboxMap widget here
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const LocationPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const MapSreenWithCurrentLocation()));
               },
               child: Text('Go to Map'),
             ),

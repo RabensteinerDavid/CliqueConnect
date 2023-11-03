@@ -52,7 +52,7 @@ class _MapScreenState extends State<MapScreen> {
         width: MediaQuery.of(context).size.width,
         child: MapboxMap(
           onStyleLoadedCallback: _onStyleLoaded,
-          accessToken: 'YOUR_ACCESS_TOKEN',
+          accessToken: 'sk.eyJ1IjoiYm9uaXRoYW4iLCJhIjoiY2xvaGFydjR1MGV5bDJqbnZ6cWg0dXh4cyJ9.m3uRWclpqOdSgYfUegOlTg',
           styleString: 'mapbox://styles/bonithan/cloh3lx0f000d01qoh3okhz10',
           initialCameraPosition: CameraPosition(
             target: LatLng(
