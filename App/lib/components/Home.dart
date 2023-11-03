@@ -9,6 +9,9 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'AuthGate.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+
+import 'MapScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -316,49 +319,42 @@ void getImgUrl() async {
         ],
         automaticallyImplyLeading: false,
       ),
- /*     floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _signOut();
-        },
-        child: Icon(Icons.logout_rounded),
-        backgroundColor: Colors.green,
-      ),*/
       body: Center(
         child: Column(
           children: [
-              Text(
-                'Welcome!',
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-            // Display the error message if it's not null
+            Text(
+              'Welcome!',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
             GestureDetector(
               onTap: () {
                 _showPicker(context);
-              }, child: CircleAvatar(
-              radius: 55,
-              backgroundColor: Color(0xff8179b4),
-              child: _photo != null
-                  ? ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: Image.file(
-                  _photo!,
+              },
+              child: CircleAvatar(
+                radius: 55,
+                backgroundColor: Color(0xff8179b4),
+                child: _photo != null
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: Image.file(
+                    _photo!,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.fitHeight,
+                  ),
+                )
+                    : Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(50)),
                   width: 100,
                   height: 100,
-                  fit: BoxFit.fitHeight,
-                ),
-              )
-                  : Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(50)),
-                width: 100,
-                height: 100,
-                child: Icon(
-                  Icons.camera_alt,
-                  color: Colors.grey[800],
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: Colors.grey[800],
+                  ),
                 ),
               ),
-            ),
             ),
             TextField(
               controller: _usernameController,
@@ -371,8 +367,15 @@ void getImgUrl() async {
               child: const Text('Save Profile'),
             ),
             ElevatedButton(
-              onPressed: () => _signOut(context), // Call the sign-out function with the correct context
+              onPressed: () => _signOut(context),
               child: const Text('Sign Out'),
+            ),
+            // Add the MapboxMap widget here
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen()));
+              },
+              child: Text('Go to Map'),
             ),
           ],
         ),

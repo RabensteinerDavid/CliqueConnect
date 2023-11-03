@@ -66,4 +66,6 @@ flutter {
 
 apply plugin: 'com.google.gms.google-services'
 
-dependencies {}
+dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
+}
