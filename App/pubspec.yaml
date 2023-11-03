@@ -49,6 +49,10 @@ dependencies:
   mapbox_gl_web: ^0.16.0
   flutter_native_splash: ^2.2.16
   image: ^3.0.0
+  geocoding: ^2.1.1
+  geolocator: ^10.1.0
+  flutter_map: ^6.0.1
+
 
 flutter_native_splash:
   color: "#817FBF"
@@ -79,6 +83,7 @@ flutter:
   assets:
     - assets/cliqueConnect.png
     - assets/intro.mp4
+    - assets/Marker.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
