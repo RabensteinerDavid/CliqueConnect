@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/save/LocationPage.dart';
 import 'package:test_clique_connect/save/MapScreen.dart';
 import 'AuthGate.dart';
@@ -373,7 +374,7 @@ void getImgUrl() async {
             // Add the MapboxMap widget here
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const MapSreenWithCurrentLocation()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AnimatedMarkersMap()));
               },
               child: Text('Go to Map'),
             ),
