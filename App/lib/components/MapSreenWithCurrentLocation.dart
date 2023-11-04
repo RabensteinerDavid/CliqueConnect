@@ -15,7 +15,7 @@ class MapSreenWithCurrentLocation extends StatefulWidget {
 class _LocationPageState extends State<MapSreenWithCurrentLocation> {
   String? _currentAddress;
   Position? _currentPosition;
-  late MapboxMapController mapController;
+  MapboxMapController? mapController;
   double iconSize = 0.3;
 
   Future<bool> _handleLocationPermission() async {
@@ -77,14 +77,17 @@ class _LocationPageState extends State<MapSreenWithCurrentLocation> {
   }
 
   void _onStyleLoaded() {
-    addImageFromAsset("assetImage", "assets/Marker.png");
+    if (mapController != null) {
+      addImageFromAsset("assetImage", "assets/Marker.png");
+    }
   }
+
 
   Future<void> addImageFromAsset(String name, String assetName) async {
     final ByteData bytes = await rootBundle.load(assetName);
     final Uint8List list = bytes.buffer.asUint8List();
-    mapController.addSymbol(_getSymbolOptions('assets/Marker.png', iconSize));
-    return mapController.addImage(name, list);
+    mapController?.addSymbol(_getSymbolOptions('assets/Marker.png', iconSize));
+    return mapController?.addImage(name, list);
   }
 
   SymbolOptions _getSymbolOptions(String iconImage, double size) {
@@ -129,7 +132,7 @@ class _LocationPageState extends State<MapSreenWithCurrentLocation> {
                   mapController = controller;
                 },
                 onCameraIdle: () {
-                  double? zoom = mapController.cameraPosition?.zoom;
+                  double? zoom = mapController?.cameraPosition?.zoom;
                   if (zoom! >= 12.0) {
                     setState(() {
                       iconSize = 0.5;
@@ -139,7 +142,7 @@ class _LocationPageState extends State<MapSreenWithCurrentLocation> {
                       iconSize = 0.3;
                     });
                   }
-                  mapController.removeSymbol('assets/Marker.png' as Symbol);
+                  mapController?.removeSymbol('assets/Marker.png' as Symbol);
                   // Add the updated symbol
                   addImageFromAsset('assetImage', 'assets/Marker.png');
                 },
