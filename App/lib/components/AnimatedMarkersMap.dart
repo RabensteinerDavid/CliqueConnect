@@ -30,7 +30,6 @@ class AnimatedMarkersMap extends StatefulWidget {
 class _LocationPageState extends State<AnimatedMarkersMap> {
   Position? _currentPosition;
   double iconSize = 0.3;
-  int _markerIndex = 0;
   int selectedCardIndex = 0;
   String? _currentAddress;
 
@@ -40,8 +39,6 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
 
   User? user = FirebaseAuth.instance.currentUser;
   final firestore = FirebaseFirestore.instance;
-
-
 
   @override
   void initState() {
@@ -54,6 +51,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+    mapMarkers = [];
   }
 
   void getPositionActivity() async {
@@ -183,7 +181,6 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
               onTap: () {
                 setState(() {
                   isCardVisible = true;
-                  _markerIndex = i;
                   selectedCardIndex = i; // Update the selected card index
                 });
                 if (_pageController != null && _pageController.hasClients) {
@@ -290,10 +287,11 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
           const Positioned(
             top: 10,
             left: 10,
+            right: 10,
             child: Opacity(
               opacity: 0.7,
               child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
+                scrollDirection: Axis.horizontal, // Ändern Sie die Richtung auf horizontal
                 child: FilterChipExample(),
               ),
             ),
@@ -303,6 +301,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
     );
   }
 }
+
 
 class _MapItemDetails extends StatefulWidget {
   const _MapItemDetails({
@@ -423,41 +422,42 @@ class FilterChipExample extends StatefulWidget {
   State<FilterChipExample> createState() => _FilterChipExampleState();
 }
 
-enum ExerciseFilter { volleyball, soccer, cycling, hiking, sport, playing, fdafdsafd, gfdagfda }
+enum ExerciseFilter {
+  all,
+  volleyball,
+  soccer,
+  cycling,
+  hiking,
+  sport,
+  playing,
+}
 
 class _FilterChipExampleState extends State<FilterChipExample> {
   final filters = <ExerciseFilter>{};
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const SizedBox(height: 5.0),
-          Wrap(
-            spacing: 5.0,
-            children: ExerciseFilter.values.map((ExerciseFilter exercise) {
-              return FilterChip(
-                label: Text(exercise.toString().split('.').last),
-                selected: filters.contains(exercise),
-                onSelected: (bool selected) {
-                  setState(() {
-                    if (selected) {
-                      filters.add(exercise);
-                    } else {
-                      filters.remove(exercise);
-                    }
-                  });
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 5.0),
-        ],
-      ),
+    return Row(
+      children: ExerciseFilter.values.map((ExerciseFilter exercise) {
+        return Row(
+          children: [
+            FilterChip(
+              label: Text(exercise.toString().split('.').last),
+              selected: filters.contains(exercise),
+              onSelected: (bool selected) {
+                setState(() {
+                  if (selected) {
+                    filters.add(exercise);
+                  } else {
+                    filters.remove(exercise);
+                  }
+                });
+              },
+            ),
+            SizedBox(width: 4.0), // Fügen Sie hier den gewünschten Abstand ein
+          ],
+        );
+      }).toList(),
     );
   }
 }
