@@ -65,35 +65,29 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
         querySnapshot.docs.forEach((activityDoc) {
           final activityName = activityDoc.id;
 
-          if (activityName == "volleyball" || activityName == "soccer") {
-            final locationsCollectionRef = activityDoc.reference.collection(
-                "location");
+          if (activityName == "Creativ") {
+            // Access the data directly using data() method
+            Map<String, dynamic> data = activityDoc.data();
 
-            locationsCollectionRef.get().then((locationQuerySnapshot) {
-              locationQuerySnapshot.docs.forEach((doc) {
-                final data = doc.data();
-                if (data != null) {
-                  final description = data["description"];
-                  final nameActivity = data["name_activity"];
-                  final location = data["position"] as GeoPoint;
+            data.forEach((key, value) {
+              List<dynamic> alldata = List.from(data[key]);
+              // Print the elements of the "dungeon_group" array
+              final nameActivity = alldata[0];
+              final description = alldata[1];
+              final location = alldata[4] as GeoPoint;
 
-                  mapMarkers.add(
-                    MapMarker(
-                      image: 'assets/Marker.png',
-                      title: nameActivity,
-                      address: 'Address Paavo 123',
-                      location: latlong.LatLng(
-                          location.latitude, location.longitude),
-                      start: now,
-                      end: now,
-                      description: description,
-                    ),
-                  );
-                } else {
-                  print("Field not found in data.");
-                }
-                print("Aktivität: $activityName, Standortdaten: $data");
-              });
+              mapMarkers.add(
+                MapMarker(
+                  image: 'assets/Marker.png',
+                  title: nameActivity,
+                  address: 'He',
+                  location: latlong.LatLng(
+                      location.latitude, location.longitude),
+                  start: now,
+                  end: now,
+                  description: description,
+                ),
+              );
             });
           }
         });

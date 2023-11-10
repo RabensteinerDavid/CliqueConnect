@@ -1,4 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_clique_connect/components/Home.dart';
 import 'package:video_player/video_player.dart';
 import 'AuthGate.dart';
 
@@ -28,6 +32,12 @@ class _SplashScreenState extends State<SplashScreen> {
     _playVideo();
   }
 
+  Future<bool?> getYourLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? storedPassword = prefs.getBool('isLoggedIn');
+    return storedPassword;
+  }
+
   void _playVideo() async {
     // playing video
     _controller.play();
@@ -35,13 +45,24 @@ class _SplashScreenState extends State<SplashScreen> {
     // add delay until the video is complete
     await Future.delayed(const Duration(seconds: 2));
 
-    // Navigating to the AuthGate screen with a custom transition
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AuthGate(),
-      ),
-    );
+    if(await getYourLogin() != null && await getYourLogin() == true){
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }
+    else{
+      // Navigating to the AuthGate screen with a custom transition
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthGate(),
+        ),
+      );
+    }
+
   }
 
   @override

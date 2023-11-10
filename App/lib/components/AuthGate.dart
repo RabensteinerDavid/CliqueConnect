@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({Key? key}) : super(key: key);
@@ -26,6 +27,14 @@ class _AuthGateState extends State<AuthGate> {
   Color textInputColor = Colors.white;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<bool> saveYourLogin() async{
+    // Load and obtain the shared preferences for this app.
+    final prefs = await SharedPreferences.getInstance();
+
+// Save the counter value to persistent storage under the 'counter' key.
+    return await prefs.setBool('isLoggedIn', true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +304,8 @@ class _AuthGateState extends State<AuthGate> {
         email: email,
         password: password,
       );
-      if (userCredential.user != null) {
+      await saveYourLogin();
+      if (userCredential.user != null ) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }

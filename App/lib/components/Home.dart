@@ -8,11 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
-import 'package:test_clique_connect/save/LocationPage.dart';
-import 'package:test_clique_connect/save/MapScreen.dart';
 import 'AuthGate.dart';
-import 'MapSreenWithCurrentLocation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,6 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getImgUrl();
+  }
+
+  Future<bool> deleteYourLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Remove the counter key-value pair from persistent storage.
+    return await prefs.remove('isLoggedIn');
   }
 
   Future _cropImage(  File? imageFile) async {
@@ -230,6 +235,7 @@ void getImgUrl() async {
   }
 
   void _signOut(BuildContext context) async {
+    await deleteYourLogin();
     try {
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
@@ -262,15 +268,6 @@ void getImgUrl() async {
                     ],
                       children: [
                         const Divider(),
-                          // You can conditionally display a local image or a network image
-             /*             if (imageURL == null)
-                            Image.asset(
-                            "assets/cliqueConnect.png",
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.fitHeight,
-                          )*/
-                      /*    else*/
                         CircleAvatar(
                           radius: 55,
                           backgroundColor: Color(0xff8179b4),
@@ -300,17 +297,6 @@ void getImgUrl() async {
                             ),
                           ),
                         ),
-
-                        /* AspectRatio(
-                          aspectRatio: 4,
-                          child: Image.network(imageURL),
-                          ),*/
-                         /*ProfilePicture(
-                         name: 'Aditya Dharmawan Saputra',
-                         radius: 20,
-                          fontsize: 1,
-                          img:  imageURL),*/
-                        // Other profile information widgets can be added here.
                     ],
                   ),
                 ),
