@@ -17,10 +17,10 @@ class _EventState extends State<Event> {
 
   _EventState({required this.imageURL});
 
-  String title = "Zeichnen";
-  String date = "11.11.2023";
-  String description = "Beschreibung";
-  String location = "Ort";
+  String title = "";
+  String date = "";
+  String description = "";
+  String location = "";
   String icon = "assets/cliqueConnect.png";
 
   final firestore = FirebaseFirestore.instance;
@@ -28,7 +28,7 @@ class _EventState extends State<Event> {
   @override
   void initState() {
     super.initState();
-    getEvent("Also jo", "Creativ");
+    getEvent("Joni stinkt", "Creative");
     getImageUrl("events/zeichnen_banner.jpg");
   }
 
@@ -76,6 +76,7 @@ class _EventState extends State<Event> {
                 Positioned(
                   top: 200,
                   left: 20,
+
                   child: Container(
                     width: 100.0,
                     height: 100.0,
@@ -96,7 +97,7 @@ class _EventState extends State<Event> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 30.0),
+              padding: EdgeInsets.only(left: 40.0, top: 30.0, right: 40.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -110,11 +111,24 @@ class _EventState extends State<Event> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 10.0),
+              padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Datum: $date',
+                  date,
+                  style: TextStyle(
+                    fontFamily: 'Asap Condensed',
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  description,
                   style: TextStyle(
                     fontFamily: 'Asap Condensed',
                     fontSize: 20.0,
@@ -127,20 +141,7 @@ class _EventState extends State<Event> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Beschreibung: $description',
-                  style: TextStyle(
-                    fontFamily: 'Asap Condensed',
-                    fontSize: 20.0,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 10.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Ort: $location',
+                  location,
                   style: TextStyle(
                     fontFamily: 'Asap Condensed',
                     fontSize: 20.0,
@@ -186,6 +187,25 @@ class _EventState extends State<Event> {
 
     title = snapshot.get(eventName)[0];
     description = snapshot.get(eventName)[1];
-    date= DateTime.fromMillisecondsSinceEpoch(snapshot.get(eventName)[2]).toString();
+    Timestamp timestamp = snapshot.get(eventName)[2];
+    DateTime dateTime = timestamp.toDate();
+    date = _formatDateTime(dateTime);
+    location = snapshot.get(eventName)[4].toString();
+
   }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${_formatDate(dateTime)} ${_formatTime(dateTime)}';
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return '${dateTime.day}.${dateTime.month}.${dateTime.year}';
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return '${dateTime.hour}:${dateTime.minute}';
+  }
+
+
+
 }
