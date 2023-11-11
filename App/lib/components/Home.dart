@@ -10,6 +10,7 @@ import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
+import 'package:test_clique_connect/components/Event.dart';
 import 'AuthGate.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,13 +49,16 @@ class _HomeScreenState extends State<HomeScreen> {
     if (imageFile != null) {
       CroppedFile? cropped = await ImageCropper().cropImage(
           sourcePath: imageFile!.path,
+          maxHeight: 400,
+          maxWidth: 400,
+          aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
           aspectRatioPresets:
           [
             CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
+            //CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9
+            //CropAspectRatioPreset.ratio4x3,
+            //CropAspectRatioPreset.ratio16x9
           ],
 
           uiSettings: [
@@ -62,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
           toolbarTitle: 'Crop',
           cropGridColor: Colors.black,
           initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false),
-          IOSUiSettings(title: 'Crop')
+          lockAspectRatio: true),
+          IOSUiSettings(title: 'Crop',aspectRatioLockEnabled: true)
     ]);
 
     if (cropped != null) {
@@ -343,12 +347,39 @@ void getImgUrl() async {
                 ),
               ),
             ),
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
-              ),
+            Column(
+              children: [
+                // Other elements or widgets
+
+                const SizedBox(height: 36.0), // Add space above the TextField
+
+                SizedBox(
+                  width: 250.0,
+                  child: TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      hintText: 'Enter your username',
+                      prefixIcon: const Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 36.0), // Add space below the TextField
+
+                // Other elements or widgets
+              ],
             ),
+
+
             ElevatedButton(
               onPressed: saveDataToFirestore,
               child: const Text('Save Profile'),
@@ -363,6 +394,12 @@ void getImgUrl() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const AnimatedMarkersMap()));
               },
               child: Text('Go to Map'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Event()));
+              },
+              child: Text('Go to Event'),
             ),
           ],
         ),
