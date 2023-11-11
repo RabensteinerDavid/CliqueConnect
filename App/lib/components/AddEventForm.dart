@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -14,6 +15,14 @@ class _EventState extends State<AddEventForm> {
   DateTime? startDate;
   DateTime? endDate;
   final TextEditingController coordinatesController = TextEditingController();
+  var categories;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCatergoryActivities();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +195,29 @@ class _EventState extends State<AddEventForm> {
     );
   }
 
+  Future<String?> getCatergoryActivities() async {
+    try {
+      final activitiesCollectionRef = FirebaseFirestore.instance.collection("categoriesActivities");
+      final data = await activitiesCollectionRef.doc("category").get();
+
+      if (data.exists) {
+        data.data()!.forEach((key, value) {
+          categories = value;
+          print(categories);
+        });
+        return "Data retrieved successfully.";
+      } else {
+        // If the document doesn't exist
+        print("Document does not exist");
+        return null;
+      }
+    } catch (e) {
+      print('Error retrieving data: $e');
+      return null;
+    }
+  }
+
+
   //48.36611, 14.51646
   Future<void> addCreativActivity() async {
     CollectionReference creativCollection =
@@ -219,3 +251,4 @@ class _EventState extends State<AddEventForm> {
     }
   }
 }
+
