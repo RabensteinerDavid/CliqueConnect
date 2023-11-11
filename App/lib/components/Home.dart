@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'AuthGate.dart';
@@ -400,6 +401,12 @@ void getImgUrl() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const Event()));
               },
               child: Text('Go to Event'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddEventForm()));
+              },
+              child: Text('Add Event'),
             ),
           ],
         ),
