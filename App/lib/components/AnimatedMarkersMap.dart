@@ -380,7 +380,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                 ),
                 Text(widget.mapMarker.title),
                 Text(widget.mapMarker.description),
-                Text(widget.mapMarker.address),
+                Text("Adress: "+widget.mapMarker.address),
                 Text('Current Index: ${widget.currentIndex}'),
               ],
             ),
