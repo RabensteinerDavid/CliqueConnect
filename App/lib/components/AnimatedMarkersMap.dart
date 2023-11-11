@@ -65,7 +65,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
         querySnapshot.docs.forEach((activityDoc) {
           final activityName = activityDoc.id;
 
-          if (activityName == "Creativ") {
+          if (activityName == "Creative" || activityName == "Culinary"|| activityName == "Education"|| activityName == "Games"|| activityName == "Nightlife"|| activityName == "Sports") {
             // Access the data directly using data() method
             Map<String, dynamic> data = activityDoc.data();
 
