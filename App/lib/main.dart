@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Intro",
       theme: ThemeData(
+        fontFamily: 'DINCondensed',
         primarySwatch: const MaterialColor(0xff26168C, <int, Color>{
           50: Color(0xff26168C),
           100: Color(0xff26168C),
