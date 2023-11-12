@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Event extends StatefulWidget {
@@ -28,7 +29,7 @@ class _EventState extends State<Event> {
   @override
   void initState() {
     super.initState();
-    getEvent("Joni stinkt", "Creative");
+    getEvent("Tanzen", "Creative");
     getImageUrl("events/zeichnen_banner.jpg");
   }
 
@@ -190,8 +191,39 @@ class _EventState extends State<Event> {
     Timestamp timestamp = snapshot.get(eventName)[2];
     DateTime dateTime = timestamp.toDate();
     date = _formatDateTime(dateTime);
-    location = snapshot.get(eventName)[4].toString();
 
+    GeoPoint locationData = snapshot.get(eventName)[4];
+
+    _convertCoordinatesToAddress(locationData);
+
+
+  }
+
+  Future<void> _convertCoordinatesToAddress(GeoPoint locationData) async {
+    var latitude = locationData.latitude;
+    var longitude = locationData.longitude;
+
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude, // Hier setzt du deine Latitude-Variable ein
+        longitude, // Hier setzt du deine Longitude-Variable ein
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark first = placemarks.first;
+        setState(() {
+          location = '${first.street}\n${first.locality}\n${first.country}';
+        });
+      } else {
+        setState(() {
+          location = 'No address found for the given coordinates';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        location = 'Error: $e';
+      });
+    }
   }
 
   String _formatDateTime(DateTime dateTime) {
