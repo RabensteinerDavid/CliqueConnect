@@ -13,6 +13,7 @@ import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'AuthGate.dart';
+import 'Calendar.dart';
 import 'CreateProfile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -414,6 +415,12 @@ void getImgUrl() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfile()));
               },
               child: Text('Create profile'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Calendar()));
+              },
+              child: Text('Create Calendar'),
             ),
           ],
         ),
