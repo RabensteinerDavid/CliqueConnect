@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/Event.dart';
+import 'package:test_clique_connect/components/EventHome.dart';
 import 'AuthGate.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -398,7 +399,8 @@ void getImgUrl() async {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Event()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Event(eventName: 'Tanzen', eventCategory: 'Creative',)));
+
               },
               child: Text('Go to Event'),
             ),
@@ -407,6 +409,12 @@ void getImgUrl() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddEventForm()));
               },
               child: Text('Add Event'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EventHome()));
+              },
+              child: Text('Go to Event Home'),
             ),
           ],
         ),
