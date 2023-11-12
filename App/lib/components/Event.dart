@@ -24,9 +24,12 @@ class _EventState extends State<Event> {
   String date = "";
   String description = "";
   String location = "";
-  Map<String, dynamic> users = {};
-  final List<dynamic> userNames = [];
-  User? user = FirebaseAuth.instance.currentUser;
+
+
+  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben
+  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
+  User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
+  String myUserName = ""; // Benutzername des aktuellen Benutzers
 
   String icon = "assets/cliqueConnect.png";
 
@@ -190,32 +193,57 @@ class _EventState extends State<Event> {
               },
               child: Icon(Icons.arrow_back),
             ),
-            SizedBox(height: 16.0), // Adjust the spacing as needed
+            SizedBox(height: 16.0),
+
             FloatingActionButton(
               onPressed: () {
-                // Logic für die Aktion beim Klicken auf den Button "Count me in"
-                _countMeIn(activityName, activityCategory);
+                // Überprüfe, ob der Benutzername bereits auf der Liste steht
+                if (userNames.contains(users["username"])) {
+                  // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
+                  _countMeOut();
+                } else {
+                  // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
+                  _countMeIn(activityName, activityCategory);
+                }
               },
-              child: Icon(Icons.check),
+              child: Icon(
+                (userNames.contains(myUserName))
+                    ? Icons.link_off // Benutzer steht auf der Liste
+                    : Icons.insert_link, // Benutzer steht nicht auf der Liste
+                color: Colors.white, // Icon-Farbe festlegen
+              ),
             ),
+
           ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
 
-  //TODO: Implementierung der Funktion _countMeIn
-
   void _countMeIn(String activityName, String activityCategory) async {
+    print("userNames: $userNames");
+    print("users['username']: ${users["username"]}");
+
+
+
     try {
       CollectionReference activitiesCollection =
       FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
-      print(userData["username"]);
+      print("Username: " + userData["username"]);
 
+      // Überprüfen, ob der Benutzername bereits auf der Liste steht
+      if (userNames.contains(userData["username"])) {
+        // Der Benutzer ist bereits auf der Liste
+        _countMeOut(); // Rufe hier deine Funktion auf
+        return;
+      }
+
+      // Füge den Benutzernamen zur Liste hinzu
       users.addEntries([MapEntry(userData["username"], true)]);
+
+      print(users);
 
       // Hier wird die Liste aktualisiert und ein neues State-Update ausgelöst
       setState(() {
@@ -236,6 +264,39 @@ class _EventState extends State<Event> {
     }
   }
 
+  void _countMeOut() async {
+    try {
+      CollectionReference activitiesCollection =
+      FirebaseFirestore.instance.collection('activities');
+
+      var userData = await firestore.collection('users').doc(user?.uid).get();
+      myUserName = userData["username"];
+      print("Username: " + userData["username"]);
+
+      // Überprüfen, ob der Benutzername auf der Liste steht
+      if (userNames.contains(userData["username"])) {
+        // Der Benutzer steht auf der Liste
+        setState(() {
+          userNames.remove(userData["username"]);
+          users[userData["username"]] = false;
+        });
+
+        // Schreiben Sie das aktualisierte Array zurück in die Datenbank
+        await activitiesCollection.doc(activityCategory).update({
+          activityName: eventList,
+        });
+
+        // Hier kannst du weitere Aktionen durchführen, z.B. eine Erfolgsmeldung anzeigen
+        print("Count me out erfolgreich!");
+      } else {
+        print("Der Benutzer steht nicht auf der Liste!");
+      }
+    } catch (e) {
+      // Fehlerbehandlung, falls etwas schief geht
+      print("Fehler beim Aktualisieren in der Datenbank: $e");
+    }
+  }
+
   Future<String?> getImageUrl(String imagePath) async {
     try {
       final Reference storageRef = FirebaseStorage.instance.ref(imagePath);
@@ -253,7 +314,6 @@ class _EventState extends State<Event> {
   }
 
   Future<void> getEvent(String eventName, String eventCategory) async {
-    print("Getting event--------------------------------------------------------------");
     final snapshot = await firestore.collection("activities").doc(eventCategory).get();
 
     if (snapshot.exists) {
