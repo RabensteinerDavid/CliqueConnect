@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:test_clique_connect/components/CreateProfile.dart';
 import 'Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,6 +35,14 @@ class _AuthGateState extends State<AuthGate> {
 
 // Save the counter value to persistent storage under the 'counter' key.
     return await prefs.setBool('isLoggedIn', true);
+  }
+
+  Future<bool?> isProfileCreated() async{
+    // Load and obtain the shared preferences for this app.
+    final prefs = await SharedPreferences.getInstance();
+
+// Save the counter value to persistent storage under the 'counter' key.
+    return prefs.getBool('profileIsCreated');
   }
 
   @override
@@ -305,9 +314,14 @@ class _AuthGateState extends State<AuthGate> {
         password: password,
       );
       await saveYourLogin();
+
+      if(await isProfileCreated() != true){
+        print("here");
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CreateProfile()));
+      }
+
       if (userCredential.user != null ) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-in.";
@@ -359,8 +373,16 @@ class _AuthGateState extends State<AuthGate> {
         password: password,
       );
       if (userCredential.user != null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        if(await isProfileCreated() != true){
+          await saveYourLogin();
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        }
+        else{
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => CreateProfile()));
+        }
+
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-up.";
