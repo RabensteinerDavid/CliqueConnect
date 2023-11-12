@@ -18,18 +18,27 @@ class _EventState extends State<Event> {
 
   _EventState({required this.imageURL});
 
+  List<dynamic> eventList = [];
+
   String title = "";
   String date = "";
   String description = "";
   String location = "";
+  Map<String, dynamic> users = {};
+  final List<dynamic> userNames = [];
+  User? user = FirebaseAuth.instance.currentUser;
+
   String icon = "assets/cliqueConnect.png";
+
+  String activityName = "Tanzen";
+  String activityCategory = "Creative";
 
   final firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    getEvent("Tanzen", "Creative");
+    getEvent(activityName, activityCategory);
     getImageUrl("events/zeichnen_banner.jpg");
   }
 
@@ -37,23 +46,35 @@ class _EventState extends State<Event> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.network(
-                  imageURL,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child; // Image is loaded
-                    } else if (loadingProgress.expectedTotalBytes == null) {
-                      return const Center(
-                        child: CircularProgressIndicator(), // Image is still loading
-                      );
-                    } else {
-                      // Image failed to load, show placeholder
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.network(
+                    imageURL,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child; // Image is loaded
+                      } else if (loadingProgress.expectedTotalBytes == null) {
+                        return const Center(
+                          child: CircularProgressIndicator(), // Image is still loading
+                        );
+                      } else {
+                        // Image failed to load, show placeholder
+                        return Center(
+                          child: Container(
+                            width: 400.0, // Width of the placeholder
+                            height: 254.0, // Height of the placeholder
+                            color: Colors.grey, // Color of the placeholder
+                          ),
+                        );
+                      }
+                    },
+                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                      // Error occurred while loading the image, show placeholder
                       return Center(
                         child: Container(
                           width: 400.0, // Width of the placeholder
@@ -61,107 +82,158 @@ class _EventState extends State<Event> {
                           color: Colors.grey, // Color of the placeholder
                         ),
                       );
-                    }
-                  },
-                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                    // Error occurred while loading the image, show placeholder
-                    return Center(
-                      child: Container(
-                        width: 400.0, // Width of the placeholder
-                        height: 254.0, // Height of the placeholder
-                        color: Colors.grey, // Color of the placeholder
-                      ),
-                    );
-                  },
-                ),
-                Positioned(
-                  top: 200,
-                  left: 20,
-
-                  child: Container(
-                    width: 100.0,
-                    height: 100.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xff26168C),
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 3.0,
-                      ),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: AssetImage(icon), // Asset image
+                    },
+                  ),
+                  Positioned(
+                    top: 200,
+                    left: 20,
+                    child: Container(
+                      width: 100.0,
+                      height: 100.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xff26168C),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 3.0,
+                        ),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(icon), // Asset image
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 30.0, right: 40.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Asap Condensed',
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.bold,
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 40.0, top: 30.0, right: 40.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Asap Condensed',
+                      fontSize: 45.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  date,
-                  style: TextStyle(
-                    fontFamily: 'Asap Condensed',
-                    fontSize: 20.0,
+              Padding(
+                padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    date,
+                    style: TextStyle(
+                      fontFamily: 'Asap Condensed',
+                      fontSize: 20.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  description,
-                  style: TextStyle(
-                    fontFamily: 'Asap Condensed',
-                    fontSize: 20.0,
+              Padding(
+                padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    description,
+                    style: TextStyle(
+                      fontFamily: 'Asap Condensed',
+                      fontSize: 20.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 40.0, top: 10.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  location,
-                  style: TextStyle(
-                    fontFamily: 'Asap Condensed',
-                    fontSize: 20.0,
+              Padding(
+                padding: EdgeInsets.only(left: 40.0, top: 10.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    location,
+                    style: TextStyle(
+                      fontFamily: 'Asap Condensed',
+                      fontSize: 20.0,
+                    ),
                   ),
                 ),
               ),
+              SizedBox(height: 20),
+              Text(
+                'List of User Names:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              // Display user names in a ListView
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: userNames.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(userNames[index]),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                // Logic for navigation to the start page
+                Navigator.pop(context);
+              },
+              child: Icon(Icons.arrow_back),
+            ),
+            SizedBox(height: 16.0), // Adjust the spacing as needed
+            FloatingActionButton(
+              onPressed: () {
+                // Logic für die Aktion beim Klicken auf den Button "Count me in"
+                _countMeIn(activityName, activityCategory);
+              },
+              child: Icon(Icons.check),
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Logic for navigation to the start page
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
+  }
+
+  //TODO: Implementierung der Funktion _countMeIn
+
+  void _countMeIn(String activityName, String activityCategory) async {
+    try {
+      CollectionReference activitiesCollection =
+      FirebaseFirestore.instance.collection('activities');
+
+      var userData = await firestore.collection('users').doc(user?.uid).get();
+      print(userData["username"]);
+
+      users.addEntries([MapEntry(userData["username"], true)]);
+
+      // Hier wird die Liste aktualisiert und ein neues State-Update ausgelöst
+      setState(() {
+        eventList[eventList.length - 1] = users;
+        userNames.add(userData["username"]);
+      });
+
+      // Schreiben Sie das aktualisierte Array zurück in die Datenbank
+      await activitiesCollection.doc(activityCategory).update({
+        activityName: eventList,
+      });
+
+      // Hier kannst du weitere Aktionen durchführen, z.B. eine Erfolgsmeldung anzeigen
+      print("Count me in erfolgreich!");
+    } catch (e) {
+      // Fehlerbehandlung, falls etwas schief geht
+      print("Fehler beim Hinzufügen zur Datenbank: $e");
+    }
   }
 
   Future<String?> getImageUrl(String imagePath) async {
@@ -184,19 +256,32 @@ class _EventState extends State<Event> {
     print("Getting event--------------------------------------------------------------");
     final snapshot = await firestore.collection("activities").doc(eventCategory).get();
 
-    print(snapshot.get(eventName));
+    if (snapshot.exists) {
+      eventList = snapshot.data()?[eventName] ?? [];
+      print(eventList);
 
-    title = snapshot.get(eventName)[0];
-    description = snapshot.get(eventName)[1];
-    Timestamp timestamp = snapshot.get(eventName)[2];
-    DateTime dateTime = timestamp.toDate();
-    date = _formatDateTime(dateTime);
+      if (eventList.isNotEmpty) {
+        title = eventList[0];
+        description = eventList[1];
+        Timestamp timestamp = eventList[2];
+        DateTime dateTime = timestamp.toDate();
+        date = _formatDateTime(dateTime);
 
-    GeoPoint locationData = snapshot.get(eventName)[4];
+        GeoPoint locationData = eventList[4];
+        _convertCoordinatesToAddress(locationData);
 
-    _convertCoordinatesToAddress(locationData);
+        users = eventList[5];
 
-
+        // Iteriere durch die Map und füge Benutzernamen hinzu, wenn der Wert true ist
+        users.forEach((userName, value) {
+          if (value == true) {
+            userNames.add(userName);
+          }
+        });
+      }
+    } else {
+      print("Document does not exist");
+    }
   }
 
   Future<void> _convertCoordinatesToAddress(GeoPoint locationData) async {
@@ -205,8 +290,8 @@ class _EventState extends State<Event> {
 
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
-        latitude, // Hier setzt du deine Latitude-Variable ein
-        longitude, // Hier setzt du deine Longitude-Variable ein
+        latitude,
+        longitude,
       );
 
       if (placemarks.isNotEmpty) {
@@ -237,7 +322,4 @@ class _EventState extends State<Event> {
   String _formatTime(DateTime dateTime) {
     return '${dateTime.hour}:${dateTime.minute}';
   }
-
-
-
 }
