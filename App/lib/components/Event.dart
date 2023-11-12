@@ -7,7 +7,12 @@ import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Event extends StatefulWidget {
-  const Event({Key? key}) : super(key: key);
+
+
+  const Event({Key? key, required this.eventCategory, required this.eventName}) : super(key: key);
+
+  final String eventCategory;
+  final String eventName;
 
   @override
   _EventState createState() => _EventState(imageURL: 'events/zeichnen_banner.jpg');
@@ -33,15 +38,17 @@ class _EventState extends State<Event> {
 
   String icon = "assets/cliqueConnect.png";
 
-  String activityName = "Tanzen";
-  String activityCategory = "Creative";
+  //String activityName = "Tanzen";
+  //String activityCategory = "Creative";
 
   final firestore = FirebaseFirestore.instance;
+
+
 
   @override
   void initState() {
     super.initState();
-    getEvent(activityName, activityCategory);
+    getEvent(widget.eventName, widget.eventCategory);
     getImageUrl("events/zeichnen_banner.jpg");
   }
 
@@ -203,7 +210,7 @@ class _EventState extends State<Event> {
                   _countMeOut();
                 } else {
                   // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
-                  _countMeIn(activityName, activityCategory);
+                  _countMeIn(widget.eventName, widget.eventCategory);
                 }
               },
               child: Icon(
@@ -252,8 +259,8 @@ class _EventState extends State<Event> {
       });
 
       // Schreiben Sie das aktualisierte Array zurück in die Datenbank
-      await activitiesCollection.doc(activityCategory).update({
-        activityName: eventList,
+      await activitiesCollection.doc(widget.eventCategory).update({
+        widget.eventName: eventList,
       });
 
       // Hier kannst du weitere Aktionen durchführen, z.B. eine Erfolgsmeldung anzeigen
@@ -282,8 +289,8 @@ class _EventState extends State<Event> {
         });
 
         // Schreiben Sie das aktualisierte Array zurück in die Datenbank
-        await activitiesCollection.doc(activityCategory).update({
-          activityName: eventList,
+        await activitiesCollection.doc(widget.eventCategory).update({
+          widget.eventName: eventList,
         });
 
         // Hier kannst du weitere Aktionen durchführen, z.B. eine Erfolgsmeldung anzeigen
