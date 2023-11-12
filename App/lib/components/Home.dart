@@ -14,6 +14,8 @@ import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'AuthGate.dart';
+import 'Calendar.dart';
+import 'CreateProfile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -415,6 +417,15 @@ void getImgUrl() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => EventHome()));
               },
               child: Text('Go to Event Home'),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfile()));
+              },
+              child: Text('Create profile'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarScreen()));
+              },
+              child: Text('Create Calendar'),
             ),
           ],
         ),
