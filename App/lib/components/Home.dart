@@ -401,26 +401,29 @@ void getImgUrl() async {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Event(eventName: 'Tanzen', eventCategory: 'Creative',)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Event(eventName: 'Tanzen', eventCategory: 'Creative',)));
 
               },
               child: Text('Go to Event'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddEventForm()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AddEventForm()));
               },
               child: Text('Add Event'),
             ),
             ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const EventHome()));
+              },
+              child: Text('Go To All Events'),
+              ),
+              ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => EventHome()));
-              },
-              child: Text('Go to Event Home'),
                 Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfile()));
-              },
-              child: Text('Create profile'),
-            ),
+                },
+                child: Text('Create Profile'),
+                ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarScreen()));
