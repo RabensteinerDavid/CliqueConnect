@@ -45,6 +45,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
     super.initState();
     getPositionActivity();
     _getCurrentPosition();
+    mapMarkers = [];
   }
 
   @override
