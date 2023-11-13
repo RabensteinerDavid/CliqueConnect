@@ -1,7 +1,9 @@
 import 'dart:ffi';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_clique_connect/components/CreateProfile.dart';
 import 'package:test_clique_connect/components/Home.dart';
 import 'package:video_player/video_player.dart';
 import 'AuthGate.dart';
@@ -34,8 +36,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<bool?> getYourLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    bool? storedPassword = prefs.getBool('isLoggedIn');
-    return storedPassword;
+    return prefs.getBool('isLoggedIn');
+  }
+
+  Future<bool?> isProfileCreated() async{
+    User? user = FirebaseAuth.instance.currentUser;
+    var userID = user?.uid;
+
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(userID!);
   }
 
   void _playVideo() async {
@@ -45,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // add delay until the video is complete
     await Future.delayed(const Duration(seconds: 2));
 
-    if(await getYourLogin() != null && await getYourLogin() == true){
+    if(await getYourLogin() == true && await isProfileCreated() == true){
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -53,7 +62,16 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     }
-    else{
+    else if(await getYourLogin() == true && await isProfileCreated() == null || await isProfileCreated() == false){
+      // Navigating to the AuthGate screen with a custom transition
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CreateProfile(),
+        ),
+      );
+    }
+   else if(await getYourLogin() == false && await isProfileCreated() == false){
       // Navigating to the AuthGate screen with a custom transition
       Navigator.pushReplacement(
         context,
@@ -61,6 +79,15 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (context) => AuthGate(),
         ),
       );
+    }
+    else{
+        // Navigating to the AuthGate screen with a custom transition
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AuthGate(),
+          ),
+        );
     }
 
   }

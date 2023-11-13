@@ -30,19 +30,16 @@ class _AuthGateState extends State<AuthGate> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<bool> saveYourLogin() async{
-    // Load and obtain the shared preferences for this app.
     final prefs = await SharedPreferences.getInstance();
-
-// Save the counter value to persistent storage under the 'counter' key.
     return await prefs.setBool('isLoggedIn', true);
   }
 
   Future<bool?> isProfileCreated() async{
-    // Load and obtain the shared preferences for this app.
-    final prefs = await SharedPreferences.getInstance();
+    User? user = FirebaseAuth.instance.currentUser;
+    var userID = user?.uid;
 
-// Save the counter value to persistent storage under the 'counter' key.
-    return prefs.getBool('profileIsCreated');
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(userID!);
   }
 
   @override
@@ -319,7 +316,6 @@ class _AuthGateState extends State<AuthGate> {
         print("here");
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CreateProfile()));
       }
-
       if (userCredential.user != null ) {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
@@ -373,8 +369,8 @@ class _AuthGateState extends State<AuthGate> {
         password: password,
       );
       if (userCredential.user != null) {
-        if(await isProfileCreated() != true){
-          await saveYourLogin();
+        await saveYourLogin();
+        if(await isProfileCreated() == true){
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomeScreen()));
         }
@@ -382,7 +378,6 @@ class _AuthGateState extends State<AuthGate> {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => CreateProfile()));
         }
-
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-up.";

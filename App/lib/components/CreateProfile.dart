@@ -17,12 +17,12 @@ import 'package:test_clique_connect/components/Home.dart';
 
 final filters = <String>{};
 
-Future<bool> profileIsCreated() async{
-  // Load and obtain the shared preferences for this app.
-  final prefs = await SharedPreferences.getInstance();
+Future<bool> profileIsCreated(bool state) async{
+  User? user = FirebaseAuth.instance.currentUser;
+  var userID = user?.uid;
 
-// Save the counter value to persistent storage under the 'counter' key.
-  return await prefs.setBool('profileIsCreated', true);
+  final prefs = await SharedPreferences.getInstance();
+  return await prefs.setBool(userID!, state);
 }
 
 class CreateProfile extends StatefulWidget {
@@ -55,6 +55,7 @@ class _EventState extends State<CreateProfile> {
   void initState() {
     super.initState();
     getUniversity();
+    profileIsCreated(false);
   }
 
   @override
@@ -359,7 +360,7 @@ class _EventState extends State<CreateProfile> {
           selectedStudyCourse = null;
           universityType = null;
         });
-        profileIsCreated();
+        profileIsCreated(true);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
 
       } catch (e) {
