@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../main.dart';
+
 class AddEventForm extends StatefulWidget {
   const AddEventForm({Key? key}) : super(key: key);
 
@@ -41,14 +43,17 @@ class _EventState extends State<AddEventForm> {
                   controller: activityNameController,
                   decoration: InputDecoration(labelText: 'Activity name'),
                 ),
+                const SizedBox(height: 12.0),
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(labelText: 'Description'),
                 ),
+                const SizedBox(height: 12.0),
                 TextField(
                   controller: _addressController,
                   decoration: InputDecoration(labelText: 'Enter an address'),
                 ),
+                const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
@@ -80,6 +85,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
@@ -115,6 +121,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
@@ -146,6 +153,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
@@ -181,6 +189,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12.0),
            /*     TextField(
                   controller: coordinatesController,
                   decoration: const InputDecoration(
@@ -206,9 +215,24 @@ class _EventState extends State<AddEventForm> {
                   decoration: const InputDecoration(labelText: 'Category'),
                 ),
                 const SizedBox(height: 16.0),
+
                 ElevatedButton(
                   onPressed: () => addCreativActivity(),
-                  child: const Text('Add Creativ Activity'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: MyApp.blueMain, // Text color
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    elevation: 3.0, // Elevation (shadow)
+                  ),
+                  child: const Text(
+                    'Add Creativ Activity',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),

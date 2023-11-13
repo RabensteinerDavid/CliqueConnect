@@ -15,33 +15,48 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  // Define your custom colors
+  static const Color blueMain = Color(0xff2e148C);
+  static const Color lilac = Color(0xff6059f0);
+  static const Color babyBlue = Color(0xffa7d5f2);
+  static const Color lightRose = Color(0xFFF199F2);
+  static const Color pinkMain = Color(0xFFEF3DF2);
+  static const Color black = Colors.black;
+  static const Color white = Colors.white;
+
+  static const Color greyDark = Color(0xffaca9bf);
+  static const Color greyMedium = Color(0xffdbd9e7);
+  static const Color greyLight = Color(0xEE2E148C);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Intro",
       theme: ThemeData(
         fontFamily: 'DINCondensed',
-        primarySwatch: const MaterialColor(0xff26168C, <int, Color>{
-          50: Color(0xff26168C),
-          100: Color(0xff26168C),
-          200: Color(0xff26168C),
-          300: Color(0xff26168C),
-          400: Color(0xff26168C),
-          500: Color(0xff26168C),
-          600: Color(0xff26168C),
-          700: Color(0xff26168C),
-          800: Color(0xff26168C),
-          900: Color(0xff26168C),
-        }), // Set your primary color
-        backgroundColor: const Color(0xff26168C), // Set the background color
+        backgroundColor: blueMain,
+        // Add more customizations with your colors
+        // For example:
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(color: black),
+          titleMedium: TextStyle(color: black),
+          titleSmall: TextStyle(color: black),
+          bodyLarge: TextStyle(color: black),
+          bodyMedium: TextStyle(color: black),
+          bodySmall: TextStyle(color: black),
+          displayLarge: TextStyle(color: black),
+          displayMedium: TextStyle(color: black),
+          displaySmall: TextStyle(color: black),
+          headlineLarge: TextStyle(color: black),
+          headlineMedium: TextStyle(color: black),
+          headlineSmall: TextStyle(color: black),
+          labelLarge: TextStyle(color: black),
+          labelMedium: TextStyle(color: black),
+          labelSmall: TextStyle(color: black),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
     );
   }
 }
-
-
-
-
-

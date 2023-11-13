@@ -14,8 +14,10 @@ import 'package:path/path.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/Home.dart';
+import 'package:test_clique_connect/main.dart';
 
 final filters = <String>{};
+
 
 Future<bool> profileIsCreated(bool state) async{
   User? user = FirebaseAuth.instance.currentUser;
@@ -51,6 +53,23 @@ class _EventState extends State<CreateProfile> {
   String? universityType;
   TextEditingController _addressController = TextEditingController();
 
+  FocusNode _nameFocus = FocusNode();
+  FocusNode _aboutFocus = FocusNode();
+  FocusNode _universityFocus = FocusNode();
+  FocusNode _courseFocus = FocusNode();
+
+
+// Add more focus nodes for other text fields if needed
+
+  Color _nameLabelColor = MyApp.greyDark;
+  Color _aboutLabelColor = MyApp.greyDark;
+  Color _universityLabelColor = MyApp.greyDark;
+  Color _courseLabelColor = MyApp.greyDark;
+
+
+  FocusNode? _lastFocused;
+// Add more variables for other label colors if needed
+
   @override
   void initState() {
     super.initState();
@@ -59,116 +78,263 @@ class _EventState extends State<CreateProfile> {
   }
 
   @override
+  void dispose() {
+    _nameFocus.dispose();
+    _aboutFocus.dispose();
+    _universityFocus.dispose();
+    _courseFocus.dispose();
+    // Dispose of other focus nodes if needed
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Your Screen Title'),
-      ),
-      body: Material(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(46.0, 60.0, 46.0, 60.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _showPicker(context);
-                  },
-                  child: CircleAvatar(
-                    radius: 55,
-                    backgroundColor: Color(0xff8179b4),
-                    child: _photo != null
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: Image.file(
-                        _photo!,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.fitHeight,
-                      ),
-                    )
-                        : Container(
+    return GestureDetector(
+      onTap: () {
+        // Close keyboard when tapping outside text fields
+        FocusScope.of(context).unfocus();
+
+        // Reset label colors
+        setState(() {
+          _nameLabelColor = MyApp.greyDark;
+          _aboutLabelColor = MyApp.greyDark;
+          _universityLabelColor = MyApp.greyDark;
+          _courseLabelColor = MyApp.greyDark;
+        });
+
+        // Set the last focused field to null
+        _lastFocused = null;
+      },
+      child: Scaffold(
+        body: Material(
+          child: SingleChildScrollView(
+            child: Stack(
+                children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  color: Color(0xFF2E148C),
+                ),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.08,
+                    left: MediaQuery.of(context).size.width * 0.1,
+                    right: MediaQuery.of(context).size.width * 0.1,
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.1,
                       decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(50)),
-                      width: 100,
-                      height: 100,
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.grey[800],
+                        image: DecorationImage(
+                          image: AssetImage('assets/cliqueConnect.png'),
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
-                ),
-                DropdownButtonFormField<String>(
-                  value: universityType,
-                  items: university != null
-                      ? university.map<DropdownMenuItem<String>>(
-                          (category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList()
-                      : [],
-                  onChanged: (value) {
-                    setState(() {
-                      universityType = value;
-                      selectedStudyCourse = null;
-                      getCourse();
-                    });
-                  },
-                  decoration: const InputDecoration(labelText: 'University'),
-                ),
-                DropdownButtonFormField<String>(
-                  value: selectedStudyCourse,
-                  items: course != null
-                      ? course.map<DropdownMenuItem<String>>(
-                          (category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList()
-                      : [],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedStudyCourse = value;
-                    });
-                  },
-                  decoration:
-                  const InputDecoration(labelText: 'Course of study'),
-                ),
-                TextField(
-                  controller: aboutController,
-                  decoration: const InputDecoration(labelText: 'About You'),
-                ),
-                const SizedBox(height: 16.0),
-                const Text(
-                  "Interests",
-                  style: TextStyle(
-                    fontSize: 26.0, // Adjust the font size as needed
-                    fontWeight: FontWeight.bold, // Apply bold style if desired
-                    color: Colors.black, // Adjust the color as needed
+                Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.5 - 65),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(46.0, 20.0, 46.0, 60.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: nameController,
+                              focusNode: _nameFocus,
+                              onTap: () {
+                                setState(() {
+                                  _nameLabelColor = MyApp.blueMain;
+                                  _aboutLabelColor = MyApp.greyDark;
+                                  _universityLabelColor = MyApp.greyDark;
+                                  _courseLabelColor = MyApp.greyDark;// Reset color for about
+                                  _lastFocused = _nameFocus;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Name',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                labelStyle: TextStyle(
+                                  color: _nameFocus.hasFocus ? MyApp.blueMain : _nameLabelColor,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20.0),
+                            DropdownButtonFormField<String>(
+                              value: universityType,
+                              items: university != null
+                                  ? university.map<DropdownMenuItem<String>>((category) {
+                                return DropdownMenuItem<String>(
+                                  value: category,
+                                  child: Text(category),
+                                );
+                              }).toList()
+                                  : [],
+                              onChanged: (value) {
+                                setState(() {
+                                  universityType = value;
+                                  selectedStudyCourse = null;
+                                  getCourse(); // Fetch courses based on the selected university
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  _universityLabelColor = MyApp.blueMain;
+                                  _nameLabelColor = MyApp.greyDark; // Reset color for name
+                                  _aboutLabelColor = MyApp.greyDark;
+                                  _courseLabelColor = MyApp.greyDark;// Reset color for about
+                                  _lastFocused = _universityFocus;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'University',
+                                hintText: 'Select your university',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                labelStyle: TextStyle(
+                                  color: _universityFocus.hasFocus ? MyApp.blueMain : _universityLabelColor,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20.0),
+                            DropdownButtonFormField<String>(
+                              value: selectedStudyCourse,
+                              items: course != null
+                                  ? course.map<DropdownMenuItem<String>>((category) {
+                                return DropdownMenuItem<String>(
+                                  value: category,
+                                  child: Text(category),
+                                );
+                              }).toList()
+                                  : [],
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedStudyCourse = value;
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  _courseLabelColor = MyApp.blueMain;// Reset color for about
+                                  _universityLabelColor = MyApp.greyDark;
+                                  _nameLabelColor = MyApp.greyDark; // Reset color for name
+                                  _aboutLabelColor = MyApp.greyDark;
+                                  _lastFocused = _courseFocus;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Course of study',
+                                hintText: 'Select your university',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                labelStyle: TextStyle(
+                                  color: _courseFocus.hasFocus ? MyApp.blueMain : _courseLabelColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                            TextField(
+                              controller: aboutController,
+                              focusNode: _aboutFocus,
+                              onTap: () {
+                                setState(() {
+                                  _aboutLabelColor = MyApp.blueMain;
+                                  _nameLabelColor = MyApp.greyDark;
+                                  _universityLabelColor = MyApp.greyDark;
+                                  _aboutLabelColor = MyApp.greyDark; // Reset color for name
+                                  _lastFocused = _aboutFocus;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'About You',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                labelStyle: TextStyle(
+                                  color: _aboutFocus.hasFocus ? MyApp.blueMain : _aboutLabelColor,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 22.0),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Interests",
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10.0),
+                            const Align(
+                              alignment: Alignment.center,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: FilterChipExample(),
+                              ),
+                            ),
+                            const SizedBox(height: 28.0),
+                            ElevatedButton(
+                              onPressed: () => savePictureToFirestore(context),
+                              style: ElevatedButton.styleFrom(
+                                primary: MyApp.blueMain, // Background color
+                                onPrimary: Colors.white, // Text color
+
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                elevation: 3.0, // Elevation (shadow)
+                              ),
+                              child: Text(
+                                'Create Account',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16.0),
-                const Align(
-                  alignment: Alignment.center,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: FilterChipExample(),
+                Positioned(
+                  top: MediaQuery.of(context).size.height * 0.3 - 75,
+                  left: MediaQuery.of(context).size.width * 0.5 - 80,
+                  child: GestureDetector(
+                    onTap: () {
+                      _showPicker(context);
+                    },
+                    child: CircleAvatar(
+                      radius: 80,
+                      backgroundColor: Color(0xff8179b4),
+                      child: _photo != null
+                          ? ClipRRect(
+                        borderRadius: BorderRadius.circular(500),
+                        child: Image.file(
+                          _photo!,
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.fitHeight,
+                        ),
+                      )
+                          : Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(500)),
+                        width: 150,
+                        height: 150,
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () => savePictureToFirestore(context),
-                  child: const Text('Create Account'),
                 ),
               ],
             ),
@@ -177,7 +343,6 @@ class _EventState extends State<CreateProfile> {
       ),
     );
   }
-
   void _showPicker(context) {
     showModalBottomSheet(
       context: context,
@@ -417,7 +582,10 @@ class _FilterChipExampleState extends State<FilterChipExample> {
 
       if (data.exists) {
         final activityList = data.data()!['activity'] as List<dynamic>;
-        final activities = activityList.map((dynamic item) => item.toString()).toList();
+        final activities = activityList
+            .where((activity) => activity != 'All' && activity != 'Archive')
+            .map((dynamic item) => item.toString())
+            .toList();
         return activities.join(',');
       } else {
         print("Document does not exist");
