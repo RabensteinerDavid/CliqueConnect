@@ -43,6 +43,10 @@ class _SplashScreenState extends State<SplashScreen> {
     User? user = FirebaseAuth.instance.currentUser;
     var userID = user?.uid;
 
+    if(userID == null){
+      return null;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(userID!);
   }
@@ -54,25 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // add delay until the video is complete
     await Future.delayed(const Duration(seconds: 2));
 
-    if(await getYourLogin() == true && await isProfileCreated() == true){
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ),
-      );
-    }
-    else if(await getYourLogin() == true && await isProfileCreated() == null || await isProfileCreated() == false){
-      // Navigating to the AuthGate screen with a custom transition
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CreateProfile(),
-        ),
-      );
-    }
-   else if(await getYourLogin() == false && await isProfileCreated() == false){
-      // Navigating to the AuthGate screen with a custom transition
+    if(await isProfileCreated() == null ){
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -81,6 +67,24 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     }
     else{
+      if(await getYourLogin() == true && await isProfileCreated() == true){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      }
+      else if(await getYourLogin() == true && await isProfileCreated() == false){
+        // Navigating to the AuthGate screen with a custom transition
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateProfile(),
+          ),
+        );
+      }
+      else if(await getYourLogin() == false && await isProfileCreated() == false){
         // Navigating to the AuthGate screen with a custom transition
         Navigator.pushReplacement(
           context,
@@ -88,7 +92,18 @@ class _SplashScreenState extends State<SplashScreen> {
             builder: (context) => AuthGate(),
           ),
         );
+      }
+      else{
+        // Navigating to the AuthGate screen with a custom transition
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AuthGate(),
+          ),
+        );
+      }
     }
+
 
   }
 
