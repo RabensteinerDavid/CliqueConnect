@@ -17,6 +17,7 @@ const MARKER_SIZE_EXPAND = 55.0;
 const MARKER_SIZE_SHRINK = 30.0;
 
 List<MapMarker> mapMarkers = [];
+final filters = <String>{};
 
 latlong.LatLng myCurrentLocation = const latlong.LatLng(0, 0);
 
@@ -66,9 +67,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
         querySnapshot.docs.forEach((activityDoc) {
           final activityName = activityDoc.id;
 
-          if (activityName == "Creative" || activityName == "Off Topic" || activityName == "Culinary"|| activityName == "Education"|| activityName == "Games"|| activityName == "Nightlife"|| activityName == "Sports") {
-            // Access the data directly using data() method
-            Map<String, dynamic> data = activityDoc.data();
+                Map<String, dynamic> data = activityDoc.data();
 
             data.forEach((key, value) {
               List<dynamic> alldata = List.from(data[key]);
@@ -77,6 +76,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
               final description = alldata[1];
               final location = alldata[4] as GeoPoint;
 
+              if (filters.contains(activityName)) {
               mapMarkers.add(
                 MapMarker(
                   image: 'assets/Marker.png',
@@ -89,8 +89,9 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                   description: description,
                 ),
               );
+              }
             });
-          }
+
         });
       });
     } else {
@@ -417,6 +418,91 @@ class FilterChipExample extends StatefulWidget {
   State<FilterChipExample> createState() => _FilterChipExampleState();
 }
 
+class _FilterChipExampleState extends State<FilterChipExample> {
+
+  Future<String?> getCatergoryActivities() async {
+    try {
+      final activitiesCollectionRef =
+      FirebaseFirestore.instance.collection("categoriesActivities");
+      final data = await activitiesCollectionRef.doc("category").get();
+
+      if (data.exists) {
+        final activityList = data.data()!['activity'] as List<dynamic>;
+        final activities = activityList
+            .where((activity) => activity != 'All' && activity != 'Archive')
+            .map((dynamic item) => item.toString())
+            .toList();
+        return activities.join(',');
+      } else {
+        print("Document does not exist");
+        return "";
+      }
+    } catch (e) {
+      print('Error retrieving data: $e');
+      return "";
+    }
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: getCatergoryActivities(),
+      builder: (context, snapshot) {
+
+
+        if (snapshot.hasError) {
+          // Return an error message if there's an error
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData) {
+          // Return an empty container if there's no data
+          return Container();
+        }
+
+        // Extract categories from the snapshot data
+        List<String> categories = snapshot.data!.split(',');
+
+        return Row(
+          children: categories.map((String category) {
+            return Row(
+              children: [
+                FilterChip(
+                  label: Text(category),
+                  selected: filters.contains(category),
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        filters.add(category);
+                      } else {
+                        filters.remove(category);
+                      }
+                    });
+                  },
+                ),
+                SizedBox(width: 4.0), // Add the desired spacing here
+              ],
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+
+
+
+/*
+class FilterChipExample extends StatefulWidget {
+  const FilterChipExample({Key? key});
+
+  @override
+  State<FilterChipExample> createState() => _FilterChipExampleState();
+}
+
 enum ExerciseFilter {
   all,
   volleyball,
@@ -456,6 +542,7 @@ class _FilterChipExampleState extends State<FilterChipExample> {
     );
   }
 }
+*/
 
 class _MyLocationMarker extends StatefulWidget {
   const _MyLocationMarker({Key? key}) : super(key: key);
