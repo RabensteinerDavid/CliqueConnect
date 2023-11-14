@@ -13,6 +13,7 @@ import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
+import 'package:test_clique_connect/components/ProfileView.dart';
 import 'AuthGate.dart';
 import 'Calendar.dart';
 import 'CreateProfile.dart';
@@ -25,7 +26,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   final TextEditingController _usernameController = TextEditingController();
   File? _photo;
   final ImagePicker _picker = ImagePicker();
@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error uploading file: $e');
     }
   }
-  static String imageURL = '';
+
 
 void getImgUrl() async {
   var userID = user?.uid;
@@ -135,7 +135,6 @@ void getImgUrl() async {
       final imageName = await data["image_data"];
 
       if (imageName != null) {
-        imageURL = imageName;
         print("Image Name: $imageName");
       }
       else {
@@ -150,7 +149,6 @@ void getImgUrl() async {
         final imageUrl = await storageRef.getDownloadURL();
 
         if (imageUrl != null) {
-          imageURL = imageUrl;
           print("Image URL: $imageUrl");
           // Now, you can use this URL to display the image in your app.
         } else {
@@ -260,56 +258,9 @@ void getImgUrl() async {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<ProfileScreen>(
-                  builder: (context) => ProfileScreen(
-                    appBar: AppBar(
-                      title: const Text('User Profile'),
-                    ),
-                    actions: [
-                      SignedOutAction((context) {
-                        Navigator.of(context).pop();
-                      }),
-                    ],
-                      children: [
-                        const Divider(),
-                        CircleAvatar(
-                          radius: 55,
-                          backgroundColor: Color(0xff8179b4),
-                          child: _photo != null
-                              ? ClipOval(
-                            child: Image.network(
-                              imageURL,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover, // Use 'cover' for best circular fit
-                            ),
-                          )
-                              : Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              shape: BoxShape.circle, // Use a circular shape for the container
-                            ),
-                            width: 100,
-                            height: 100,
-                            child: ClipOval(
-                              child: Image.network(
-                                imageURL,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover, // Use 'cover' for best circular fit
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            icon: const Icon(Icons.person), onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileView()));
+          },
           )
         ],
         automaticallyImplyLeading: false,
@@ -354,9 +305,7 @@ void getImgUrl() async {
             Column(
               children: [
                 // Other elements or widgets
-
                 const SizedBox(height: 36.0), // Add space above the TextField
-
                 SizedBox(
                   width: 250.0,
                   child: TextField(
@@ -376,14 +325,10 @@ void getImgUrl() async {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 36.0), // Add space below the TextField
-
                 // Other elements or widgets
               ],
             ),
-
-
             ElevatedButton(
               onPressed: saveDataToFirestore,
               child: const Text('Save Profile'),
@@ -402,7 +347,6 @@ void getImgUrl() async {
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const Event(eventName: 'Tanzen', eventCategory: 'Creative',)));
-
               },
               child: Text('Go to Event'),
             ),
