@@ -112,7 +112,7 @@ class _EventState extends State<CreateProfile> {
                 children: [
                 Container(
                   height: MediaQuery.of(context).size.height * 0.3,
-                  color: Color(0xFF2E148C),
+                  color: MyApp.blueMain,
                 ),
                   Positioned(
                     top: MediaQuery.of(context).size.height * 0.08,
@@ -120,7 +120,7 @@ class _EventState extends State<CreateProfile> {
                     right: MediaQuery.of(context).size.width * 0.1,
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.1,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage('assets/cliqueConnect.png'),
                           fit: BoxFit.contain,
