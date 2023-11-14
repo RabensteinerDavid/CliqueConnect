@@ -556,7 +556,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 40.0),
                 ElevatedButton(
                   onPressed: () => savePictureToFirestore(context),
                   style: ElevatedButton.styleFrom(
