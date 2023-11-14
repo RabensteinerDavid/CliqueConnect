@@ -6,12 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../main.dart';
 import 'package:path/path.dart';
-
-
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({Key? key}) : super(key: key);
@@ -24,19 +21,19 @@ class _EventState extends State<AddEventForm> {
 
   DateTime? startDate;
   DateTime? endDate;
-  //final TextEditingController coordinatesController = TextEditingController();
+
   var categories;
   String? selectedCategory;
-  TextEditingController _addressController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
-  FocusNode _nameFocus = FocusNode();
-  FocusNode _descriptionnFocuse = FocusNode();
-  FocusNode _addressFocus = FocusNode();
-  FocusNode _startDateFocus = FocusNode();
-  FocusNode _startTimeFocus = FocusNode();
-  FocusNode _endDateFocus = FocusNode();
-  FocusNode _endTimeFocus = FocusNode();
-  FocusNode _categoryFocus = FocusNode();
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _descriptionnFocuse = FocusNode();
+  final FocusNode _addressFocus = FocusNode();
+  final FocusNode _startDateFocus = FocusNode();
+  final FocusNode _startTimeFocus = FocusNode();
+  final FocusNode _endDateFocus = FocusNode();
+  final FocusNode _endTimeFocus = FocusNode();
+  final FocusNode _categoryFocus = FocusNode();
 
   Color _nameLabelColor = MyApp.greyDark;
   Color _descriptionlColor = MyApp.greyDark;
@@ -50,8 +47,6 @@ class _EventState extends State<AddEventForm> {
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-
-  FocusNode? _lastFocused;
 
   File? _photo;
   final ImagePicker _picker = ImagePicker();
@@ -98,7 +93,6 @@ class _EventState extends State<AddEventForm> {
       });
 
       // Set the last focused field to null
-      _lastFocused = null;
     },
     child: Scaffold(
       body: Material(
@@ -153,7 +147,6 @@ class _EventState extends State<AddEventForm> {
                 _endDateLabelColor = MyApp.greyDark;
                 _endTimeLabelColor = MyApp.greyDark;
                 _categoryLabelColor = MyApp.greyDark;
-                _lastFocused = _nameFocus;
                 });
                 },
                 decoration: InputDecoration(
@@ -165,10 +158,6 @@ class _EventState extends State<AddEventForm> {
                 ),
                 ),
                 ),
-                /*TextField(
-                  controller: activityNameController,
-                  decoration: InputDecoration(labelText: 'Activity name'),
-                ),*/
                 const SizedBox(height: 12.0),
                 TextField(
                   controller: descriptionController,
@@ -183,7 +172,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _descriptionnFocuse;
                     });
                   },
                   decoration: InputDecoration(
@@ -195,10 +183,6 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-            /*    TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(labelText: 'Description'),
-                ),*/
                 const SizedBox(height: 12.0),
                 TextField(
                   controller: _addressController,
@@ -213,7 +197,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _descriptionnFocuse;
                     });
                   },
                   decoration: InputDecoration(
@@ -225,65 +208,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-             /*   TextField(
-                  controller: _addressController,
-                  decoration: InputDecoration(labelText: 'Enter an address'),
-                ),*/
                 const SizedBox(height: 12.0),
-         /*       InkWell(
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null && pickedDate != startDate) {
-                      setState(() {
-                        startDate = pickedDate;
-                      });
-                    }
-                    FocusScope.of(context).requestFocus(_startDateFocus);
-
-                    // Update the color logic
-                    setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.blueMain; // Update to the desired color
-                      _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = MyApp.greyDark;
-                      _endTimeLabelColor = MyApp.greyDark;
-                      _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _categoryFocus;
-                    });
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'Start Date',
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startDateFocus.hasFocus ? MyApp.blueMain :  Colors.black54)),
-                      labelStyle: TextStyle(
-                        color: _startDateFocus.hasFocus ? MyApp.blueMain : _startDateLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          startDate != null
-                              ? "${startDate!.toLocal()}".split(' ')[0]
-                              : 'Select start date',
-                          style: const TextStyle(
-                            color: MyApp.black,
-                          ),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-
-                ),*/
                 InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showCupertinoModalPopup<DateTime>(
@@ -325,7 +250,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _categoryFocus;
                     });
                   },
                   child: InputDecorator(
@@ -353,37 +277,6 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-                /* InkWell(
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null && pickedDate != startDate) {
-                      setState(() {
-                        startDate = pickedDate;
-                      });
-                    }
-                  },
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Start Date',
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          startDate != null
-                              ? "${startDate!.toLocal()}".split(' ')[0]
-                              : 'Select start date',
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
@@ -437,7 +330,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _startTimeFocus;
                     });
                   },
                   child: InputDecorator(
@@ -465,99 +357,6 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-
-                /*     InkWell(
-                  onTap: () async {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (pickedTime != null && pickedTime != startDate) {
-                      setState(() {
-                        startDate = DateTime(
-                          startDate!.year,
-                          startDate!.month,
-                          startDate!.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
-                        );
-                      });
-                    }
-                    FocusScope.of(context).requestFocus(_startTimeFocus);
-
-                    // Update the color logic
-                    setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.blueMain; // Update to the desired color
-                      _endDateLabelColor = MyApp.greyDark;
-                      _endTimeLabelColor = MyApp.greyDark;
-                      _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _startTimeFocus;
-                    });
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'Start Time', // Update to 'Start Time'
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startTimeFocus.hasFocus ? MyApp.blueMain :  Colors.black54)),
-                      labelStyle: TextStyle(
-                        color: _startTimeFocus.hasFocus ? MyApp.blueMain : _startTimeLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          startDate != null
-                              ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select start time',
-                          style: const TextStyle(
-                            color: MyApp.black,
-                          ),
-                        ),
-                        const Icon(Icons.access_time),
-                      ],
-                    ),
-                  ),
-                ),*/
-                /* InkWell(
-                  onTap: () async {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (pickedTime != null && pickedTime != startDate) {
-                      setState(() {
-                        startDate = DateTime(
-                          startDate!.year,
-                          startDate!.month,
-                          startDate!.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
-                        );
-                      });
-                    }
-                  },
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Start Time',
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          startDate != null
-                              ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select start time',
-                        ),
-                        const Icon(Icons.access_time),
-                      ],
-                    ),
-                  ),
-                ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
@@ -602,7 +401,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.blueMain; // Update to the desired color
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _endDateFocus;
                     });
                   },
                   child: InputDecorator(
@@ -630,94 +428,6 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-
-                /* InkWell(
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null && pickedDate != endDate) {
-                      setState(() {
-                        endDate = pickedDate;
-                      });
-
-                      // Move the focus to the 'End Date' field after picking the date
-                      FocusScope.of(context).requestFocus(_endDateFocus);
-                    }
-
-                    // Update the color logic
-                    setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = MyApp.blueMain; // Update to the desired color
-                      _endTimeLabelColor = MyApp.greyDark;
-                      _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _endDateFocus;
-                    });
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'End Date',
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endDateFocus.hasFocus ? MyApp.blueMain :  Colors.black54)),
-                      labelStyle: TextStyle(
-                        color: _endDateFocus.hasFocus ? MyApp.blueMain : _endDateLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? "${endDate!.toLocal()}".split(' ')[0]
-                              : 'Select end date',
-                          style: const TextStyle(
-                            color: MyApp.black,
-                          ),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),
-*/
-                /* InkWell(
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null && pickedDate != endDate) {
-                      setState(() {
-                        endDate = pickedDate;
-                      });
-                    }
-                  },
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'End Date',
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? "${endDate!.toLocal()}".split(' ')[0]
-                              : 'Select end date',
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
@@ -771,7 +481,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.blueMain;
                       _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _endTimeFocus;
                     });
                   },
                   child: InputDecorator(
@@ -924,7 +633,6 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.blueMain;
-                      _lastFocused = _categoryFocus;
                     });
                   },
                   decoration: InputDecoration(

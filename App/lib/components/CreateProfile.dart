@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -11,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/Home.dart';
 import 'package:test_clique_connect/main.dart';
@@ -46,29 +43,20 @@ class _EventState extends State<CreateProfile> {
 
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 
-  //final TextEditingController coordinatesController = TextEditingController();
   var university;
   var course;
   String? selectedStudyCourse;
   String? universityType;
-  TextEditingController _addressController = TextEditingController();
 
-  FocusNode _nameFocus = FocusNode();
-  FocusNode _aboutFocus = FocusNode();
-  FocusNode _universityFocus = FocusNode();
-  FocusNode _courseFocus = FocusNode();
-
-
-// Add more focus nodes for other text fields if needed
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _aboutFocus = FocusNode();
+  final FocusNode _universityFocus = FocusNode();
+  final FocusNode _courseFocus = FocusNode();
 
   Color _nameLabelColor = MyApp.greyDark;
   Color _aboutLabelColor = MyApp.greyDark;
   Color _universityLabelColor = MyApp.greyDark;
   Color _courseLabelColor = MyApp.greyDark;
-
-
-  FocusNode? _lastFocused;
-// Add more variables for other label colors if needed
 
   @override
   void initState() {
@@ -83,7 +71,6 @@ class _EventState extends State<CreateProfile> {
     _aboutFocus.dispose();
     _universityFocus.dispose();
     _courseFocus.dispose();
-    // Dispose of other focus nodes if needed
     super.dispose();
   }
 
@@ -91,20 +78,15 @@ class _EventState extends State<CreateProfile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Close keyboard when tapping outside text fields
         FocusScope.of(context).unfocus();
 
-        // Reset label colors
         setState(() {
           _nameLabelColor = MyApp.greyDark;
           _aboutLabelColor = MyApp.greyDark;
           _universityLabelColor = MyApp.greyDark;
           _courseLabelColor = MyApp.greyDark;
         });
-
-        // Set the last focused field to null
-        _lastFocused = null;
-      },
+        },
       child: Scaffold(
         body: Material(
           child: SingleChildScrollView(
@@ -147,13 +129,12 @@ class _EventState extends State<CreateProfile> {
                                   _aboutLabelColor = MyApp.greyDark;
                                   _universityLabelColor = MyApp.greyDark;
                                   _courseLabelColor = MyApp.greyDark;// Reset color for about
-                                  _lastFocused = _nameFocus;
                                 });
                               },
                               decoration: InputDecoration(
                                 labelText: 'Name',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 labelStyle: TextStyle(
                                   color: _nameFocus.hasFocus ? MyApp.blueMain : _nameLabelColor,
                                 ),
@@ -184,20 +165,19 @@ class _EventState extends State<CreateProfile> {
                                   _nameLabelColor = MyApp.greyDark; // Reset color for name
                                   _aboutLabelColor = MyApp.greyDark;
                                   _courseLabelColor = MyApp.greyDark;// Reset color for about
-                                  _lastFocused = _universityFocus;
                                 });
                               },
                               decoration: InputDecoration(
                                 labelText: 'University',
                                 hintText: 'Select your university',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 labelStyle: TextStyle(
                                   color: _universityFocus.hasFocus ? MyApp.blueMain : _universityLabelColor,
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             DropdownButtonFormField<String>(
                               value: selectedStudyCourse,
                               items: course != null
@@ -219,14 +199,13 @@ class _EventState extends State<CreateProfile> {
                                   _universityLabelColor = MyApp.greyDark;
                                   _nameLabelColor = MyApp.greyDark; // Reset color for name
                                   _aboutLabelColor = MyApp.greyDark;
-                                  _lastFocused = _courseFocus;
                                 });
                               },
                               decoration: InputDecoration(
                                 labelText: 'Course of study',
                                 hintText: 'Select your university',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 labelStyle: TextStyle(
                                   color: _courseFocus.hasFocus ? MyApp.blueMain : _courseLabelColor,
                                 ),
@@ -242,13 +221,12 @@ class _EventState extends State<CreateProfile> {
                                   _nameLabelColor = MyApp.greyDark;
                                   _universityLabelColor = MyApp.greyDark;
                                   _aboutLabelColor = MyApp.greyDark; // Reset color for name
-                                  _lastFocused = _aboutFocus;
                                 });
                               },
                               decoration: InputDecoration(
                                 labelText: 'About You',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 labelStyle: TextStyle(
                                   color: _aboutFocus.hasFocus ? MyApp.blueMain : _aboutLabelColor,
                                 ),
@@ -287,7 +265,7 @@ class _EventState extends State<CreateProfile> {
                                 ),
                                 elevation: 3.0, // Elevation (shadow)
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Create Account',
                                 style: TextStyle(
                                   fontSize: 18.0,
@@ -295,7 +273,6 @@ class _EventState extends State<CreateProfile> {
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
@@ -311,7 +288,7 @@ class _EventState extends State<CreateProfile> {
                     },
                     child: CircleAvatar(
                       radius: 80,
-                      backgroundColor: Color(0xff8179b4),
+                      backgroundColor: const Color(0xff8179b4),
                       child: _photo != null
                           ? ClipRRect(
                         borderRadius: BorderRadius.circular(500),
