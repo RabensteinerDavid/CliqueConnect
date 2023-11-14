@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +28,7 @@ class _EventState extends State<AddEventForm> {
   final TextEditingController _addressController = TextEditingController();
 
   final FocusNode _nameFocus = FocusNode();
-  final FocusNode _descriptionnFocuse = FocusNode();
+  final FocusNode _descriptionFocuse = FocusNode();
   final FocusNode _addressFocus = FocusNode();
   final FocusNode _startDateFocus = FocusNode();
   final FocusNode _startTimeFocus = FocusNode();
@@ -43,6 +44,11 @@ class _EventState extends State<AddEventForm> {
   Color _endDateLabelColor = MyApp.greyDark;
   Color _endTimeLabelColor = MyApp.greyDark;
   Color _categoryLabelColor = MyApp.greyDark;
+
+  bool _startDateText = false;
+  bool _startTimeText = false;
+  bool _endDateText = false;
+  bool _endTimeText = false;
 
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -61,7 +67,7 @@ class _EventState extends State<AddEventForm> {
   @override
   void dispose() {
     _nameFocus.dispose();
-    _descriptionnFocuse.dispose();
+    _descriptionFocuse.dispose();
     _addressFocus.dispose();
     _startDateFocus.dispose();
     _startTimeFocus.dispose();
@@ -161,7 +167,7 @@ class _EventState extends State<AddEventForm> {
                 const SizedBox(height: 12.0),
                 TextField(
                   controller: descriptionController,
-                  focusNode: _descriptionnFocuse,
+                  focusNode: _descriptionFocuse,
                   onTap: () {
                     setState(() {
                       _nameLabelColor = MyApp.greyDark;
@@ -179,7 +185,7 @@ class _EventState extends State<AddEventForm> {
                     border: const OutlineInputBorder(),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                     labelStyle: TextStyle(
-                      color: _descriptionnFocuse.hasFocus ? MyApp.blueMain : _descriptionlColor,
+                      color: _descriptionFocuse.hasFocus ? MyApp.blueMain : _descriptionlColor,
                     ),
                   ),
                 ),
@@ -226,6 +232,8 @@ class _EventState extends State<AddEventForm> {
                               if (newDate != null && newDate != startDate) {
                                 setState(() {
                                   startDate = newDate;
+
+                                _startDateText = true;
                                 });
                               }
                             },
@@ -268,8 +276,8 @@ class _EventState extends State<AddEventForm> {
                           startDate != null
                               ? "${startDate!.toLocal()}".split(' ')[0]
                               : 'Select start date',
-                          style: const TextStyle(
-                            color: MyApp.black,
+                          style: TextStyle(
+                            color: _startDateText ? MyApp.black : _startDateLabelColor,
                           ),
                         ),
                         const Icon(Icons.calendar_today),
@@ -293,6 +301,7 @@ class _EventState extends State<AddEventForm> {
                             onDateTimeChanged: (DateTime newTime) {
                               if (newTime != null && newTime != startDate) {
                                 setState(() {
+                                  _startTimeText = true;
                                   startDate = DateTime(
                                     startDate!.year,
                                     startDate!.month,
@@ -348,8 +357,8 @@ class _EventState extends State<AddEventForm> {
                           startDate != null
                               ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
                               : 'Select start time',
-                          style: const TextStyle(
-                            color: MyApp.black,
+                          style: TextStyle(
+                            color:_startTimeText ? MyApp.black: _startTimeLabelColor,
                           ),
                         ),
                         const Icon(Icons.access_time),
@@ -364,7 +373,7 @@ class _EventState extends State<AddEventForm> {
                       context: context,
                       builder: (context) {
                         return Container(
-                          color: Colors.white, // Set the background color to white
+                          color: Colors.white,
                           height: 200.0,
                           child: CupertinoDatePicker(
                             mode: CupertinoDatePickerMode.date,
@@ -375,6 +384,7 @@ class _EventState extends State<AddEventForm> {
                               if (newDate != null && newDate != endDate) {
                                 setState(() {
                                   endDate = newDate;
+                                  _endDateText = true; // Update the variable for 'End Date'
                                 });
                               }
                             },
@@ -386,10 +396,8 @@ class _EventState extends State<AddEventForm> {
                       setState(() {
                         endDate = pickedDate;
                       });
-
-                      // Move the focus to the 'End Date' field after picking the date
-                      FocusScope.of(context).requestFocus(_endDateFocus);
                     }
+                    FocusScope.of(context).requestFocus(_endDateFocus);
 
                     // Update the color logic
                     setState(() {
@@ -398,7 +406,7 @@ class _EventState extends State<AddEventForm> {
                       _addressLabelColor = MyApp.greyDark;
                       _startDateLabelColor = MyApp.greyDark;
                       _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = MyApp.blueMain; // Update to the desired color
+                      _endDateLabelColor = _endDateText ? MyApp.blueMain : MyApp.greyDark; // Update based on the variable
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
                     });
@@ -419,8 +427,8 @@ class _EventState extends State<AddEventForm> {
                           endDate != null
                               ? "${endDate!.toLocal()}".split(' ')[0]
                               : 'Select end date',
-                          style: const TextStyle(
-                            color: MyApp.black,
+                          style: TextStyle(
+                            color: _endDateText ? MyApp.black : _endDateLabelColor,
                           ),
                         ),
                         const Icon(Icons.calendar_today),
@@ -428,6 +436,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 12.0),
                 InkWell(
                   onTap: () async {
@@ -443,6 +452,7 @@ class _EventState extends State<AddEventForm> {
                             use24hFormat: true,
                             onDateTimeChanged: (DateTime newDateTime) {
                               if (newDateTime != null && newDateTime != endDate) {
+                                _endDateText = true;
                                 setState(() {
                                   endDate = DateTime(
                                     endDate!.year,
@@ -499,8 +509,8 @@ class _EventState extends State<AddEventForm> {
                           endDate != null
                               ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
                               : 'Select end time',
-                          style: const TextStyle(
-                            color: MyApp.black,
+                          style: TextStyle(
+                            color: _endDateText ? MyApp.black : _endTimeLabelColor,
                           ),
                         ),
                         const Icon(Icons.access_time),
@@ -508,106 +518,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-
-                /* InkWell(
-                  onTap: () async {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (pickedTime != null && pickedTime != endDate) {
-                      setState(() {
-                        endDate = DateTime(
-                          endDate!.year,
-                          endDate!.month,
-                          endDate!.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
-                        );
-                      });
-                    }
-
-                    FocusScope.of(context).requestFocus(_endTimeFocus);
-                    // Update the color logic
-                    setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = MyApp.greyDark;
-                      _endTimeLabelColor = MyApp.blueMain;
-                      _categoryLabelColor = MyApp.greyDark;
-                      _lastFocused = _endTimeFocus;
-                    });
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'End Time',
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endTimeFocus.hasFocus ? MyApp.blueMain :  Colors.black54)),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      labelStyle: TextStyle(
-                        color: _endTimeFocus.hasFocus ? MyApp.blueMain : _endTimeLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select end time',
-                          style: const TextStyle(
-                            color: MyApp.black,
-                          ),
-                        ),
-                        const Icon(Icons.access_time),
-                      ],
-                    ),
-                  ),
-                ),*/
-
-                /*   InkWell(
-                  onTap: () async {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (pickedTime != null && pickedTime != endDate) {
-                      setState(() {
-                        endDate = DateTime(
-                          endDate!.year,
-                          endDate!.month,
-                          endDate!.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
-                        );
-                      });
-                    }
-                  },
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'End Time',
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select end time',
-                        ),
-                        const Icon(Icons.access_time),
-                      ],
-                    ),
-                  ),
-                ),*/
                 const SizedBox(height: 12.0),
-           /*     TextField(
-                  controller: coordinatesController,
-                  decoration: const InputDecoration(
-                      labelText: 'Coordinates (e.g., 48.36611, 14.51646)'),
-                ),*/
                 DropdownButtonFormField<String>(
                   value: selectedCategory,
                   items: categories != null
@@ -645,29 +556,9 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-                // Dropdown for selecting category
-               /* DropdownButtonFormField<String>(
-                  value: selectedCategory,
-                  items: categories != null
-                      ? categories.map<DropdownMenuItem<String>>(
-                          (category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList()
-                      : [],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCategory = value;
-                    });
-                  },
-                  decoration: const InputDecoration(labelText: 'Category'),
-                ),*/
                 const SizedBox(height: 16.0),
-
                 ElevatedButton(
-                  onPressed: () => addCreativActivity(),
+                  onPressed: () => savePictureToFirestore(context),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white, backgroundColor: MyApp.blueMain, // Text color
 
@@ -689,13 +580,13 @@ class _EventState extends State<AddEventForm> {
           ),
                 Positioned(
                   top: MediaQuery.of(context).size.height * 0.3 - 75,
-                  left: MediaQuery.of(context).size.width * 0.5 - 125,
+                  left: MediaQuery.of(context).size.width * 0.5 - 100,
                   child: GestureDetector(
                     onTap: () {
                       _showPicker(context);
                     },
                     child: Container(
-                      width: 250,
+                      width: 200,
                       height: 150,
                       decoration: BoxDecoration(
                         color: const Color(0xff8179b4),
@@ -771,14 +662,14 @@ class _EventState extends State<AddEventForm> {
       CroppedFile? cropped = await ImageCropper().cropImage(
           sourcePath: imageFile!.path,
           maxHeight: 400,
-          maxWidth: 400,
-          aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
+          maxWidth: 500,
+          aspectRatio: const CropAspectRatio(ratioX: 4.0, ratioY: 3.0),
           aspectRatioPresets:
           [
-            CropAspectRatioPreset.square,
+            //CropAspectRatioPreset.square,
             //CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.original,
-            //CropAspectRatioPreset.ratio4x3,
+            //CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
             //CropAspectRatioPreset.ratio16x9
           ],
 
@@ -897,11 +788,95 @@ class _EventState extends State<AddEventForm> {
     return result;
   }
 
-  Future<void> addCreativActivity() async {
+  void savePictureToFirestore(context) async {
+    String nameActivity = activityNameController.text;
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (nameActivity.isNotEmpty) {
+      if (_photo != null) {
+        final path = 'events/${user?.uid}/${basename("${nameActivity}_${basename(_photo!.path)}")}';
+        final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
+        var uploadTask = ref.putFile(_photo!);
+        final snapshot = await uploadTask!.whenComplete(() {});
+        final urlDownload = await snapshot.ref.getDownloadURL();
+        await addCreativActivity(urlDownload, context);
+      } else {
+        // Display an error message if the photo is not selected
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a photo.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      // Display an error message if the photo is not selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a name activity.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+
+  Future<void> addCreativActivity(String urlDownload, context) async {
+    // Check if any required field is empty or null
+    if (activityNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a name for the activity.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    if (descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a description for the activity.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    if (startDate == null || endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select both start and end dates for the activity.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     await _convertAddressToCoordinates();
 
-    CollectionReference creativCollection =
-    FirebaseFirestore.instance.collection('activities');
+    if (_result.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter an address for the activity.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    if (urlDownload == null || urlDownload.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: Image URL is null or empty.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+
+
+    CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
 
     String newActivity = activityNameController.text;
     try {
@@ -915,22 +890,24 @@ class _EventState extends State<AddEventForm> {
             double.parse(extractNumbers(_result.split(',')[0].trim())),
             double.parse(extractNumbers(_result.split(',')[1].trim())),
           ),
+          urlDownload,
         ],
       });
       print('Creativ activity added successfully!');
       // Clear the text fields after adding the entry
       activityNameController.clear();
       descriptionController.clear();
-      //coordinatesController.clear();
       _addressController.clear();
       setState(() {
         startDate = null;
         endDate = null;
         selectedCategory = null;
+        _photo = null;
       });
     } catch (e) {
       print('Error adding creativ activity: $e');
     }
   }
+
 }
 
