@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart';
@@ -229,7 +230,7 @@ class _EventState extends State<AddEventForm> {
                   decoration: InputDecoration(labelText: 'Enter an address'),
                 ),*/
                 const SizedBox(height: 12.0),
-                InkWell(
+         /*       InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,
@@ -282,8 +283,76 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
 
-                ),
+                ),*/
+                InkWell(
+                  onTap: () async {
+                    DateTime? pickedDate = await showCupertinoModalPopup<DateTime>(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          color: Colors.white, // Set the background color to white
+                          height: 200.0,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: DateTime.now(),
+                            minimumDate: null,
+                            maximumDate: DateTime(2101),
+                            onDateTimeChanged: (DateTime newDate) {
+                              if (newDate != null && newDate != startDate) {
+                                setState(() {
+                                  startDate = newDate;
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    );
+                    if (pickedDate != null && pickedDate != startDate) {
+                      setState(() {
+                        startDate = pickedDate;
+                      });
+                    }
+                    FocusScope.of(context).requestFocus(_startDateFocus);
 
+                    // Update the color logic
+                    setState(() {
+                      _nameLabelColor = MyApp.greyDark;
+                      _descriptionlColor = MyApp.greyDark;
+                      _addressLabelColor = MyApp.greyDark;
+                      _startDateLabelColor = MyApp.blueMain;
+                      _startTimeLabelColor = MyApp.greyDark;
+                      _endDateLabelColor = MyApp.greyDark;
+                      _endTimeLabelColor = MyApp.greyDark;
+                      _categoryLabelColor = MyApp.greyDark;
+                      _lastFocused = _categoryFocus;
+                    });
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Start Date',
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      labelStyle: TextStyle(
+                        color: _startDateFocus.hasFocus ? MyApp.blueMain : _startDateLabelColor,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          startDate != null
+                              ? "${startDate!.toLocal()}".split(' ')[0]
+                              : 'Select start date',
+                          style: const TextStyle(
+                            color: MyApp.black,
+                          ),
+                        ),
+                        const Icon(Icons.calendar_today),
+                      ],
+                    ),
+                  ),
+                ),
                 /* InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
@@ -317,6 +386,87 @@ class _EventState extends State<AddEventForm> {
                 ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
+                  onTap: () async {
+                    TimeOfDay? pickedTime = await showCupertinoModalPopup<TimeOfDay>(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          color: Colors.white, // Set the background color to white
+                          height: 200.0,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.time,
+                            initialDateTime: DateTime.now(),
+                            use24hFormat: true,
+                            onDateTimeChanged: (DateTime newTime) {
+                              if (newTime != null && newTime != startDate) {
+                                setState(() {
+                                  startDate = DateTime(
+                                    startDate!.year,
+                                    startDate!.month,
+                                    startDate!.day,
+                                    newTime.hour,
+                                    newTime.minute,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    );
+                    if (pickedTime != null && pickedTime != startDate) {
+                      setState(() {
+                        startDate = DateTime(
+                          startDate!.year,
+                          startDate!.month,
+                          startDate!.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
+                      });
+                    }
+                    FocusScope.of(context).requestFocus(_startTimeFocus);
+
+                    // Update the color logic
+                    setState(() {
+                      _nameLabelColor = MyApp.greyDark;
+                      _descriptionlColor = MyApp.greyDark;
+                      _addressLabelColor = MyApp.greyDark;
+                      _startDateLabelColor = MyApp.greyDark;
+                      _startTimeLabelColor = MyApp.blueMain; // Update to the desired color
+                      _endDateLabelColor = MyApp.greyDark;
+                      _endTimeLabelColor = MyApp.greyDark;
+                      _categoryLabelColor = MyApp.greyDark;
+                      _lastFocused = _startTimeFocus;
+                    });
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Start Time', // Update to 'Start Time'
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      labelStyle: TextStyle(
+                        color: _startTimeFocus.hasFocus ? MyApp.blueMain : _startTimeLabelColor,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          startDate != null
+                              ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
+                              : 'Select start time',
+                          style: const TextStyle(
+                            color: MyApp.black,
+                          ),
+                        ),
+                        const Icon(Icons.access_time),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /*     InkWell(
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -372,7 +522,7 @@ class _EventState extends State<AddEventForm> {
                       ],
                     ),
                   ),
-                ),
+                ),*/
                 /* InkWell(
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
@@ -410,6 +560,78 @@ class _EventState extends State<AddEventForm> {
                 ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
+                  onTap: () async {
+                    DateTime? pickedDate = await showCupertinoModalPopup<DateTime>(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          color: Colors.white, // Set the background color to white
+                          height: 200.0,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: DateTime.now(),
+                            minimumDate: null,
+                            maximumDate: DateTime(2101),
+                            onDateTimeChanged: (DateTime newDate) {
+                              if (newDate != null && newDate != endDate) {
+                                setState(() {
+                                  endDate = newDate;
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    );
+                    if (pickedDate != null && pickedDate != endDate) {
+                      setState(() {
+                        endDate = pickedDate;
+                      });
+
+                      // Move the focus to the 'End Date' field after picking the date
+                      FocusScope.of(context).requestFocus(_endDateFocus);
+                    }
+
+                    // Update the color logic
+                    setState(() {
+                      _nameLabelColor = MyApp.greyDark;
+                      _descriptionlColor = MyApp.greyDark;
+                      _addressLabelColor = MyApp.greyDark;
+                      _startDateLabelColor = MyApp.greyDark;
+                      _startTimeLabelColor = MyApp.greyDark;
+                      _endDateLabelColor = MyApp.blueMain; // Update to the desired color
+                      _endTimeLabelColor = MyApp.greyDark;
+                      _categoryLabelColor = MyApp.greyDark;
+                      _lastFocused = _endDateFocus;
+                    });
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'End Date',
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      labelStyle: TextStyle(
+                        color: _endDateFocus.hasFocus ? MyApp.blueMain : _endDateLabelColor,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          endDate != null
+                              ? "${endDate!.toLocal()}".split(' ')[0]
+                              : 'Select end date',
+                          style: const TextStyle(
+                            color: MyApp.black,
+                          ),
+                        ),
+                        const Icon(Icons.calendar_today),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /* InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,
@@ -464,7 +686,7 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-
+*/
                 /* InkWell(
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
@@ -498,6 +720,87 @@ class _EventState extends State<AddEventForm> {
                 ),*/
                 const SizedBox(height: 12.0),
                 InkWell(
+                  onTap: () async {
+                    TimeOfDay? pickedTime = await showCupertinoModalPopup<TimeOfDay>(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          color: Colors.white, // Set the background color to white
+                          height: 200.0,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.time,
+                            initialDateTime: DateTime.now(),
+                            use24hFormat: true,
+                            onDateTimeChanged: (DateTime newDateTime) {
+                              if (newDateTime != null && newDateTime != endDate) {
+                                setState(() {
+                                  endDate = DateTime(
+                                    endDate!.year,
+                                    endDate!.month,
+                                    endDate!.day,
+                                    newDateTime.hour,
+                                    newDateTime.minute,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    );
+                    if (pickedTime != null && pickedTime != endDate) {
+                      setState(() {
+                        endDate = DateTime(
+                          endDate!.year,
+                          endDate!.month,
+                          endDate!.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
+                      });
+                    }
+
+                    FocusScope.of(context).requestFocus(_endTimeFocus);
+                    // Update the color logic
+                    setState(() {
+                      _nameLabelColor = MyApp.greyDark;
+                      _descriptionlColor = MyApp.greyDark;
+                      _addressLabelColor = MyApp.greyDark;
+                      _startDateLabelColor = MyApp.greyDark;
+                      _startTimeLabelColor = MyApp.greyDark;
+                      _endDateLabelColor = MyApp.greyDark;
+                      _endTimeLabelColor = MyApp.blueMain;
+                      _categoryLabelColor = MyApp.greyDark;
+                      _lastFocused = _endTimeFocus;
+                    });
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'End Time',
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                      labelStyle: TextStyle(
+                        color: _endTimeFocus.hasFocus ? MyApp.blueMain : _endTimeLabelColor,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          endDate != null
+                              ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
+                              : 'Select end time',
+                          style: const TextStyle(
+                            color: MyApp.black,
+                          ),
+                        ),
+                        const Icon(Icons.access_time),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /* InkWell(
                   onTap: () async {
                     TimeOfDay? pickedTime = await showTimePicker(
                       context: context,
@@ -553,7 +856,7 @@ class _EventState extends State<AddEventForm> {
                       ],
                     ),
                   ),
-                ),
+                ),*/
 
                 /*   InkWell(
                   onTap: () async {
@@ -922,3 +1225,4 @@ class _EventState extends State<AddEventForm> {
     }
   }
 }
+
