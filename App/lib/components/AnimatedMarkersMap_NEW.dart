@@ -33,6 +33,14 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
   @override
   void initState() {
     super.initState();
+    _updateMarkers();
+  }
+
+  void _updateMarkers() async {
+    final markers = await getMarkersAsFuture();
+    setState(() {
+      _markers = markers;
+    });
   }
 
   @override
@@ -85,19 +93,24 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
           if (nameActivity.toString().contains("Volleyball")) {
             imagePic = 'assets/Volleyball.png';
           }
-          _markers.add(
-            MapMarker(
-              image: imagePic,
-              title: nameActivity,
-              address: address,
-              location: latlong.LatLng(location.latitude, location.longitude),
-              start: now,
-              end: now,
-              description: description,
-            ),
-          );
+
+          // Check if the activityName is in the selected filters
+          if (filters.isEmpty || filters.contains(activityName)) {
+            _markers.add(
+              MapMarker(
+                image: imagePic,
+                title: nameActivity,
+                address: address,
+                location: latlong.LatLng(location.latitude, location.longitude),
+                start: now,
+                end: now,
+                description: description,
+              ),
+            );
+          }
         }
       }
+
       return _markers;
     } else {
       print("User ID is null. Make sure the user is authenticated.");
@@ -116,7 +129,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
               if (positionSnapshot.hasData) {
                 final userPosition = positionSnapshot.data;
                 return FutureBuilder<List<MapMarker>>(
-                  future: getMarkersAsFuture(), // Corrected method name
+                  future: getMarkersAsFuture(),
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
                       List<MapMarker> markers = markersSnapshot.data ?? [];
