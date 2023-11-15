@@ -6,16 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 
+//TODO 1. Clique Connect Button in der Mitte will einfach nicht über das Titelbild schaun
+//TODO 2. Ich schaffs nicht, die Profilbilder der Connecteten leute anzeigen zu lassen
+
+//TODO Das, dass sich der connect button umwandelt, wenn man ihn klickt, mach ich noch
+
 class Event extends StatefulWidget {
-
-
-  const Event({Key? key, required this.eventCategory, required this.eventName}) : super(key: key);
+  const Event({Key? key, required this.eventCategory, required this.eventName})
+      : super(key: key);
 
   final String eventCategory;
   final String eventName;
 
   @override
-  _EventState createState() => _EventState(imageURL: 'events/zeichnen_banner.jpg');
+  _EventState createState() =>
+      _EventState(imageURL: 'events/zeichnen_banner.jpg');
 }
 
 class _EventState extends State<Event> {
@@ -30,20 +35,16 @@ class _EventState extends State<Event> {
   String description = "";
   String location = "";
 
-
-  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben
-  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
+  Map<String, dynamic> users =
+      {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben
+  final List<dynamic> userNames =
+      []; // Liste für Benutzernamen --> zum Anzeigen
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
 
   String icon = "assets/cliqueConnect.png";
 
-  //String activityName = "Tanzen";
-  //String activityCategory = "Creative";
-
   final firestore = FirebaseFirestore.instance;
-
-
 
   @override
   void initState() {
@@ -55,6 +56,10 @@ class _EventState extends State<Event> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily:
+            'DINCondensed', // Hier die gewünschte Standard-Schriftart angeben
+      ),
       home: Scaffold(
         body: SingleChildScrollView(
           child: Column(
@@ -65,12 +70,14 @@ class _EventState extends State<Event> {
                 children: [
                   Image.network(
                     imageURL,
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
                         return child; // Image is loaded
                       } else if (loadingProgress.expectedTotalBytes == null) {
                         return const Center(
-                          child: CircularProgressIndicator(), // Image is still loading
+                          child:
+                              CircularProgressIndicator(), // Image is still loading
                         );
                       } else {
                         // Image failed to load, show placeholder
@@ -83,98 +90,123 @@ class _EventState extends State<Event> {
                         );
                       }
                     },
-                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    errorBuilder: (BuildContext context, Object error,
+                        StackTrace? stackTrace) {
                       // Error occurred while loading the image, show placeholder
                       return Center(
                         child: Container(
                           width: 400.0, // Width of the placeholder
                           height: 254.0, // Height of the placeholder
-                          color: Colors.grey, // Color of the placeholder
+                          color: Colors.grey, // Color of the placeholder,
                         ),
                       );
                     },
                   ),
-                  Positioned(
-                    top: 200,
-                    left: 20,
-                    child: Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xff26168C),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3.0,
-                        ),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: AssetImage(icon), // Asset image
+                ],
+              ),
+
+              //CliqueConnect Button middle-right
+              //TODO Ich habs leider nicht geschafft, dass er über das Titelbild steht... :(
+              Align(
+                alignment: Alignment.topRight, // Adjust alignment as needed
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                  // Adjust padding as needed
+                  child: Positioned(
+                    child: GestureDetector(
+                      onTap: () {
+                        //TODO navigate to the stories site, if stories are available
+                        // Handle button click action here
+                        print("Button Clicked!");
+                      },
+                      child: Container(
+                        width: 100.0,
+                        height: 100.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xff26168C),
+                          border: Border.all(
+                            color: Colors.pink,
+                            width: 3.0,
+                          ),
+                          image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: AssetImage(icon), // Asset image
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
+
               Padding(
-                padding: EdgeInsets.only(left: 40.0, top: 30.0, right: 40.0),
+                padding: EdgeInsets.only(left: 25.0, top: 0.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     title,
-                    style: TextStyle(
-                      fontFamily: 'Asap Condensed',
-                      fontSize: 45.0,
-                      fontWeight: FontWeight.bold,
+                    style: const TextStyle(
+                      fontSize: 35.0,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
+                padding: EdgeInsets.only(left: 25.0, top: 20.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     date,
-                    style: TextStyle(
-                      fontFamily: 'Asap Condensed',
-                      fontSize: 20.0,
+                    style: const TextStyle(
+                      fontSize: 17.0,
+                      fontFamily: 'DINNextLtPro',
                     ),
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 40.0, top: 10.0, right: 40.0),
+                padding: EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     description,
-                    style: TextStyle(
-                      fontFamily: 'Asap Condensed',
-                      fontSize: 20.0,
+                    style: const TextStyle(
+                      fontSize: 17.0,
+                      fontFamily: 'DINNextLtPro',
                     ),
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 40.0, top: 10.0),
+                padding: EdgeInsets.only(left: 25.0, top: 20.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     location,
-                    style: TextStyle(
-                      fontFamily: 'Asap Condensed',
-                      fontSize: 20.0,
+                    style: const TextStyle(
+                      fontSize: 17.0,
+                      fontFamily: 'DINNextLtPro',
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
-                'List of User Names:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+
+              SizedBox(height: 10, width: 10),
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 25.0, top: 40.0),
+                  child: Text(
+                    'Participants:',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontFamily: 'DINNextLtPro',
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2E148C),
+                    ),
+                  ),
                 ),
               ),
               // Display user names in a ListView
@@ -182,60 +214,152 @@ class _EventState extends State<Event> {
                 shrinkWrap: true,
                 itemCount: userNames.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(userNames[index]),
+                  String username = userNames[index];
+                  String imageUrl =
+                      ""; // Retrieve this dynamically using getImageUrl
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          username,
+                          style: const TextStyle(
+                            color: Color(0xFF2E148C), // Set the text color
+                          ),
+                        ),
+                        leading: Image.network(
+                          imageUrl,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      if (index < userNames.length - 1)
+                        Divider(color: Colors.black12, thickness: 0.5),
+                    ],
                   );
                 },
               ),
             ],
           ),
         ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+        floatingActionButton: Row(
           children: [
-            FloatingActionButton(
-              onPressed: () {
-                // Logic for navigation to the start page
-                Navigator.pop(context);
-              },
-              child: Icon(Icons.arrow_back),
-            ),
-            SizedBox(height: 16.0),
+            Stack(
+              children: [
+                // Back button upper left-corner
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(30.0, 40.0, 0.0, 0.0),
+                    // Adjust padding as needed
+                    child: SizedBox(
+                      width: 36.0, // Adjust width as needed
+                      height: 36.0, // Adjust height as needed
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          // Logic for navigation to the start page
+                          Navigator.pop(context);
+                        },
+                        backgroundColor: Colors.transparent,
+                        // Set background color to transparent
+                        elevation: 0,
+                        // Remove elevation
+                        child: const Icon(
+                          Icons.arrow_back,
+                          size: 20.0,
+                          color: Color(0xFF2E148C),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
-            FloatingActionButton(
-              onPressed: () {
-                // Überprüfe, ob der Benutzername bereits auf der Liste steht
-                if (userNames.contains(users["username"])) {
-                  // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
-                  _countMeOut();
-                } else {
-                  // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
-                  _countMeIn(widget.eventName, widget.eventCategory);
-                }
-              },
-              child: Icon(
-                (userNames.contains(myUserName))
-                    ? Icons.link_off // Benutzer steht auf der Liste
-                    : Icons.insert_link, // Benutzer steht nicht auf der Liste
-                color: Colors.white, // Icon-Farbe festlegen
-              ),
+                //connect button bottom right-corner
+                Align(
+                  alignment: Alignment.bottomRight,
+                  // Align to the bottom right corner
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(315, 20, 20, 20),
+                    // Adjust padding as needed
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        // Überprüfe, ob der Benutzername bereits auf der Liste steht
+                        if (userNames.contains(users["username"])) {
+                          // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
+                          _countMeOut();
+                        } else {
+                          // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
+                          _countMeIn(widget.eventName, widget.eventCategory);
+                        }
+                      },
+                      backgroundColor: Colors.pink,
+                      elevation: 0,
+                      child: Icon(
+                        (userNames.contains(myUserName))
+                            ? Icons.link_off
+                            : Icons.insert_link,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-
           ],
         ),
       ),
     );
   }
 
+//TODO: getImageUrl von Home kopieren und anpassen
+//TODO  HELP!!!! Ich schaffs nicht, dass die Profilbilder angezeigt werden... :(
+
+  void getImgUrl() async {
+    var userID = user?.uid;
+
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final imageName = await data["image_data"];
+
+        if (imageName != null) {
+          imageURL = imageName;
+          print("Image Name: $imageName");
+        } else {
+          print("Image Name not found in the document.");
+        }
+      } else {
+        print("Document not found for user with ID: $userID");
+        final Reference storageRef =
+            FirebaseStorage.instance.ref('files/cliqueConnect.png');
+
+        try {
+          final imageUrl = await storageRef.getDownloadURL();
+
+          if (imageUrl != null) {
+            imageURL = imageUrl;
+            print("Image URL: $imageUrl");
+            // Now, you can use this URL to display the image in your app.
+          } else {
+            print("Image URL not found.");
+          }
+        } catch (e) {
+          print("Error retrieving image URL: $e");
+        }
+      }
+    }
+  }
+
   void _countMeIn(String activityName, String activityCategory) async {
     print("userNames: $userNames");
     print("users['username']: ${users["username"]}");
 
-
-
     try {
       CollectionReference activitiesCollection =
-      FirebaseFirestore.instance.collection('activities');
+          FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
       print("Username: " + userData["username"]);
@@ -274,7 +398,7 @@ class _EventState extends State<Event> {
   void _countMeOut() async {
     try {
       CollectionReference activitiesCollection =
-      FirebaseFirestore.instance.collection('activities');
+          FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
       myUserName = userData["username"];
@@ -321,7 +445,8 @@ class _EventState extends State<Event> {
   }
 
   Future<void> getEvent(String eventName, String eventCategory) async {
-    final snapshot = await firestore.collection("activities").doc(eventCategory).get();
+    final snapshot =
+        await firestore.collection("activities").doc(eventCategory).get();
 
     if (snapshot.exists) {
       eventList = snapshot.data()?[eventName] ?? [];
