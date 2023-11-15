@@ -129,7 +129,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
               if (positionSnapshot.hasData) {
                 final userPosition = positionSnapshot.data;
                 return FutureBuilder<List<MapMarker>>(
-                  future: getMarkersAsFuture(),
+                  future: getMarkersAsFuture(), // Corrected method name
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
                       List<MapMarker> markers = markersSnapshot.data ?? [];
