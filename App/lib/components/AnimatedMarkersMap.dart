@@ -90,9 +90,9 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
             data.forEach((key, value) async {
               List<dynamic> alldata = List.from(data[key]);
 
-              final nameActivity = alldata[0];
-              final description = alldata[1];
-              final location = alldata[4] as GeoPoint;
+              final nameActivity = await alldata[0];
+              final description = await alldata[1];
+              final location = await alldata[4] as GeoPoint;
 
               var address = await _convertAddressToCoordinates(location);
 
