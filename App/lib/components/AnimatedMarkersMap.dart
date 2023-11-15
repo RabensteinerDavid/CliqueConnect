@@ -7,6 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 
+import '../main.dart';
 import '../shema/MapMarker.dart';
 
 // Replace with your Mapbox access token
@@ -56,6 +57,23 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
     mapMarkers = [];
   }
 
+  Future<String> _convertAddressToCoordinates(GeoPoint location) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          location.latitude, location.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark first = placemarks.first;
+
+          return'${first.street}, ${first.locality}, ${first.administrativeArea}';
+      } else {
+          return 'No address found for the given coordinates';
+      }
+    } catch (e) {
+        return 'Error: $e';
+    }
+  }
+
   void getPositionActivity() async {
     final userID = user?.uid;
 
@@ -69,26 +87,35 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
 
                 Map<String, dynamic> data = activityDoc.data();
 
-            data.forEach((key, value) {
+            data.forEach((key, value) async {
               List<dynamic> alldata = List.from(data[key]);
-              // Print the elements of the "dungeon_group" array
+
               final nameActivity = alldata[0];
               final description = alldata[1];
               final location = alldata[4] as GeoPoint;
 
+              var address = await _convertAddressToCoordinates(location);
+
+              var imagePic = 'assets/Marker.png';
+              if(nameActivity.toString().contains("Volleyball")){
+                imagePic = 'assets/Volleyball.png';
+              }
+
               if (filters.contains(activityName)) {
-              mapMarkers.add(
-                MapMarker(
-                  image: 'assets/Marker.png',
-                  title: nameActivity,
-                  address: 'He',
-                  location: latlong.LatLng(
-                      location.latitude, location.longitude),
-                  start: now,
-                  end: now,
-                  description: description,
-                ),
-              );
+                setState(() {
+                  mapMarkers.add(
+                    MapMarker(
+                      image: imagePic,
+                      title: nameActivity,
+                      address: address,
+                      location: latlong.LatLng(
+                          location.latitude, location.longitude),
+                      start: now,
+                      end: now,
+                      description: description,
+                    ),
+                  );
+                });
               }
             });
 
@@ -141,8 +168,6 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
     }).catchError((e) {
       debugPrint(e.toString());
     });
-
-
   }
 
   Future<void> _getAddressFromLatLng(Position position) async {
@@ -179,7 +204,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                   isCardVisible = true;
                   selectedCardIndex = i; // Update the selected card index
                 });
-                if (_pageController != null && _pageController.hasClients) {
+                if (_pageController.hasClients) {
                   _pageController.animateToPage(
                     i,
                     duration: const Duration(milliseconds: 500),
@@ -199,15 +224,6 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("AnimatedMarker"),
-        actions: [
-          IconButton(
-            onPressed: () => null,
-            icon: const Icon(Icons.filter_alt_outlined),
-          )
-        ],
-      ),
       body: Stack(
         children: [
           GestureDetector(
@@ -239,7 +255,8 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: latlong.LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+                      point: latlong.LatLng(_currentPosition!.latitude,
+                          _currentPosition!.longitude),
                       builder: (_) {
                         return const _MyLocationMarker();
                       },
@@ -254,11 +271,49 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                 : const Center(child: CircularProgressIndicator()),
           ),
 
+          // New Header Design
+          Container(
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.18,
+            color: MyApp.blueMain,
+          ),
+          Positioned(
+            top: MediaQuery
+                .of(context)
+                .size
+                .height * 0.07,
+            left: MediaQuery
+                .of(context)
+                .size
+                .width * 0.08,
+            right: MediaQuery
+                .of(context)
+                .size
+                .width * 0.1,
+            child: Container(
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.08,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/cliqueConnect.png'),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+
           Positioned(
             bottom: 30,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.3,
             child: Visibility(
               visible: isCardVisible,
               child: PageView.builder(
@@ -272,7 +327,8 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                     pageController: _pageController,
                     onCardSwiped: (int index) {
                       setState(() {
-                        selectedCardIndex = index; // Update the selected card index
+                        selectedCardIndex =
+                            index; // Update the selected card index
                       });
                     },
                   );
@@ -280,14 +336,15 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
               ),
             ),
           ),
+
           const Positioned(
-            top: 10,
+            top: 160,
             left: 10,
             right: 10,
             child: Opacity(
               opacity: 0.7,
               child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal, // Ändern Sie die Richtung auf horizontal
+                scrollDirection: Axis.horizontal,
                 child: FilterChipExample(),
               ),
             ),
@@ -295,11 +352,9 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
         ],
       ),
     );
-  }
-}
+  }}
 
-
-class _MapItemDetails extends StatefulWidget {
+  class _MapItemDetails extends StatefulWidget {
   const _MapItemDetails({
     Key? key,
     required this.mapMarker,
@@ -365,30 +420,53 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
         }
       },
 
-      child: Card(
-        color: Colors.white,
-        margin: const EdgeInsets.all(16.0),
-        child: Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  widget.mapMarker.image,
-                  width: 100,
-                  height: 100,
+      child:
+      Stack(
+        children: [
+          // Positioned widget for the Card
+          Positioned(
+            child: Card(
+              color: Colors.white,
+              margin: const EdgeInsets.all(50.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0.0), // Set the radius to 0 for sharp corners
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(35.0, 20.0, 10.0, 20.0), // Add left padding of 10
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.mapMarker.title,
+                        style: const TextStyle(
+                          fontSize: 34, // Adjust the font size as needed
+                          fontWeight: FontWeight.bold, // You can adjust the font weight as well
+                        ),
+                      ),
+                      Text(widget.mapMarker.description),
+                      Text("Address: ${widget.mapMarker.address}"),
+                     /* Text('Current Index: ${widget.currentIndex}'),*/
+                    ],
+                  ),
                 ),
-                Text(widget.mapMarker.title),
-                Text(widget.mapMarker.description),
-                Text("Adress: "+widget.mapMarker.address),
-                Text('Current Index: ${widget.currentIndex}'),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+
+          // Positioned widget for the image in the foreground
+          Positioned(
+            top: 18, // Adjust the top position as needed
+            left: 18, // Adjust the left position as needed
+            child: Image.asset(
+              widget.mapMarker.image,
+              width: 70,
+              height: 70,
+            ),
+          ),
+        ],
+      )
     );
   }
 }
@@ -443,26 +521,20 @@ class _FilterChipExampleState extends State<FilterChipExample> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
       future: getCatergoryActivities(),
       builder: (context, snapshot) {
 
-
         if (snapshot.hasError) {
-          // Return an error message if there's an error
           return Text('Error: ${snapshot.error}');
         }
 
         if (!snapshot.hasData) {
-          // Return an empty container if there's no data
           return Container();
         }
 
-        // Extract categories from the snapshot data
         List<String> categories = snapshot.data!.split(',');
 
         return Row(
@@ -482,7 +554,7 @@ class _FilterChipExampleState extends State<FilterChipExample> {
                     });
                   },
                 ),
-                SizedBox(width: 4.0), // Add the desired spacing here
+                const SizedBox(width: 4.0), // Add the desired spacing here
               ],
             );
           }).toList(),
@@ -491,58 +563,6 @@ class _FilterChipExampleState extends State<FilterChipExample> {
     );
   }
 }
-
-
-
-
-/*
-class FilterChipExample extends StatefulWidget {
-  const FilterChipExample({Key? key});
-
-  @override
-  State<FilterChipExample> createState() => _FilterChipExampleState();
-}
-
-enum ExerciseFilter {
-  all,
-  volleyball,
-  soccer,
-  cycling,
-  hiking,
-  sport,
-  playing,
-}
-
-class _FilterChipExampleState extends State<FilterChipExample> {
-  final filters = <ExerciseFilter>{};
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: ExerciseFilter.values.map((ExerciseFilter exercise) {
-        return Row(
-          children: [
-            FilterChip(
-              label: Text(exercise.toString().split('.').last),
-              selected: filters.contains(exercise),
-              onSelected: (bool selected) {
-                setState(() {
-                  if (selected) {
-                    filters.add(exercise);
-                  } else {
-                    filters.remove(exercise);
-                  }
-                });
-              },
-            ),
-            SizedBox(width: 4.0), // Fügen Sie hier den gewünschten Abstand ein
-          ],
-        );
-      }).toList(),
-    );
-  }
-}
-*/
 
 class _MyLocationMarker extends StatefulWidget {
   const _MyLocationMarker({Key? key}) : super(key: key);

@@ -94,6 +94,7 @@ flutter:
     - assets/cliqueConnect.png
     - assets/intro.mp4
     - assets/Marker.png
+    - assets/Volleyball.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
