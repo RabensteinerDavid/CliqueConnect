@@ -9,6 +9,7 @@ class MapMarker {
   final Timestamp end;
   final String address;
   final LatLng location; // Assuming LatLng is from the 'latlong2' package
+  final String category;
 
   MapMarker({
     required this.image,
@@ -18,5 +19,6 @@ class MapMarker {
     required this.description,
     required this.address,
     required this.location,
+    required this.category,
   });
 }
