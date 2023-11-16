@@ -17,7 +17,7 @@ const MARKER_COLOR = Color(0xFF3DC5A7);
 const MARKER_SIZE_EXPAND = 55.0;
 const MARKER_SIZE_SHRINK = 30.0;
 
-final filters = <String>{};
+final List<String> filters = [];
 late List<MapMarker> _markers = [];
 
 class AnimatedMarkersMap_NEW extends StatefulWidget {
@@ -38,6 +38,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
   void _updateMarkers() async {
     final markers = await getMarkersAsFuture();
+    print('Markers from getMarkersAsFuture: $markers');
     setState(() {
       _markers = markers;
     });
@@ -70,6 +71,9 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     final firestore = FirebaseFirestore.instance;
     final userID = user?.uid;
 
+    final locationIndex = 4; // or whatever index location has in your alldata list
+
+
     if (userID != null) {
       final activitiesCollectionRef = firestore.collection("activities");
 
@@ -83,30 +87,37 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
         for (final key in data.keys) {
           List<dynamic> alldata = List.from(data[key]);
 
-          final nameActivity = await alldata[0];
-          final description = await alldata[1];
-          final location = await alldata[4] as GeoPoint;
+          if (alldata.length > locationIndex) { // Check if the list has enough elements
+            final nameActivity = await alldata[0];
+            final description = await alldata[1];
+            final location = await alldata[locationIndex];
+            var catergory = "";
+            if (alldata.length > 6) {
+              catergory = await alldata[6];
+            }
 
-          var address = await _convertAddressToCoordinates(location);
+            if (location != null && location is GeoPoint) {
+              var address = await _convertAddressToCoordinates(location);
 
-          var imagePic = 'assets/Marker.png';
-          if (nameActivity.toString().contains("Volleyball")) {
-            imagePic = 'assets/Volleyball.png';
-          }
+              var imagePic = 'assets/Marker.png';
+              if (nameActivity.toString().contains("Volleyball")) {
+                imagePic = 'assets/Volleyball.png';
+              }
 
-          // Check if the activityName is in the selected filters
-          if (filters.isEmpty || filters.contains(activityName)) {
-            _markers.add(
-              MapMarker(
-                image: imagePic,
-                title: nameActivity,
-                address: address,
-                location: latlong.LatLng(location.latitude, location.longitude),
-                start: now,
-                end: now,
-                description: description,
-              ),
-            );
+                _markers.add(
+                  MapMarker(
+                    image: imagePic,
+                    title: nameActivity,
+                    address: address,
+                    location: latlong.LatLng(location.latitude, location.longitude),
+                    start: now,
+                    end: now,
+                    description: description,
+                    category: catergory,
+                  ),
+                );
+
+            }
           }
         }
       }
@@ -118,8 +129,25 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     }
   }
 
+  List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
+    return markers.map((marker) {
+      return Marker(
+        point: marker.location,
+        builder: (BuildContext context) {
+          return YourCustomMarkerWidget(marker);
+        },
+      );
+    }).toList();
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    final filterMarkers = _markers.where((marker) {
+      print(filters.contains(marker.category));
+      return filters.isEmpty || filters.contains(marker.category);
+    });
+
     return Scaffold(
       body: Stack(
         children: [
@@ -152,14 +180,14 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                           ),
                           MarkerLayer(
                             markers: [
-                              ..._markers.map((marker) {
+                         /*     ..._markers.map((marker) {
                                 return Marker(
                                   point: marker.location,
                                   builder: (BuildContext context) {
                                     return YourCustomMarkerWidget(marker);
                                   },
                                 );
-                              }).toList(),
+                              }).toList(),*/
                               Marker(
                                 point: latlong.LatLng(userPosition.latitude, userPosition.longitude),
                                 builder: (_) {
@@ -167,6 +195,9 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                                 },
                               ),
                             ],
+                          ),
+                          MarkerLayer(
+                            markers: _buildMarkersWithFilter(filterMarkers),
                           ),
                         ],
                       );
@@ -197,7 +228,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             top: 160,
             left: 10,
             right: 10,
@@ -205,7 +236,43 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
               opacity: 0.7,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: FilterChipExample(),
+                child: FutureBuilder<String?>(
+                  future: getCatergoryActivities(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+
+                    if (!snapshot.hasData) {
+                      return Container();
+                    }
+
+                    List<String> categories = snapshot.data!.split(',');
+
+                    return Row(
+                      children: categories.map((String category) {
+                        return Row(
+                          children: [
+                            FilterChip(
+                              label: Text(category),
+                              selected: filters.contains(category),
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  if (mounted && selected) {
+                                    filters.add(category);
+                                  } else {
+                                    filters.remove(category);
+                                  }
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 4.0),
+                          ],
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -213,16 +280,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
       ),
     );
   }
-}
 
-class FilterChipExample extends StatefulWidget {
-  const FilterChipExample({Key? key}) : super(key: key);
-
-  @override
-  State<FilterChipExample> createState() => _FilterChipExampleState();
-}
-
-class _FilterChipExampleState extends State<FilterChipExample> {
   Future<String?> getCatergoryActivities() async {
     try {
       final activitiesCollectionRef = FirebaseFirestore.instance.collection("categoriesActivities");
@@ -243,47 +301,6 @@ class _FilterChipExampleState extends State<FilterChipExample> {
       print('Error retrieving data: $e');
       return "";
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: getCatergoryActivities(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        if (!snapshot.hasData) {
-          return Container();
-        }
-
-        List<String> categories = snapshot.data!.split(',');
-
-        return Row(
-          children: categories.map((String category) {
-            return Row(
-              children: [
-                FilterChip(
-                  label: Text(category),
-                  selected: filters.contains(category),
-                  onSelected: (bool selected) {
-                    setState(() {
-                      if (mounted && selected) {
-                        filters.add(category);
-                      } else {
-                        filters.remove(category);
-                      }
-                    });
-                  },
-                ),
-                const SizedBox(width: 4.0), // Add the desired spacing here
-              ],
-            );
-          }).toList(),
-        );
-      },
-    );
   }
 }
 
