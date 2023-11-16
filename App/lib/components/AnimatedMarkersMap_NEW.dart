@@ -331,8 +331,10 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                                 setState(() {
                                   if (mounted && selected) {
                                     filtersCategory.add(category);
+                                    isCardVisible = false;
                                   } else {
                                     filtersCategory.remove(category);
+                                    isCardVisible = false;
                                   }
                                   _updateFilteredMarkers(); // Update filtered markers when filters change
                                 });
