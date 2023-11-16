@@ -37,10 +37,13 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
   int selectedCardIndex = 0;
 
+  late Future<List<MapMarker>> _markersFuture;
+
   @override
   void initState() {
     super.initState();
     _updateMarkers();
+    _markersFuture = getMarkersAsFuture();
     mapMarkers = [];
   }
 
@@ -181,21 +184,22 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
             builder: (context, positionSnapshot) {
               if (positionSnapshot.hasData) {
                 final userPosition = positionSnapshot.data;
+
                 return FutureBuilder<List<MapMarker>>(
-                  future: getMarkersAsFuture(), // Corrected method name
+                  future: _markersFuture,
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
                       List<MapMarker> markers = markersSnapshot.data ?? [];
                       return FlutterMap(
                         mapController: mapController,
                         options: MapOptions(
-                      /*    onTap: (tapPosition, point) {
+                          onTap: (tapPosition, point) {
                             if (tapPosition != Marker) {
                               setState(() {
                                 isCardVisible = false;
                               });
                             }
-                          },*/
+                          },
                           minZoom: 1,
                           maxZoom: 19,
                           zoom: 18,
