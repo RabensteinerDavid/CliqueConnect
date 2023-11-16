@@ -51,7 +51,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     final markers = await getMarkersAsFuture();
     print('Markers from getMarkersAsFuture: $markers');
     setState(() {
-      _markers = markers;
+      //_markers = markers;
       mapMarkers = List.from(markers); // Update mapMarkers as well
     });
   }
@@ -81,16 +81,17 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
   }
 
   Future<List<MapMarker>> getMarkersAsFuture() async {
-    _markers.clear();
     final firestore = FirebaseFirestore.instance;
     final userID = user?.uid;
-
 
     if (userID != null) {
       final activitiesCollectionRef = firestore.collection("activities");
 
       final querySnapshot = await activitiesCollectionRef.get();
       final now = Timestamp.now();
+
+      // Use a map to track markers by title
+      Map<String, MapMarker> uniqueMarkers = {};
 
       for (final activityDoc in querySnapshot.docs) {
         final activityName = activityDoc.id;
@@ -99,40 +100,47 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
         for (final key in data.keys) {
           List<dynamic> alldata = List.from(data[key]);
 
-            final nameActivity = await alldata[0];
-            final description = await alldata[1];
-            final location = await alldata[4];
-            var catergory = "";
-            if (alldata.length > 6) {
-              catergory = await alldata[6];
-            }
+          final nameActivity = await alldata[0];
+          final description = await alldata[1];
+          final location = await alldata[4];
+          var catergory = "";
 
-            if (location != null && location is GeoPoint) {
-              var address = await _convertAddressToCoordinates(location);
-
-              var imagePic = 'assets/Marker.png';
-              if (nameActivity.toString().contains("Volleyball")) {
-                imagePic = 'assets/Volleyball.png';
-              }
-
-                _markers.add(
-                  MapMarker(
-                    image: imagePic,
-                    title: nameActivity,
-                    address: address,
-                    location: latlong.LatLng(location.latitude, location.longitude),
-                    start: now,
-                    end: now,
-                    description: description,
-                    category: catergory,
-                  ),
-                );
-
-            }
+          if (alldata.length > 6) {
+            catergory = await alldata[6];
           }
 
+          if (location != null && location is GeoPoint) {
+            var address = await _convertAddressToCoordinates(location);
+
+            var imagePic = 'assets/Marker.png';
+            if (nameActivity.toString().contains("Volleyball")) {
+              imagePic = 'assets/Volleyball.png';
+            }
+
+            // Use the title as a unique identifier
+            String title = nameActivity.toString();
+
+            // Check if the title is already in the map
+            if (!uniqueMarkers.containsKey(title)) {
+              uniqueMarkers[title] = MapMarker(
+                image: imagePic,
+                title: title,
+                address: address,
+                location: latlong.LatLng(location.latitude, location.longitude),
+                start: now,
+                end: now,
+                description: description,
+                category: catergory,
+              );
+            }
+          }
+        }
       }
 
+      // Convert the map values to a list
+      _markers = uniqueMarkers.values.toList();
+
+      print(_markers.length);
       return _markers;
     } else {
       print("User ID is null. Make sure the user is authenticated.");
@@ -140,10 +148,16 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     }
   }
 
+
+
   List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
+
     return markers.map((marker) {
       final index = _markers.indexOf(marker);
+      final markerSize = index == selectedCardIndex ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
       return Marker(
+        height: markerSize,
+        width: markerSize,
         point: marker.location,
         builder: (BuildContext context) {
           return YourCustomMarkerWidget(
@@ -278,8 +292,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                     pageController: _pageController,
                     onCardSwiped: (int index) {
                       setState(() {
-                        selectedCardIndex =
-                            index; // Update the selected card index
+                        selectedCardIndex = index; // Update the selected card index
                       });
                     },
                   );
