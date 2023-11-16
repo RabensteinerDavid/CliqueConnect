@@ -20,6 +20,8 @@ const MARKER_SIZE_SHRINK = 30.0;
 final List<String> filtersCategory = [];
 List<MapMarker> _markers = [];
 
+List<int> indexToShow = [];
+
 late List<MapMarker> filteredMapMarkers; //hier stehen nur die einträge drinnen die gefiltert worden sind
 
 class AnimatedMarkersMap_NEW extends StatefulWidget {
@@ -50,7 +52,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   void _updateMarkers() async {
     final markers = await getMarkersAsFuture();
-    print('Markers from getMarkersAsFuture: $markers');
     setState(() {
       _markers = List.from(markers);
     });
@@ -138,8 +139,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
       // Convert the map values to a list
       _markers = uniqueMarkers.values.toList();
-
-      print(_markers.length);
       return _markers;
     } else {
       print("User ID is null. Make sure the user is authenticated.");
@@ -286,10 +285,10 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                   final item = filteredMapMarkers[index];
                   return _MapItemDetails(
                     mapMarker: item,
-                    currentIndex: originalIndex,
+                    currentIndex: index,
                     pageController: _pageController,
                     onCardSwiped: (int index) {
-                      final item = _markers[index];
+                      final item = filteredMapMarkers[index];
                       setState(() {
                         _animateCameraToMarker(item);
                         selectedCardIndex = index; // Update the selected card index
@@ -335,6 +334,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                                   } else {
                                     filtersCategory.remove(category);
                                   }
+                                  _updateFilteredMarkers(); // Update filtered markers when filters change
                                 });
                               },
                             ),
@@ -352,6 +352,20 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
       ),
     );
   }
+
+  void _updateFilteredMarkers() {
+    setState(() {
+      filteredMapMarkers = _markers.where((marker) {
+        return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
+      }).toList();
+
+      // Update selectedCardIndex to match the selected card in the filtered list
+      if (selectedCardIndex >= filteredMapMarkers.length) {
+        selectedCardIndex = 0; // Reset selected card index if it's out of bounds
+      }
+    });
+  }
+
 
   void _animateCameraToMarker(MapMarker marker) {
     final destLocation = marker.location;
@@ -465,7 +479,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                 curve: Curves.ease,
               );
               widget.onCardSwiped(newIndex); // Notify the parent about the swipe
-            } else if (_offset < 0 && widget.currentIndex < _markers.length - 1) {
+            } else if (_offset < 0 && widget.currentIndex < filteredMapMarkers.length - 1) {
               // Swiped left
               final newIndex = widget.currentIndex + 1;
               widget.pageController.nextPage(
@@ -511,7 +525,6 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                         ),
                         Text(widget.mapMarker.description),
                         Text("Address: ${widget.mapMarker.address}"),
-                        /* Text('Current Index: ${widget.currentIndex}'),*/
                       ],
                     ),
                   ),
