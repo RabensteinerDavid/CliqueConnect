@@ -93,6 +93,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
               final nameActivity = await alldata[0];
               final description = await alldata[1];
               final location = await alldata[4] as GeoPoint;
+              final catergory = await alldata[5];
 
               var address = await _convertAddressToCoordinates(location);
 
@@ -113,6 +114,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                       start: now,
                       end: now,
                       description: description,
+                      category: catergory,
                     ),
                   );
                 });
