@@ -17,9 +17,10 @@ const MARKER_COLOR = Color(0xFF3DC5A7);
 const MARKER_SIZE_EXPAND = 55.0;
 const MARKER_SIZE_SHRINK = 30.0;
 
-final List<String> filters = [];
-late List<MapMarker> _markers = [];
-List<MapMarker> mapMarkers = [];
+final List<String> filtersCategory = [];
+List<MapMarker> _markers = [];
+
+late List<MapMarker> filteredMapMarkers; //hier stehen nur die einträge drinnen die gefiltert worden sind
 
 class AnimatedMarkersMap_NEW extends StatefulWidget {
   const AnimatedMarkersMap_NEW({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class AnimatedMarkersMap_NEW extends StatefulWidget {
   State<AnimatedMarkersMap_NEW> createState() => _LocationPageState();
 }
 
-class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
+class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProviderStateMixin {
   MapController mapController = MapController();
 
   final PageController _pageController = PageController(initialPage: 0, keepPage: true);
@@ -44,23 +45,21 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     super.initState();
     _updateMarkers();
     _markersFuture = getMarkersAsFuture();
-    mapMarkers = [];
+    _markers = [];
   }
 
   void _updateMarkers() async {
     final markers = await getMarkersAsFuture();
     print('Markers from getMarkersAsFuture: $markers');
     setState(() {
-      //_markers = markers;
-      mapMarkers = List.from(markers); // Update mapMarkers as well
+      _markers = List.from(markers);
     });
   }
-
 
   @override
   void dispose() {
     super.dispose();
-    mapMarkers = [];
+    _markers = [];
   }
 
   Future<String> _convertAddressToCoordinates(GeoPoint location) async {
@@ -148,8 +147,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     }
   }
 
-
-
   List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
     return markers.map((marker) {
       final index = _markers.indexOf(marker);
@@ -160,20 +157,21 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
         point: marker.location,
         builder: (BuildContext context) {
           return YourCustomMarkerWidget(
-            marker: marker, // Add this line to pass the 'marker' argument
+            marker: marker,
             selected: index == selectedCardIndex,
             onTap: () {
               setState(() {
                 isCardVisible = true;
                 selectedCardIndex = index;
               });
-              Future.delayed(Duration(milliseconds: 50), () {
+              Future.delayed(const Duration(milliseconds: 50), () {
                 if (_pageController.hasClients) {
                   _pageController.animateToPage(
                     index,
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.ease,
                   );
+                  _animateCameraToMarker(marker);
                 }
               });
             },
@@ -183,18 +181,26 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     }).toList();
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-    final filterMarkers = _markers.where((marker) {
-      return filters.isEmpty || filters.contains(marker.category);
+    filteredMapMarkers = _markers.where((marker) {
+      return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
+    }).toList();
+
+    filteredMapMarkers = _markers.where((marker) {
+      return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
+    }).toList();
+
+    // Print all entries in filteredMapMarkers
+    print("filteredMapMarkers");
+    filteredMapMarkers.asMap().forEach((index, marker) {
+      print("Index: $index, Title: ${marker.title}");
     });
 
-    final filteredMapMarkers = mapMarkers.where((marker) {
-      return filters.isEmpty || filters.contains(marker.category);
-    }).toList();
+    print("_markers");
+    _markers.asMap().forEach((index, marker) {
+      print("Index: $index, Title: ${marker.title}");
+    });
 
     return Scaffold(
       body: Stack(
@@ -246,7 +252,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                             ],
                           ),
                           MarkerLayer(
-                            markers: _buildMarkersWithFilter(filterMarkers),
+                            markers: _buildMarkersWithFilter(filteredMapMarkers),
                           ),
                         ],
                       ): const CircularProgressIndicator();
@@ -289,14 +295,16 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                 controller: _pageController,
                 itemCount: filteredMapMarkers.length,
                 itemBuilder: (context, index) {
-                  final originalIndex = mapMarkers.indexOf(filteredMapMarkers[index]);
+                  final originalIndex = _markers.indexOf(filteredMapMarkers[index]);
                   final item = filteredMapMarkers[index];
                   return _MapItemDetails(
                     mapMarker: item,
                     currentIndex: originalIndex,
                     pageController: _pageController,
                     onCardSwiped: (int index) {
+                      final item = _markers[index];
                       setState(() {
+                        _animateCameraToMarker(item);
                         selectedCardIndex = index; // Update the selected card index
                       });
                     },
@@ -332,13 +340,13 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                           children: [
                             FilterChip(
                               label: Text(category),
-                              selected: filters.contains(category),
+                              selected: filtersCategory.contains(category),
                               onSelected: (bool selected) {
                                 setState(() {
                                   if (mounted && selected) {
-                                    filters.add(category);
+                                    filtersCategory.add(category);
                                   } else {
-                                    filters.remove(category);
+                                    filtersCategory.remove(category);
                                   }
                                 });
                               },
@@ -356,6 +364,48 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
         ],
       ),
     );
+  }
+
+  void _animateCameraToMarker(MapMarker marker) {
+    final destLocation = marker.location;
+    final destZoom = 18.0;
+
+    // Create some tweens. These serve to split up the transition from one location to another.
+    // In our case, we want to split the transition between our current map center and the destination.
+    final latTween =
+    Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween =
+    Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+
+    // Create an animation controller that has a duration and a TickerProvider.
+    final controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this, // Use the TickerProvider from the current state
+    );
+
+    // The animation determines what path the animation will take.
+    // You can try different Curves values; I found fastOutSlowIn to be a good choice.
+    final Animation<double> animation =
+    CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    // Update the map position during each animation frame.
+    controller.addListener(() {
+      mapController.move(
+        latlong.LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+        zoomTween.evaluate(animation),
+      );
+    });
+
+    // Dispose of the controller when the animation is completed or dismissed.
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    // Start the animation.
+    controller.forward();
   }
 
   Future<String?> getCatergoryActivities() async {
@@ -428,7 +478,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                 curve: Curves.ease,
               );
               widget.onCardSwiped(newIndex); // Notify the parent about the swipe
-            } else if (_offset < 0 && widget.currentIndex < mapMarkers.length - 1) {
+            } else if (_offset < 0 && widget.currentIndex < _markers.length - 1) {
               // Swiped left
               final newIndex = widget.currentIndex + 1;
               widget.pageController.nextPage(
@@ -581,15 +631,21 @@ class YourCustomMarkerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String titleMarker = "Marker";
+    if (marker.title.contains("Volleyball")) {
+      titleMarker = "Volleyball_marker";
+    }
     final size = selected ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
     return GestureDetector(
-      onTap: onTap, // Call the provided callback when the marker is tapped
+      onTap: () {
+        onTap();
+      },
       child: Center(
         child: AnimatedContainer(
           height: size,
           width: size,
           duration: const Duration(milliseconds: 400),
-          child: Image.asset('assets/Marker.png'),
+          child: Image.asset('assets/$titleMarker.png'),
         ),
       ),
     );
