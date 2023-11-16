@@ -19,6 +19,7 @@ const MARKER_SIZE_SHRINK = 30.0;
 
 final List<String> filters = [];
 late List<MapMarker> _markers = [];
+List<MapMarker> mapMarkers = [];
 
 class AnimatedMarkersMap_NEW extends StatefulWidget {
   const AnimatedMarkersMap_NEW({Key? key}) : super(key: key);
@@ -30,10 +31,17 @@ class AnimatedMarkersMap_NEW extends StatefulWidget {
 class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
   MapController mapController = MapController();
 
+  final PageController _pageController = PageController(initialPage: 0, keepPage: true);
+
+  bool isCardVisible = false;
+
+  int selectedCardIndex = 0;
+
   @override
   void initState() {
     super.initState();
     _updateMarkers();
+    mapMarkers = [];
   }
 
   void _updateMarkers() async {
@@ -41,12 +49,15 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     print('Markers from getMarkersAsFuture: $markers');
     setState(() {
       _markers = markers;
+      mapMarkers = List.from(markers); // Update mapMarkers as well
     });
   }
+
 
   @override
   void dispose() {
     super.dispose();
+    mapMarkers = [];
   }
 
   Future<String> _convertAddressToCoordinates(GeoPoint location) async {
@@ -71,8 +82,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
     final firestore = FirebaseFirestore.instance;
     final userID = user?.uid;
 
-    final locationIndex = 4; // or whatever index location has in your alldata list
-
 
     if (userID != null) {
       final activitiesCollectionRef = firestore.collection("activities");
@@ -87,10 +96,9 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
         for (final key in data.keys) {
           List<dynamic> alldata = List.from(data[key]);
 
-          if (alldata.length > locationIndex) { // Check if the list has enough elements
             final nameActivity = await alldata[0];
             final description = await alldata[1];
-            final location = await alldata[locationIndex];
+            final location = await alldata[4];
             var catergory = "";
             if (alldata.length > 6) {
               catergory = await alldata[6];
@@ -119,7 +127,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
             }
           }
-        }
+
       }
 
       return _markers;
@@ -131,20 +139,37 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
   List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
     return markers.map((marker) {
+      final index = _markers.indexOf(marker);
       return Marker(
         point: marker.location,
         builder: (BuildContext context) {
-          return YourCustomMarkerWidget(marker);
+          return YourCustomMarkerWidget(
+            marker: marker, // Add this line to pass the 'marker' argument
+            selected: index == selectedCardIndex,
+            onTap: () {
+              setState(() {
+                isCardVisible = true;
+                selectedCardIndex = index;
+              });
+              if (_pageController.hasClients) {
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease,
+                );
+              }
+            },
+          );
         },
       );
     }).toList();
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     final filterMarkers = _markers.where((marker) {
-      print(filters.contains(marker.category));
       return filters.isEmpty || filters.contains(marker.category);
     });
 
@@ -164,6 +189,13 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                       return FlutterMap(
                         mapController: mapController,
                         options: MapOptions(
+                      /*    onTap: (tapPosition, point) {
+                            if (tapPosition != Marker) {
+                              setState(() {
+                                isCardVisible = false;
+                              });
+                            }
+                          },*/
                           minZoom: 1,
                           maxZoom: 19,
                           zoom: 18,
@@ -180,14 +212,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                           ),
                           MarkerLayer(
                             markers: [
-                         /*     ..._markers.map((marker) {
-                                return Marker(
-                                  point: marker.location,
-                                  builder: (BuildContext context) {
-                                    return YourCustomMarkerWidget(marker);
-                                  },
-                                );
-                              }).toList(),*/
                               Marker(
                                 point: latlong.LatLng(userPosition.latitude, userPosition.longitude),
                                 builder: (_) {
@@ -225,6 +249,37 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                   image: AssetImage('assets/cliqueConnect.png'),
                   fit: BoxFit.contain,
                 ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.3,
+            child: Visibility(
+              visible: isCardVisible,
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: mapMarkers.length,
+                itemBuilder: (context, index) {
+                  final item = mapMarkers[index];
+                  return _MapItemDetails(
+                    mapMarker: item,
+                    currentIndex: index,
+                    pageController: _pageController,
+                    onCardSwiped: (int index) {
+                      setState(() {
+                        selectedCardIndex =
+                            index; // Update the selected card index
+                      });
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -304,6 +359,123 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
   }
 }
 
+class _MapItemDetails extends StatefulWidget {
+  const _MapItemDetails({
+    Key? key,
+    required this.mapMarker,
+    required this.currentIndex,
+    required this.pageController,
+    required this.onCardSwiped,
+  }) : super(key: key);
+
+  final MapMarker mapMarker;
+  final int currentIndex;
+  final PageController pageController;
+  final ValueChanged<int> onCardSwiped;
+
+  @override
+  _MapItemDetailsState createState() => _MapItemDetailsState();
+}
+
+class _MapItemDetailsState extends State<_MapItemDetails> {
+  double _dragStartX = 0.0;
+  double _currentX = 0.0;
+  double _offset = 0.0;
+  final double _threshold = 50.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onHorizontalDragStart: (details) {
+          _dragStartX = details.localPosition.dx;
+        },
+        onHorizontalDragUpdate: (details) {
+          _currentX = details.localPosition.dx;
+          final delta = _currentX - _dragStartX;
+          setState(() {
+            _offset = delta;
+          });
+        },
+        onHorizontalDragEnd: (details) {
+          if (_offset.abs() > _threshold) {
+            if (_offset > 0 && widget.currentIndex > 0) {
+              // Swiped right
+              final newIndex = widget.currentIndex - 1;
+              widget.pageController.previousPage(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.ease,
+              );
+              widget.onCardSwiped(newIndex); // Notify the parent about the swipe
+            } else if (_offset < 0 && widget.currentIndex < mapMarkers.length - 1) {
+              // Swiped left
+              final newIndex = widget.currentIndex + 1;
+              widget.pageController.nextPage(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.ease,
+              );
+              widget.onCardSwiped(newIndex); // Notify the parent about the swipe
+            }
+            setState(() {
+              _offset = 0.0;
+            });
+          } else {
+            setState(() {
+              _offset = 0.0;
+            });
+          }
+        },
+
+        child:
+        Stack(
+          children: [
+            // Positioned widget for the Card
+            Positioned(
+              child: Card(
+                color: Colors.white,
+                margin: const EdgeInsets.all(50.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0.0), // Set the radius to 0 for sharp corners
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(35.0, 20.0, 10.0, 20.0), // Add left padding of 10
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.mapMarker.title,
+                          style: const TextStyle(
+                            fontSize: 34, // Adjust the font size as needed
+                            fontWeight: FontWeight.bold, // You can adjust the font weight as well
+                          ),
+                        ),
+                        Text(widget.mapMarker.description),
+                        Text("Address: ${widget.mapMarker.address}"),
+                        /* Text('Current Index: ${widget.currentIndex}'),*/
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Positioned widget for the image in the foreground
+            Positioned(
+              top: 18, // Adjust the top position as needed
+              left: 18, // Adjust the left position as needed
+              child: Image.asset(
+                widget.mapMarker.image,
+                width: 70,
+                height: 70,
+              ),
+            ),
+          ],
+        )
+    );
+  }
+}
+
 class _MyLocationMarker extends StatefulWidget {
   const _MyLocationMarker({Key? key}) : super(key: key);
 
@@ -375,19 +547,29 @@ void main() {
 
 class YourCustomMarkerWidget extends StatelessWidget {
   final MapMarker marker;
+  final bool selected;
+  final void Function() onTap;
 
-  const YourCustomMarkerWidget(this.marker, {Key? key}) : super(key: key);
+  const YourCustomMarkerWidget({
+    Key? key,
+    required this.marker,
+    required this.selected,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedContainer(
-        height: 45,
-        width: 45,
-        duration: const Duration(milliseconds: 400),
-        child: Image.asset('assets/Marker.png'),
+    final size = selected ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
+    return GestureDetector(
+      onTap: onTap, // Call the provided callback when the marker is tapped
+      child: Center(
+        child: AnimatedContainer(
+          height: size,
+          width: size,
+          duration: const Duration(milliseconds: 400),
+          child: Image.asset('assets/Marker.png'),
+        ),
       ),
     );
   }
 }
-
