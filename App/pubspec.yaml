@@ -95,6 +95,7 @@ flutter:
     - assets/intro.mp4
     - assets/Marker.png
     - assets/Volleyball.png
+    - assets/Volleyball_marker.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
