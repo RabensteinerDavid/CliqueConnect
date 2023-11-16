@@ -151,7 +151,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
 
   List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
-
     return markers.map((marker) {
       final index = _markers.indexOf(marker);
       final markerSize = index == selectedCardIndex ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
@@ -168,13 +167,15 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                 isCardVisible = true;
                 selectedCardIndex = index;
               });
-              if (_pageController.hasClients) {
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.ease,
-                );
-              }
+              Future.delayed(Duration(milliseconds: 50), () {
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.ease,
+                  );
+                }
+              });
             },
           );
         },
@@ -184,11 +185,16 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
 
 
 
+
   @override
   Widget build(BuildContext context) {
     final filterMarkers = _markers.where((marker) {
       return filters.isEmpty || filters.contains(marker.category);
     });
+
+    final filteredMapMarkers = mapMarkers.where((marker) {
+      return filters.isEmpty || filters.contains(marker.category);
+    }).toList();
 
     return Scaffold(
       body: Stack(
@@ -204,7 +210,8 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
                       List<MapMarker> markers = markersSnapshot.data ?? [];
-                      return FlutterMap(
+                      return  _markers.isNotEmpty
+                          ? FlutterMap(
                         mapController: mapController,
                         options: MapOptions(
                           onTap: (tapPosition, point) {
@@ -242,7 +249,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
                             markers: _buildMarkersWithFilter(filterMarkers),
                           ),
                         ],
-                      );
+                      ): const CircularProgressIndicator();
                     }
                     return const CircularProgressIndicator();
                   },
@@ -275,20 +282,18 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> {
             bottom: 30,
             left: 0,
             right: 0,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.3,
             child: Visibility(
-              visible: isCardVisible,
+              visible: isCardVisible && filteredMapMarkers.isNotEmpty,
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: mapMarkers.length,
+                itemCount: filteredMapMarkers.length,
                 itemBuilder: (context, index) {
-                  final item = mapMarkers[index];
+                  final originalIndex = mapMarkers.indexOf(filteredMapMarkers[index]);
+                  final item = filteredMapMarkers[index];
                   return _MapItemDetails(
                     mapMarker: item,
-                    currentIndex: index,
+                    currentIndex: originalIndex,
                     pageController: _pageController,
                     onCardSwiped: (int index) {
                       setState(() {
