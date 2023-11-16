@@ -789,125 +789,134 @@ class _EventState extends State<AddEventForm> {
   }
 
   void savePictureToFirestore(context) async {
-    String nameActivity = activityNameController.text;
-    User? user = FirebaseAuth.instance.currentUser;
+    try {
+      String nameActivity = activityNameController.text;
+      User? user = FirebaseAuth.instance.currentUser;
 
-    if (nameActivity.isNotEmpty) {
-      if (_photo != null) {
-        final path = 'events/${user?.uid}/${basename("${nameActivity}_${basename(_photo!.path)}")}';
-        final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
-        var uploadTask = ref.putFile(_photo!);
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final urlDownload = await snapshot.ref.getDownloadURL();
-        await addCreativActivity(urlDownload, context);
+      if (nameActivity.isNotEmpty) {
+        if (_photo != null) {
+          final path = 'events/${user?.uid}/${basename("${nameActivity}_${basename(_photo!.path)}")}';
+          final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
+          var uploadTask = ref.putFile(_photo!);
+          final snapshot = await uploadTask!.whenComplete(() {});
+          final urlDownload = await snapshot.ref.getDownloadURL();
+          await addCreativActivity(urlDownload, context);
+        } else {
+          // Display an error message if the photo is not selected
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please select a photo.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       } else {
         // Display an error message if the photo is not selected
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select a photo.'),
+            content: Text('Please select a name activity.'),
             duration: Duration(seconds: 2),
           ),
         );
       }
-    } else {
-      // Display an error message if the photo is not selected
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a name activity.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+    } catch (e) {
+      print('Error in savePictureToFirestore: $e');
+      // You may also want to show an error message to the user.
     }
   }
-
 
   Future<void> addCreativActivity(String urlDownload, context) async {
-    // Check if any required field is empty or null
-    if (activityNameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a name for the activity.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    if (descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a description for the activity.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    if (startDate == null || endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select both start and end dates for the activity.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-    await _convertAddressToCoordinates();
-
-    if (_result.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter an address for the activity.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    if (urlDownload == null || urlDownload.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error: Image URL is null or empty.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-
-
-    CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
-
-    String newActivity = activityNameController.text;
     try {
-      await creativCollection.doc(selectedCategory).update({
-        newActivity: [
-          activityNameController.text,
-          descriptionController.text,
-          Timestamp.fromDate(startDate!),
-          Timestamp.fromDate(endDate!),
-          GeoPoint(
-            double.parse(extractNumbers(_result.split(',')[0].trim())),
-            double.parse(extractNumbers(_result.split(',')[1].trim())),
+      // Check if any required field is empty or null
+      if (activityNameController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter a name for the activity.'),
+            duration: Duration(seconds: 2),
           ),
-          urlDownload,
-        ],
-      });
-      print('Creativ activity added successfully!');
-      // Clear the text fields after adding the entry
-      activityNameController.clear();
-      descriptionController.clear();
-      _addressController.clear();
-      setState(() {
-        startDate = null;
-        endDate = null;
-        selectedCategory = null;
-        _photo = null;
-      });
+        );
+        return;
+      }
+
+      if (descriptionController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter a description for the activity.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      if (startDate == null || endDate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select both start and end dates for the activity.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+      await _convertAddressToCoordinates();
+
+      if (_result.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter an address for the activity.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      if (urlDownload == null || urlDownload.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error: Image URL is null or empty.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
+
+      String newActivity = activityNameController.text;
+      try {
+        await creativCollection.doc(selectedCategory).update({
+          newActivity: [
+            activityNameController.text,
+            descriptionController.text,
+            Timestamp.fromDate(startDate!),
+            Timestamp.fromDate(endDate!),
+            GeoPoint(
+              double.parse(extractNumbers(_result.split(',')[0].trim())),
+              double.parse(extractNumbers(_result.split(',')[1].trim())),
+            ),
+            urlDownload,
+            selectedCategory,
+          ],
+        });
+        print('Creativ activity added successfully!');
+        // Clear the text fields after adding the entry
+        activityNameController.clear();
+        descriptionController.clear();
+        _addressController.clear();
+        setState(() {
+          startDate = null;
+          endDate = null;
+          selectedCategory = null;
+          _photo = null;
+        });
+      } catch (e) {
+        print('Error updating Firestore in addCreativActivity: $e');
+      }
     } catch (e) {
-      print('Error adding creativ activity: $e');
+      print('Error in addCreativActivity: $e');
+      // You may also want to show an error message to the user.
     }
   }
+
 
 }
 
