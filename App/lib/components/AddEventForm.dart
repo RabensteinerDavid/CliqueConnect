@@ -802,6 +802,7 @@ class _EventState extends State<AddEventForm> {
           final urlDownload = await snapshot.ref.getDownloadURL();
           await addCreativActivity(urlDownload, context);
         } else {
+          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect.png?alt=media&token=1c1c6b52-ac5f-402d-8535-ab06708d0fbb", context);
           // Display an error message if the photo is not selected
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
