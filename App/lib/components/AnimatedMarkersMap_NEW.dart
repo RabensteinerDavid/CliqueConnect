@@ -147,9 +147,9 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     }
   }
 
-  List<Marker> _buildMarkersWithFilter(Iterable<MapMarker> markers) {
+  List<Marker> _buildMarkersWithFilter(List<MapMarker> markers) {
     return markers.map((marker) {
-      final index = _markers.indexOf(marker);
+      final index = filteredMapMarkers.indexOf(marker); // Use the index from the filtered list
       final markerSize = index == selectedCardIndex ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
       return Marker(
         height: markerSize,
@@ -181,26 +181,13 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     }).toList();
   }
 
+
   @override
   Widget build(BuildContext context) {
+    // Use filteredMapMarkers instead of _markers when building markers
     filteredMapMarkers = _markers.where((marker) {
       return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
     }).toList();
-
-    filteredMapMarkers = _markers.where((marker) {
-      return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
-    }).toList();
-
-    // Print all entries in filteredMapMarkers
-    print("filteredMapMarkers");
-    filteredMapMarkers.asMap().forEach((index, marker) {
-      print("Index: $index, Title: ${marker.title}");
-    });
-
-    print("_markers");
-    _markers.asMap().forEach((index, marker) {
-      print("Index: $index, Title: ${marker.title}");
-    });
 
     return Scaffold(
       body: Stack(
