@@ -96,6 +96,14 @@ flutter:
     - assets/Marker.png
     - assets/Volleyball.png
     - assets/Volleyball_marker.png
+    - icons/home_grey.png
+    - icons/home_white.png
+    - icons/chat_all_grey.png
+    - icons/chat_all_white.png
+    - icons/calendar_grey.png
+    - icons/calendar_white.png
+    - icons/map_color.png
+    - icons/map_white.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

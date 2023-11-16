@@ -4,6 +4,8 @@ import 'package:test_clique_connect/components/CreateProfile.dart';
 import 'Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'NavigationBar.dart';
+
 class AuthGate extends StatefulWidget {
   const AuthGate({Key? key}) : super(key: key);
 
@@ -317,7 +319,7 @@ class _AuthGateState extends State<AuthGate> {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CreateProfile()));
       }
       if (userCredential.user != null ) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavigationBarExample()));
       }
     } catch (e) {
       String errorMessage = "An error occurred during sign-in.";

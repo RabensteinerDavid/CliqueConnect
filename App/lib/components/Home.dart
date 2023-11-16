@@ -11,6 +11,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
+import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return await prefs.remove('isLoggedIn');
   }
 
-  Future _cropImage(  File? imageFile) async {
+  Future _cropImage(File? imageFile) async {
     if (imageFile != null) {
       CroppedFile? cropped = await ImageCropper().cropImage(
           sourcePath: imageFile!.path,
@@ -66,24 +67,25 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
 
           uiSettings: [
-          AndroidUiSettings(
-          toolbarTitle: 'Crop',
-          cropGridColor: Colors.black,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: true),
-          IOSUiSettings(title: 'Crop',aspectRatioLockEnabled: true)
-    ]);
+            AndroidUiSettings(
+                toolbarTitle: 'Crop',
+                cropGridColor: Colors.black,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: true),
+            IOSUiSettings(title: 'Crop', aspectRatioLockEnabled: true)
+          ]);
 
-    if (cropped != null) {
-    setState(() {
-      _photo = File(cropped.path);
-    });
+      if (cropped != null) {
+        setState(() {
+          _photo = File(cropped.path);
+        });
+      }
     }
-  }
   }
 
   Future imgFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 0);
+    final pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery, imageQuality: 0);
 
     setState(() {
       if (pickedFile != null) {
@@ -96,11 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future imgFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 0);
+    final pickedFile = await _picker.pickImage(
+        source: ImageSource.camera, imageQuality: 0);
     setState(() {
       if (pickedFile != null) {
-         _photo = File(pickedFile.path);
-         _cropImage(File(pickedFile.path));
+        _photo = File(pickedFile.path);
+        _cropImage(File(pickedFile.path));
       } else {
         print('No img selected');
       }
@@ -124,42 +127,42 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-void getImgUrl() async {
-  var userID = user?.uid;
+  void getImgUrl() async {
+    var userID = user?.uid;
 
-  if (userID != null) {
-    final snapshot = await firestore.collection("users").doc(userID).get();
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
 
-    if (snapshot.exists) {
-      final data = snapshot.data() as Map<String, dynamic>;
-      final imageName = await data["image_data"];
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final imageName = await data["image_data"];
 
-      if (imageName != null) {
-        print("Image Name: $imageName");
-      }
-      else {
-        print("Image Name not found in the document.");
-      }
-    } else {
-
-      print("Document not found for user with ID: $userID");
-      final Reference storageRef = FirebaseStorage.instance.ref('files/cliqueConnect.png');
-
-      try {
-        final imageUrl = await storageRef.getDownloadURL();
-
-        if (imageUrl != null) {
-          print("Image URL: $imageUrl");
-          // Now, you can use this URL to display the image in your app.
-        } else {
-          print("Image URL not found.");
+        if (imageName != null) {
+          print("Image Name: $imageName");
         }
-      } catch (e) {
-        print("Error retrieving image URL: $e");
+        else {
+          print("Image Name not found in the document.");
+        }
+      } else {
+        print("Document not found for user with ID: $userID");
+        final Reference storageRef = FirebaseStorage.instance.ref(
+            'files/cliqueConnect.png');
+
+        try {
+          final imageUrl = await storageRef.getDownloadURL();
+
+          if (imageUrl != null) {
+            print("Image URL: $imageUrl");
+            // Now, you can use this URL to display the image in your app.
+          } else {
+            print("Image URL not found.");
+          }
+        } catch (e) {
+          print("Error retrieving image URL: $e");
+        }
       }
     }
   }
-}
 
   void _showPicker(context) {
     showModalBottomSheet(
@@ -195,7 +198,6 @@ void getImgUrl() async {
     final user = this.user;
 
     if (user != null) {
-
       try {
         await firestore.collection('users').doc(user.uid).set({
           'username': username,
@@ -222,8 +224,7 @@ void getImgUrl() async {
         //final imageUrl = await firebaseReference.getDownloadURL();
         await saveUserDataToFirestore(username, urlDownload);
       } else {
-
-         print('No Photo to upload');
+        print('No Photo to upload');
 
         await saveUserDataToFirestore(username, '');
       }
@@ -245,7 +246,8 @@ void getImgUrl() async {
     try {
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => AuthGate()), // Replace with your authentication gate screen
+        MaterialPageRoute(builder: (context) =>
+            AuthGate()), // Replace with your authentication gate screen
       );
     } catch (e) {
       print('Error signing out: $e');
@@ -258,123 +260,141 @@ void getImgUrl() async {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.person), onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileView()));
-          },
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileView()),
+              );
+            },
           )
         ],
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              'Welcome!',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            GestureDetector(
-              onTap: () {
-                _showPicker(context);
-              },
-              child: CircleAvatar(
-                radius: 55,
-                backgroundColor: Color(0xff8179b4),
-                child: _photo != null
-                    ? ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.file(
-                    _photo!,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Text(
+                'Welcome!',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .displaySmall,
+              ),
+              GestureDetector(
+                onTap: () {
+                  _showPicker(context);
+                },
+                child: CircleAvatar(
+                  radius: 55,
+                  backgroundColor: Color(0xff8179b4),
+                  child: _photo != null
+                      ? ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.file(
+                      _photo!,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.fitHeight,
+                    ),
+                  )
+                      : Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(50)),
                     width: 100,
                     height: 100,
-                    fit: BoxFit.fitHeight,
-                  ),
-                )
-                    : Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(50)),
-                  width: 100,
-                  height: 100,
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.grey[800],
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              children: [
-                // Other elements or widgets
-                const SizedBox(height: 36.0), // Add space above the TextField
-                SizedBox(
-                  width: 250.0,
-                  child: TextField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      hintText: 'Enter your username',
-                      prefixIcon: const Icon(Icons.person),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 36.0), // Add space below the TextField
-                // Other elements or widgets
-              ],
-            ),
-            ElevatedButton(
-              onPressed: saveDataToFirestore,
-              child: const Text('Save Profile'),
-            ),
-            ElevatedButton(
-              onPressed: () => _signOut(context),
-              child: const Text('Sign Out'),
-            ),
-            // Add the MapboxMap widget here
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AnimatedMarkersMap()));
-              },
-              child: Text('Go to Map'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Event(eventName: 'Tanzen', eventCategory: 'Creative',)));
-              },
-              child: Text('Go to Event'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AddEventForm()));
-              },
-              child: Text('Add Event'),
-            ),
-            ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const EventHome()));
-              },
-              child: Text('Go To All Events'),
+              ),
+              Column(
+                children: [
+                  // Other elements or widgets
+                  const SizedBox(height: 36.0), // Add space above the TextField
+                  SizedBox(
+                    width: 250.0,
+                    child: TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        hintText: 'Enter your username',
+                        prefixIcon: const Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 16.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 36.0), // Add space below the TextField
+                  // Other elements or widgets
+                ],
               ),
               ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CreateProfile()));
+                onPressed: saveDataToFirestore,
+                child: const Text('Save Profile'),
+              ),
+              ElevatedButton(
+                onPressed: () => _signOut(context),
+                child: const Text('Sign Out'),
+              ),
+              // Add the MapboxMap widget here
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const AnimatedMarkersMap_NEW()));
+                },
+                child: Text('Go to Map'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) =>
+                      const Event(
+                        eventName: 'Tanzen', eventCategory: 'Creative',)));
+                },
+                child: Text('Go to Event'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const AddEventForm()));
+                },
+                child: Text('Add Event'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const EventHome()));
+                },
+                child: Text('Go To All Events'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CreateProfile()));
                 },
                 child: Text('Create Profile'),
-                ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarScreen()));
-              },
-              child: Text('Create Calendar'),
-            ),
-          ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => CalendarScreen()));
+                },
+                child: Text('Create Calendar'),
+              ),
+            ],
+          ),
         ),
       ),
     );

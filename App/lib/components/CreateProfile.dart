@@ -13,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/Home.dart';
 import 'package:test_clique_connect/main.dart';
 
+import 'NavigationBar.dart';
+
 final filters = <String>{};
 
 
@@ -503,7 +505,7 @@ class _EventState extends State<CreateProfile> {
           universityType = null;
         });
         profileIsCreated(true);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BottomNavigationBarExample()));
 
       } catch (e) {
         ScaffoldMessenger.of(context as BuildContext).showSnackBar(SnackBar(

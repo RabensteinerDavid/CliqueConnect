@@ -7,6 +7,7 @@ import 'package:test_clique_connect/components/CreateProfile.dart';
 import 'package:test_clique_connect/components/Home.dart';
 import 'package:video_player/video_player.dart';
 import 'AuthGate.dart';
+import 'NavigationBar.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -71,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(),
+            builder: (context) =>BottomNavigationBarExample(),
           ),
         );
       }
