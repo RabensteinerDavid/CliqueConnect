@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_clique_connect/main.dart';
 import '../pages/chat_page.dart';
 
 class GroupTile extends StatelessWidget {
@@ -19,7 +20,7 @@ class GroupTile extends StatelessWidget {
         child: ListTile(
           leading: CircleAvatar(
             radius: 30.0,
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: MyApp.blueMain,
             child: Text(groupName.substring(0, 1).toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
           ),
           title: Text(groupName, style: TextStyle(fontWeight: FontWeight.bold)),

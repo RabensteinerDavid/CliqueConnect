@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_clique_connect/components/AuthGate.dart';
+import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
 import '../components/AuthGate.dart';
 import '../pages/profile_page.dart';
@@ -45,15 +46,10 @@ class _HomePageState extends State<HomePageChat> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              _popupDialog(context);
-            },
-            child: Icon(Icons.add_circle, color: Colors.grey[700], size: 75.0),
-          ),
+
           SizedBox(height: 20.0),
           Text(
-            "You've not joined any group, tap on the 'add' icon to create a group or search for groups by tapping on the search button below.",
+            "You've not joined any group, cliqueConnect to be in a group",
           ),
         ],
       ),
@@ -61,8 +57,6 @@ class _HomePageState extends State<HomePageChat> {
   }
 
   Widget groupsList() {
-    print("_groups");
-    print(_groups);
     return StreamBuilder<Map<String, dynamic>>(
       stream: _groups,
       builder: (context, snapshot) {
@@ -103,15 +97,12 @@ class _HomePageState extends State<HomePageChat> {
       });
 
       if (_user!.uid != null) {
-        print("here3");
         // Remove the listen() method, StreamBuilder will handle it
         Stream<DocumentSnapshot> groupsStream = DatabaseService(uid: _user!.uid).getUserGroups();
         groupsStream.listen((DocumentSnapshot<Object?> snapshot) {
           if (snapshot.exists) {
             // Document exists, you can access its data
             Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-            print('Document ID: ${snapshot.id}');
-            print('Data: $data');
             _groupsController.add(data);
           } else {
             // Document doesn't exist
@@ -199,7 +190,6 @@ class _HomePageState extends State<HomePageChat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      drawer: buildDrawer(),
       body: groupsList(),
 /*      floatingActionButton: buildFloatingActionButton(),*/
     );
@@ -217,8 +207,9 @@ class _HomePageState extends State<HomePageChat> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.black87,
+        backgroundColor: MyApp.blueMain,
         elevation: 0.0,
+        iconTheme: IconThemeData(color: Colors.white), // Set the color of the back arrow to white
         actions: <Widget>[
           IconButton(
             padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -234,54 +225,6 @@ class _HomePageState extends State<HomePageChat> {
     );
   }
 
-
-  Widget buildDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.symmetric(vertical: 50.0),
-        children: <Widget>[
-          Icon(Icons.account_circle, size: 150.0, color: Colors.grey[700]),
-          SizedBox(height: 15.0),
-          Text(_userName, textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 7.0),
-          ListTile(
-            onTap: () {},
-            selected: true,
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: 20.0, vertical: 5.0),
-            leading: Icon(Icons.group),
-            title: Text('Groups'),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) =>
-                    ProfilePage(userName: _userName, email: _email),
-              ));
-            },
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: 20.0, vertical: 5.0),
-            leading: Icon(Icons.account_circle),
-            title: Text('Profile'),
-          ),
-          ListTile(
-            onTap: () async {
-              await _auth.signOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const AuthGate()),
-                    (Route<dynamic> route) => false,
-              );
-            },
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: 20.0, vertical: 5.0),
-            leading: const Icon(Icons.exit_to_app, color: Colors.red),
-            title: Text('Log Out', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget buildFloatingActionButton() {
     return FloatingActionButton(

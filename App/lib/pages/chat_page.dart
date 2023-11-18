@@ -57,72 +57,82 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
-      body: Container(
-        // Set the background color to white
-        color: Colors.white,
-        child: Stack(
-          children: <Widget>[
-            StreamBuilder<QuerySnapshot>(
-              stream: _chats,
-              builder: (context, snapshot) {
-                return snapshot.hasData
-                    ? ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    return MessageTile(
-                      message: snapshot.data!.docs[index]['message'],
-                      sender: snapshot.data!.docs[index]['sender'],
-                      sentByMe: widget.userName ==
-                          snapshot.data!.docs[index]['sender'],
-                    );
-                  },
-                )
-                    : Container();
-              },
-            ),
-            Container(
-              alignment: Alignment.bottomCenter,
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-                color: Colors.grey[700],
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        controller: messageEditingController,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "Send a message ...",
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          border: InputBorder.none,
+      body: Stack(
+        children: <Widget>[
+          StreamBuilder<QuerySnapshot>(
+            stream: _chats,
+            builder: (context, snapshot) {
+              return snapshot.hasData
+                  ? ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  return MessageTile(
+                    message: snapshot.data!.docs[index]['message'],
+                    sender: snapshot.data!.docs[index]['sender'],
+                    sentByMe: widget.userName == snapshot.data!.docs[index]['sender'],
+                  );
+                },
+              )
+                  : Container();
+            },
+          ),
+          Positioned(
+            bottom: 40, // Adjust this value to move it higher or lower
+            left: 30,
+            right: 30,
+            child: Container(
+              width: MediaQuery.of(context).size.width, // Adjust the width as needed
+              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, -2), // Negative offset to move it up
+                  ),
+                ],
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                      controller: messageEditingController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        hintText: "Send a message ...",
+                        hintStyle: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 16,
                         ),
+                        border: InputBorder.none,
                       ),
                     ),
-                    SizedBox(width: 12.0),
-                    GestureDetector(
-                      onTap: () {
-                        _sendMessage();
-                      },
-                      child: Container(
-                        height: 50.0,
-                        width: 50.0,
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Center(child: Icon(Icons.send, color: Colors.white)),
+                  ),
+                  SizedBox(width: 12.0),
+                  GestureDetector(
+                    onTap: () {
+                      _sendMessage();
+                    },
+                    child: Container(
+                      height: 30.0,
+                      width: 30.0,
+                      child: Image.asset(
+                        "icons/send_blue.png", // Replace with your image asset path
+                        width: 30, // Adjust width as needed
+                        height: 30, // Adjust height as needed
+                        fit: BoxFit.cover,
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+
+        ],
       ),
     );
   }

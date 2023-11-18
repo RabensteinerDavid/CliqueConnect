@@ -105,6 +105,7 @@ flutter:
     - icons/map_color.png
     - icons/map_white.png
     - icons/ arrow_white.png
+    - icons/send_blue.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

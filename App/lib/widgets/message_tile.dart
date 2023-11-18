@@ -71,60 +71,85 @@ class _MessageTileState extends State<MessageTile> {
           ),
         ),
         const SizedBox(height: 7.0),
+        // Inside your MessageTile widget
         Padding(
           padding: const EdgeInsets.only(),
-          child: Row(
+          child:Row(
             mainAxisAlignment: widget.sentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
               const SizedBox(width: 24),
-              FutureBuilder(
-                future: imageUrlFuture,
+              FutureBuilder<String>(
+                future: getImageUrlForUser(widget.sender),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData) {
-                      return CircleAvatar(
-                        radius: 10,
-                        backgroundColor: const Color(0xff8179b4),
-                        child: ClipOval(
-                          child: imageURL.isNotEmpty
-                              ? Image.network(
-                            imageURL,
-                            width: 15,
-                            height: 15,
-                            fit: BoxFit.cover,
-                          )
-                              : Image.asset(
-                            'assets/cliqueConnect.png',
-                            width: 15,
-                            height: 15,
-                            fit: BoxFit.cover,
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // If the Future is still running, show a loading indicator or placeholder
+                    return const SizedBox(
+                      width: 24.0, // Adjust the width as needed
+                      height: 24.0, // Adjust the height as needed
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    // If an error occurred, show an error message or handle it accordingly
+                    return Text('Error loading image');
+                  } else {
+                    // If the Future is complete, build the widget with the loaded image URL
+                    String imageUrl = snapshot.data ?? ''; // Use a default value if null
+                    // Only build the Row if the image URL is not empty
+                    if (imageUrl.isNotEmpty) {
+                      return Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 10,
+                            backgroundImage: NetworkImage(imageUrl),
                           ),
-                        ),
+                          const SizedBox(width: 8), // Add spacing between CircleAvatar and sender's name
+                          Text(
+                            widget.sender.toUpperCase(),
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
                       );
+                    } else {
+                      return const SizedBox(); // Return an empty SizedBox if the image URL is empty
                     }
-                    // Show a loading indicator while waiting for the Futures to complete.
-                    return const CircularProgressIndicator();
                   }
-                  return Container(); // Return an empty container during loading.
                 },
               ),
-              const SizedBox(width: 8), // Add some spacing between CircleAvatar and Text
-              Text(
-                widget.sender.toUpperCase(),
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                  fontSize: 13.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(width: 24),
+                const SizedBox(width: 24),
             ],
           ),
         ),
       ],
     );
+  }
+
+  Future<String> getImageUrlForUser(String username) async {
+    final firestore = FirebaseFirestore.instance;
+    try {
+      final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+        final imageName = data["image_data"];
+
+        if (imageName != null) {
+          return imageName;
+        } else {
+          return ''; // Default image or handle accordingly
+        }
+      } else {
+        return ''; // Default image or handle accordingly
+      }
+    } catch (e) {
+      print('Error retrieving image URL for user $username: $e');
+      return ''; // Default image or handle accordingly
+    }
   }
 
   Future<bool> getImgUrl() async {
