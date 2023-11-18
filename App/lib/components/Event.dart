@@ -9,8 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import '../services/database_service.dart';
 
 //TODO 1. Clique Connect Button in der Mitte will einfach nicht über das Titelbild schaun
-//TODO 2. Ich schaffs nicht, die Profilbilder der Connecteten leute anzeigen zu lassen
-
 //TODO Das, dass sich der connect button umwandelt, wenn man ihn klickt, mach ich noch
 
 class Event extends StatefulWidget {
@@ -217,31 +215,42 @@ class _EventState extends State<Event> {
                 itemCount: userNames.length,
                 itemBuilder: (context, index) {
                   String username = userNames[index];
-                  String imageUrl =
-                      ""; // Retrieve this dynamically using getImageUrl
 
-                  return Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          username,
-                          style: const TextStyle(
-                            color: Color(0xFF2E148C), // Set the text color
-                          ),
-                        ),
-                     /*   leading: Image.network(
-                          imageUrl,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),*/
-                      ),
-                      if (index < userNames.length - 1)
-                        Divider(color: Colors.black12, thickness: 0.5),
-                    ],
+                  return FutureBuilder<String>(
+                    future: getImageUrlForUser(username),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // If the Future is still running, show a loading indicator or placeholder
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        // If an error occurred, show an error message or handle it accordingly
+                        return Text('Error loading image');
+                      } else {
+                        // If the Future is complete, build the widget with the loaded image URL
+                        String imageUrl = snapshot.data ?? ''; // Use a default value if null
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text(
+                                username,
+                                style: const TextStyle(
+                                  color: Color(0xFF2E148C),
+                                ),
+                              ),
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(imageUrl),
+                              ),
+                            ),
+                            if (index < userNames.length - 1)
+                              Divider(color: Colors.black12, thickness: 0.5),
+                          ],
+                        );
+                      }
+                    },
                   );
                 },
               ),
+
             ],
           ),
         ),
@@ -254,28 +263,24 @@ class _EventState extends State<Event> {
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(30.0, 40.0, 0.0, 0.0),
-                    // Adjust padding as needed
                     child: SizedBox(
-                      width: 36.0, // Adjust width as needed
-                      height: 36.0, // Adjust height as needed
+                      width: 30.0,
+                      height: 30.0,
                       child: FloatingActionButton(
                         onPressed: () {
                           // Logic for navigation to the start page
                           Navigator.pop(context);
                         },
-                        backgroundColor: Colors.transparent,
-                        // Set background color to transparent
                         elevation: 0,
-                        // Remove elevation
-                        child: const Icon(
-                          Icons.arrow_back,
-                          size: 20.0,
-                          color: Color(0xFF2E148C),
+                        child: Image.asset(
+                          'icons/ arrow_white.png', // Set the correct path to your image
+
                         ),
                       ),
                     ),
                   ),
                 ),
+
 
                 //connect button bottom right-corner
                 Align(
@@ -314,46 +319,33 @@ class _EventState extends State<Event> {
     );
   }
 
-//TODO: getImageUrl von Home kopieren und anpassen
-//TODO  HELP!!!! Ich schaffs nicht, dass die Profilbilder angezeigt werden... :(
 
-  void getImgUrl() async {
-    var userID = user?.uid;
 
-    if (userID != null) {
-      final snapshot = await firestore.collection("users").doc(userID).get();
+  Future<String> getImageUrlForUser(String username) async {
+    try {
+      final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
 
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        final imageName = await data["image_data"];
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+        final imageName = data["image_data"];
 
         if (imageName != null) {
-          imageURL = imageName;
-          print("Image Name: $imageName");
+          return imageName;
         } else {
-          print("Image Name not found in the document.");
+          return ''; // Default image or handle accordingly
         }
       } else {
-        print("Document not found for user with ID: $userID");
-        final Reference storageRef =
-            FirebaseStorage.instance.ref('files/cliqueConnect.png');
-
-        try {
-          final imageUrl = await storageRef.getDownloadURL();
-
-          if (imageUrl != null) {
-            imageURL = imageUrl;
-            print("Image URL: $imageUrl");
-            // Now, you can use this URL to display the image in your app.
-          } else {
-            print("Image URL not found.");
-          }
-        } catch (e) {
-          print("Error retrieving image URL: $e");
-        }
+        return ''; // Default image or handle accordingly
       }
+    } catch (e) {
+      print('Error retrieving image URL for user $username: $e');
+      return ''; // Default image or handle accordingly
     }
   }
+
+
+
+
 
   void _countMeIn(String activityName, String activityCategory) async {
     print("userNames: $userNames");
