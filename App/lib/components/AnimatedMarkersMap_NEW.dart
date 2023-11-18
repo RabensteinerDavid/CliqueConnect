@@ -103,11 +103,15 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
           final nameActivity = await alldata[0];
           final description = await alldata[1];
           final location = await alldata[4];
-          var catergory = "";
+          /*Map<String, dynamic> category; // Assuming this is your category variable
 
           if (alldata.length > 6) {
-            catergory = await alldata[6];
-          }
+            category = await alldata[6];
+          } else {
+            // Handle the case where category is not available or assign a default value
+            category = {}; // You can assign an empty map or handle it based on your logic
+          }*/
+
 
           if (location != null && location is GeoPoint) {
             var address = await _convertAddressToCoordinates(location);
@@ -119,6 +123,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
             // Use the title as a unique identifier
             String title = nameActivity.toString();
+            final category = alldata.length > 6 ? await alldata[6].toString() : '';
 
             // Check if the title is already in the map
             if (!uniqueMarkers.containsKey(title)) {
@@ -130,7 +135,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                 start: now,
                 end: now,
                 description: description,
-                category: catergory,
+                category: category,
               );
             }
           }

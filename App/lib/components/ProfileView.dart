@@ -119,6 +119,9 @@ class _YourCurrentScreenState extends State<ProfileView> {
   Future<bool> getImgUrl() async {
     var userID = user?.uid;
 
+    print("userID");
+    print(userID);
+
     if (userID != null) {
       final snapshot = await firestore.collection("users").doc(userID).get();
 

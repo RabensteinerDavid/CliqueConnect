@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_clique_connect/main.dart'; // Import your main file to access MyApp.blueMain
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
+import '../pages/home_page.dart';
 import 'Calendar.dart';
 import 'Home.dart';
 
@@ -84,7 +85,7 @@ class _BottomNavigationBarExampleState
       case 0:
         return const HomeScreen();
       case 1:
-        return const HomeScreen();
+        return HomePageChat();
       case 2:
         return CalendarScreen();
       case 3:

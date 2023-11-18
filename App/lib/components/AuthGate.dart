@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:test_clique_connect/components/CreateProfile.dart';
+import '../helper/helper_functions.dart';
 import 'Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -314,11 +315,17 @@ class _AuthGateState extends State<AuthGate> {
       );
       await saveYourLogin();
 
-      if(await isProfileCreated() != true){
+      await HelperFunctions.saveUserLoggedInSharedPreference(true);
+      await HelperFunctions.saveUserEmailSharedPreference(email);
+      await HelperFunctions.saveUserNameSharedPreference(
+          "David Rabensteiner"
+      );
+
+      if (await isProfileCreated() != true) {
         print("here");
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CreateProfile()));
       }
-      if (userCredential.user != null ) {
+      if (userCredential.user != null) {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavigationBarExample()));
       }
     } catch (e) {
@@ -341,8 +348,7 @@ class _AuthGateState extends State<AuthGate> {
     String password = passwordController.text;
     String confirmPassword = confirmPasswordController.text;
 
-    final emailRegExp =
-    RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -372,11 +378,10 @@ class _AuthGateState extends State<AuthGate> {
       );
       if (userCredential.user != null) {
         await saveYourLogin();
-        if(await isProfileCreated() == true){
+        if (await isProfileCreated() == true) {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        }
-        else{
+        } else {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => CreateProfile()));
         }

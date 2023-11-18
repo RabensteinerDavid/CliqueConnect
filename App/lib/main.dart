@@ -28,6 +28,8 @@ class MyApp extends StatelessWidget {
   static const Color greyMedium = Color(0xffdbd9e7);
   static const Color greyLight = Color(0xEE2E148C);
 
+  static const Color greyChat = Color(0xffEEEEEE);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

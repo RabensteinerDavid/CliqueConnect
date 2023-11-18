@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../services/database_service.dart';
+
 //TODO 1. Clique Connect Button in der Mitte will einfach nicht über das Titelbild schaun
 //TODO 2. Ich schaffs nicht, die Profilbilder der Connecteten leute anzeigen zu lassen
 
@@ -227,12 +229,12 @@ class _EventState extends State<Event> {
                             color: Color(0xFF2E148C), // Set the text color
                           ),
                         ),
-                        leading: Image.network(
+                     /*   leading: Image.network(
                           imageUrl,
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
-                        ),
+                        ),*/
                       ),
                       if (index < userNames.length - 1)
                         Divider(color: Colors.black12, thickness: 0.5),
@@ -378,8 +380,31 @@ class _EventState extends State<Event> {
 
       // Hier wird die Liste aktualisiert und ein neues State-Update ausgelöst
       setState(() {
-        eventList[eventList.length - 1] = users;
+        eventList[7] = users;
         userNames.add(userData["username"]);
+      });
+
+      await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
+        if (snapshot != null && snapshot.docs.isNotEmpty) {
+          print("here in if");
+          var doc = snapshot.docs.first; // Assuming you're interested in the first document
+          String groupId = doc['groupId']; // Replace with the actual field name
+          String groupName = doc['groupName']; // Replace with the actual field name
+              print("Dates from user");
+          print(groupId);
+          print(groupName);
+          print(userData["username"]);
+          try {
+            // Perform operations with the extracted values
+            // For example, you might want to call a function with these values
+            await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
+            print('User added to the group successfully');
+          } catch (e) {
+            print('Error adding user to the group: $e');
+          }
+        } else {
+          print('Snapshot is null or does not contain any documents');
+        }
       });
 
       // Schreiben Sie das aktualisierte Array zurück in die Datenbank
@@ -462,7 +487,7 @@ class _EventState extends State<Event> {
         GeoPoint locationData = eventList[4];
         _convertCoordinatesToAddress(locationData);
 
-        users = eventList[5];
+        users = eventList[7];
 
         // Iteriere durch die Map und füge Benutzernamen hinzu, wenn der Wert true ist
         users.forEach((userName, value) {

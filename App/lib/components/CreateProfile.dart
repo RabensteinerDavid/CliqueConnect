@@ -496,6 +496,7 @@ class _EventState extends State<CreateProfile> {
           'course':selectedStudyCourse,
           'about_me':aboutController.text,
           'interests': filters,
+          'groups': [],
         });
 
         nameController.clear();

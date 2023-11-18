@@ -15,6 +15,7 @@ import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
+import '../pages/home_page.dart';
 import 'AuthGate.dart';
 import 'Calendar.dart';
 import 'CreateProfile.dart';
@@ -339,6 +340,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 36.0), // Add space below the TextField
                   // Other elements or widgets
                 ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => HomePageChat()));
+                },
+                child: Text('Chat'),
               ),
               ElevatedButton(
                 onPressed: saveDataToFirestore,

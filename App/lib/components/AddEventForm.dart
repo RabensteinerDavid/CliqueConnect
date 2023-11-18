@@ -8,8 +8,11 @@ import 'package:geocoding/geocoding.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import '../helper/helper_functions.dart';
 import '../main.dart';
 import 'package:path/path.dart';
+
+import '../services/database_service.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({Key? key}) : super(key: key);
@@ -57,6 +60,7 @@ class _EventState extends State<AddEventForm> {
   File? _photo;
   final ImagePicker _picker = ImagePicker();
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+  User? _user;
 
   @override
   void initState() {
@@ -826,6 +830,29 @@ class _EventState extends State<AddEventForm> {
     }
   }
 
+  Future<String> getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final firestore = FirebaseFirestore.instance;
+
+    var userID = user?.uid;
+    var course = "No Course Available";
+
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final userCourse = data["username"];
+
+        print(userCourse);
+        if (userCourse != null) {
+          course = userCourse;
+        }
+      }
+    }
+    return course;
+  }
+
   Future<void> addCreativActivity(String urlDownload, context) async {
     try {
       // Check if any required field is empty or null
@@ -883,6 +910,21 @@ class _EventState extends State<AddEventForm> {
       CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
 
       String newActivity = activityNameController.text;
+      _user = FirebaseAuth.instance.currentUser;
+      if (newActivity != null && _user != null) {
+        await HelperFunctions.getUserNameSharedPreference().then((val) {
+          DatabaseService(uid: _user!.uid).createGroup(val!, newActivity);
+        });
+        Navigator.of(context).pop();
+      } else {
+        // Handle the case where _groupName or _user is null
+        // You might want to show a message or handle it in a way that makes sense for your app
+        print("Error: _groupName or _user is null");
+      }
+
+      Map<String, dynamic> users = {};
+      users.addEntries([MapEntry(await getUsername(), true)]);
+
       try {
         await creativCollection.doc(selectedCategory).update({
           newActivity: [
@@ -896,9 +938,10 @@ class _EventState extends State<AddEventForm> {
             ),
             urlDownload,
             selectedCategory,
+            users,
           ],
         });
-        print('Creativ activity added successfully!');
+
         // Clear the text fields after adding the entry
         activityNameController.clear();
         descriptionController.clear();
@@ -908,7 +951,9 @@ class _EventState extends State<AddEventForm> {
           endDate = null;
           selectedCategory = null;
           _photo = null;
-        });
+        }
+        );
+
       } catch (e) {
         print('Error updating Firestore in addCreativActivity: $e');
       }
