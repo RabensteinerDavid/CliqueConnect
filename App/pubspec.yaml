@@ -104,6 +104,7 @@ flutter:
     - icons/calendar_white.png
     - icons/map_color.png
     - icons/map_white.png
+    - icons/ arrow_white.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
