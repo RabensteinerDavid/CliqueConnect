@@ -58,7 +58,7 @@ class _EventState extends State<Event> {
     return MaterialApp(
       theme: ThemeData(
         fontFamily:
-            'DINCondensed', // Hier die gewünschte Standard-Schriftart angeben
+        'DINCondensed', // Hier die gewünschte Standard-Schriftart angeben
       ),
       home: Scaffold(
         body: SingleChildScrollView(
@@ -67,6 +67,7 @@ class _EventState extends State<Event> {
             children: [
               Stack(
                 alignment: Alignment.center,
+                clipBehavior: Clip.none,
                 children: [
                   Image.network(
                     imageURL,
@@ -77,7 +78,7 @@ class _EventState extends State<Event> {
                       } else if (loadingProgress.expectedTotalBytes == null) {
                         return const Center(
                           child:
-                              CircularProgressIndicator(), // Image is still loading
+                          CircularProgressIndicator(), // Image is still loading
                         );
                       } else {
                         // Image failed to load, show placeholder
@@ -102,17 +103,9 @@ class _EventState extends State<Event> {
                       );
                     },
                   ),
-                ],
-              ),
-
-              //CliqueConnect Button middle-right
-              //TODO Ich habs leider nicht geschafft, dass er über das Titelbild steht... :(
-              Align(
-                alignment: Alignment.topRight, // Adjust alignment as needed
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
-                  // Adjust padding as needed
-                  child: Positioned(
+                  Positioned(
+                    top: 220,
+                    right: 50.0,
                     child: GestureDetector(
                       onTap: () {
                         //TODO navigate to the stories site, if stories are available
@@ -137,7 +130,7 @@ class _EventState extends State<Event> {
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
 
               Padding(
