@@ -84,7 +84,19 @@ class _SearchPageState extends State<SearchPage> {
       ),
       title: Text(groupName, style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text("Admin: $admin"),
-      trailing: InkWell(
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatPage(
+                groupId: groupId,
+                userName: userName,
+                groupName: groupName,
+              ),
+            ),
+          );
+        },
+   /*   trailing: InkWell(
         onTap: () async {
           await DatabaseService(uid: _user.uid).togglingGroupJoin(groupId, groupName, userName);
           if (_isJoined) {
@@ -101,13 +113,13 @@ class _SearchPageState extends State<SearchPage> {
               ),
             );
             Future.delayed(Duration(milliseconds: 2000), () {
-              print("yooooooo");
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) =>
                     ChatPage(groupId: groupId, userName: userName, groupName: groupName),
               ));
             });
-          } else {
+          }
+*//*          else {
             setState(() {
               _isJoined = !_isJoined;
             });
@@ -120,7 +132,7 @@ class _SearchPageState extends State<SearchPage> {
                     style: TextStyle(fontSize: 17.0)),
               ),
             );
-          }
+          }*//*
         },
         child: _isJoined
             ? Container(
@@ -140,7 +152,7 @@ class _SearchPageState extends State<SearchPage> {
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Text('Join', style: TextStyle(color: Colors.white)),
         ),
-      ),
+      ),*/
     );
   }
 
@@ -164,7 +176,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: TextField(
                       controller: searchEditingController,
                       style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: "Search groups...",
                         hintStyle: TextStyle(color: Colors.white38, fontSize: 16),
                         border: InputBorder.none,

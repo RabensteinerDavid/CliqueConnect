@@ -18,7 +18,7 @@ class DatabaseService {
   Future<QuerySnapshot> searchByName(String searchField) async {
     return await FirebaseFirestore.instance
         .collection("groups")
-        .where("groupName", isEqualTo: searchField)
+        .where("groupName", isGreaterThanOrEqualTo: searchField)
         .get();
   }
 
