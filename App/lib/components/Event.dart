@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../services/database_service.dart';
 
-//TODO 1. Clique Connect Button in der Mitte will einfach nicht über das Titelbild schaun
+
 //TODO Das, dass sich der connect button umwandelt, wenn man ihn klickt, mach ich noch
 
 class Event extends StatefulWidget {
@@ -105,7 +105,7 @@ class _EventState extends State<Event> {
                   ),
                   Positioned(
                     top: 220,
-                    right: 50.0,
+                    right: 290.0,
                     child: GestureDetector(
                       onTap: () {
                         //TODO navigate to the stories site, if stories are available
@@ -113,8 +113,8 @@ class _EventState extends State<Event> {
                         print("Button Clicked!");
                       },
                       child: Container(
-                        width: 100.0,
-                        height: 100.0,
+                        width: 75.0,
+                        height: 75.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color(0xff26168C),
@@ -130,11 +130,15 @@ class _EventState extends State<Event> {
                       ),
                     ),
                   ),
+
+
+
+
                 ],
               ),
 
               Padding(
-                padding: EdgeInsets.only(left: 25.0, top: 0.0, right: 40.0),
+                padding: EdgeInsets.only(left: 25.0, top: 60.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -186,22 +190,56 @@ class _EventState extends State<Event> {
                 ),
               ),
 
-              SizedBox(height: 10, width: 10),
-              const Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(left: 25.0, top: 40.0),
-                  child: Text(
-                    'Participants:',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontFamily: 'DINNextLtPro',
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E148C),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10, width: 10),
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 25.0, top: 40),
+                      child: Text(
+                        'Participants:',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontFamily: 'DINNextLtPro',
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2E148C),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    // Align to the bottom right corner
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
+                      // Adjust padding as needed
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          // Überprüfe, ob der Benutzername bereits auf der Liste steht
+                          if (userNames.contains(users["username"])) {
+                            // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
+                            _countMeOut();
+                          } else {
+                            // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
+                            _countMeIn(widget.eventName, widget.eventCategory);
+                          }
+                        },
+                        backgroundColor: Colors.pink,
+                        elevation: 0,
+                        child: Icon(
+                          (userNames.contains(myUserName))
+                              ? Icons.link_off
+                              : Icons.insert_link,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
               // Display user names in a ListView
               ListView.builder(
                 shrinkWrap: true,
@@ -214,7 +252,7 @@ class _EventState extends State<Event> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         // If the Future is still running, show a loading indicator or placeholder
-                        return CircularProgressIndicator();
+                        return LinearProgressIndicator(color: Color(0xFF2E148C),  minHeight: 0.2,);
                       } else if (snapshot.hasError) {
                         // If an error occurred, show an error message or handle it accordingly
                         return Text('Error loading image');
@@ -276,34 +314,7 @@ class _EventState extends State<Event> {
 
 
                 //connect button bottom right-corner
-                Align(
-                  alignment: Alignment.bottomRight,
-                  // Align to the bottom right corner
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(315, 20, 20, 20),
-                    // Adjust padding as needed
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        // Überprüfe, ob der Benutzername bereits auf der Liste steht
-                        if (userNames.contains(users["username"])) {
-                          // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
-                          _countMeOut();
-                        } else {
-                          // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
-                          _countMeIn(widget.eventName, widget.eventCategory);
-                        }
-                      },
-                      backgroundColor: Colors.pink,
-                      elevation: 0,
-                      child: Icon(
-                        (userNames.contains(myUserName))
-                            ? Icons.link_off
-                            : Icons.insert_link,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ],
