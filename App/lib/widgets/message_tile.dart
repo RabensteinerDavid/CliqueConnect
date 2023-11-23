@@ -86,11 +86,11 @@ class _MessageTileState extends State<MessageTile> {
                     return const SizedBox(
                       width: 24.0, // Adjust the width as needed
                       height: 24.0, // Adjust the height as needed
-                      child: CircularProgressIndicator(),
+                      child: Text(""),
                     );
                   } else if (snapshot.hasError) {
                     // If an error occurred, show an error message or handle it accordingly
-                    return Text('Error loading image');
+                    return const Text('Error loading image');
                   } else {
                     // If the Future is complete, build the widget with the loaded image URL
                     String imageUrl = snapshot.data ?? ''; // Use a default value if null
@@ -99,18 +99,17 @@ class _MessageTileState extends State<MessageTile> {
                       return Row(
                         children: [
                           CircleAvatar(
-                            radius: 10,
+                            radius: 6,
                             backgroundImage: NetworkImage(imageUrl),
                           ),
-                          const SizedBox(width: 8), // Add spacing between CircleAvatar and sender's name
+                          const SizedBox(width: 4), // Add spacing between CircleAvatar and sender's name
                           Text(
                             widget.sender.toUpperCase(),
                             textAlign: TextAlign.start,
                             style: const TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12.0,
                               color: Colors.black,
-                              letterSpacing: -0.5,
+                              letterSpacing: -.1,
                             ),
                           ),
                         ],

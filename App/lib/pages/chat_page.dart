@@ -23,6 +23,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   late Stream<QuerySnapshot> _chats;
   TextEditingController messageEditingController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+
 
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -37,16 +39,42 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
 
     _chats = DatabaseService(uid: currentUser!.uid).getChats(widget.groupId);
+
+    // Add a post-frame callback to scroll to the bottom after the widgets are built
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.easeOut,
+        );
+      });
+    });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.groupName, style: TextStyle(color: MyApp.blueMain)),
+        title: Text(widget.groupName, style: const TextStyle(color: MyApp.blueMain)),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.0,
+        actions: [
+          GestureDetector(
+            onTap: () {
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Icon(
+                Icons.circle, // Replace with your desired icon
+                color: MyApp.blueMain,
+              ),
+            ),
+          ),
+        ],
         // Add a line at the bottom of the AppBar
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2.0),
@@ -59,22 +87,35 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Stack(
         children: <Widget>[
-          StreamBuilder<QuerySnapshot>(
-            stream: _chats,
-            builder: (context, snapshot) {
-              return snapshot.hasData
-                  ? ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  return MessageTile(
-                    message: snapshot.data!.docs[index]['message'],
-                    sender: snapshot.data!.docs[index]['sender'],
-                    sentByMe: widget.userName == snapshot.data!.docs[index]['sender'],
-                  );
-                },
-              )
-                  : Container();
-            },
+          Column(
+            children: <Widget>[
+              Expanded(
+                flex: 1, // 70% height
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 120.0),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _chats,
+                    builder: (context, snapshot) {
+                      return snapshot.hasData
+                          ? ListView.builder(
+                        shrinkWrap: true,
+                        controller: _scrollController,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          return MessageTile(
+                            message: snapshot.data!.docs[index]['message'],
+                            sender: snapshot.data!.docs[index]['sender'],
+                            sentByMe: widget.userName ==
+                                snapshot.data!.docs[index]['sender'],
+                          );
+                        },
+                      )
+                          : Container();
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
           Positioned(
             bottom: 40, // Adjust this value to move it higher or lower
@@ -91,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, -2), // Negative offset to move it up
+                    offset: const Offset(0, -2), // Negative offset to move it up
                   ),
                 ],
               ),
@@ -101,7 +142,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextField(
                       controller: messageEditingController,
                       style: TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: "Send a message ...",
                         hintStyle: TextStyle(
                           color: Colors.black54,
@@ -111,7 +152,7 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 12.0),
+                  const SizedBox(width: 12.0),
                   GestureDetector(
                     onTap: () {
                       _sendMessage();
@@ -131,13 +172,13 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-
         ],
       ),
     );
   }
 
-  _sendMessage() {
+
+  _sendMessage() async {
     if (messageEditingController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
         "message": messageEditingController.text,
@@ -147,11 +188,23 @@ class _ChatPageState extends State<ChatPage> {
 
       DatabaseService(uid: currentUser!.uid).sendMessage(widget.groupId, chatMessageMap);
 
+      // Wait for a short duration to ensure the message is added before scrolling
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Scroll to the bottom after sending a message
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+
       setState(() {
         messageEditingController.text = "";
       });
     }
   }
+
+
 
   @override
   void dispose() {

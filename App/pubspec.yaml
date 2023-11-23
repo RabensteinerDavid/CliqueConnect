@@ -56,8 +56,6 @@ dependencies:
   flutter_neat_and_clean_calendar: ^0.3.14+32
   carousel_slider: ^4.2.1
 
-
-
 flutter_native_splash:
   color: "#817FBF"
   #image: assets/cliqueConnect.png
@@ -109,6 +107,7 @@ flutter:
     - icons/send_blue.png
     - icons/hat_rose.png
     - icons/profile_rose.png
+    - icons/plus_pink.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

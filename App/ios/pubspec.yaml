@@ -42,6 +42,7 @@ dependencies:
   shared_preferences: ^2.2.2
   flutter_neat_and_clean_calendar: ^0.3.14+32
   carousel_slider: ^4.2.1
+  flutter_list_view: ^1.1.22
 
 dev_dependencies:
   flutter_test:

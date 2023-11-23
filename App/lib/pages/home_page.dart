@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_clique_connect/components/AuthGate.dart';
+import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
 import '../components/AuthGate.dart';
@@ -39,22 +40,42 @@ class _HomePageState extends State<HomePageChat> {
     await  _getUserAuthAndJoinedGroups();
   }
 
-  Widget noGroupWidget() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25.0),
+  Widget noGroupWidget(BuildContext context) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-
-          SizedBox(height: 20.0),
-          Text(
-            "You've not joined any group, cliqueConnect to be in a group",
+          // Add the search icon button
+          IconButton(
+            icon: Image.asset(
+              "icons/plus_pink.png",
+              width: 50.0, // Adjust the width as needed
+              height: 50.0, // Adjust the height as needed
+            ),
+            onPressed: () {
+              // Navigate to the search page when the search icon is pressed
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EventHome()), // Replace EventHome with your actual widget
+              );
+            },
+          ),
+          const SizedBox(height: 20.0),
+          const Text(
+            "You've not joined any group. You have to connect to be in a group",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16.0, // Adjust the font size as needed
+            ),
           ),
         ],
       ),
     );
   }
+
+
+
 
   Widget groupsList() {
     return StreamBuilder<Map<String, dynamic>>(
@@ -72,7 +93,7 @@ class _HomePageState extends State<HomePageChat> {
               },
             );
           } else {
-            return noGroupWidget();
+            return noGroupWidget(context);
           }
         } else {
           return Center(
@@ -190,30 +211,42 @@ class _HomePageState extends State<HomePageChat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: groupsList(),
-/*      floatingActionButton: buildFloatingActionButton(),*/
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(48.0, 46.0, 18.0, 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Messages',
+                style: TextStyle(fontSize: 18.0, color: MyApp.blueMain),
+              ),
+            ),
+          ),
+          groupsList(),
+        ],
+      ),
+      /*floatingActionButton: buildFloatingActionButton(),*/
     );
   }
+
+
 
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(kToolbarHeight),
       child: AppBar(
-        title: Text(
-          'Groups',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 27.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+       title: Image.asset('assets/cliqueConnect.png',  fit: BoxFit.contain,
+         height: 50,),
+        centerTitle: true, // Center the title (icon) in the middle
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
-        iconTheme: IconThemeData(color: Colors.white), // Set the color of the back arrow to white
+        iconTheme: const IconThemeData(color: Colors.white), // Set the color of the back arrow to white
         actions: <Widget>[
           IconButton(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
-            icon: Icon(Icons.search, color: Colors.white, size: 25.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            icon: const Icon(Icons.search, color: Colors.white, size: 25.0),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => SearchPage()),
@@ -224,6 +257,7 @@ class _HomePageState extends State<HomePageChat> {
       ),
     );
   }
+
 
 
   Widget buildFloatingActionButton() {
