@@ -103,6 +103,14 @@ flutter:
     - assets/culinary_noStory.png
     - assets/offTopic_noStory.png
     - assets/archive_noStory.png
+    - assets/Marker_creative_noStory.png
+    - assets/Marker_sports_noStory.png
+    - assets/Marker_gaming_noStory.png
+    - assets/Marker_education_noStory.png
+    - assets/Marker_nightLife_noStory.png
+    - assets/Marker_culinary_noStory.png
+    - assets/Marker_offTopic_noStory.png
+    - assets/Marker_archive_noStory.png
     - icons/home_grey.png
     - icons/home_white.png
     - icons/chat_all_grey.png

@@ -25,8 +25,6 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messageEditingController = TextEditingController();
   ScrollController _scrollController = ScrollController();
 
-
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get the current user
@@ -66,11 +64,31 @@ class _ChatPageState extends State<ChatPage> {
           GestureDetector(
             onTap: () {
             },
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(
-                Icons.circle, // Replace with your desired icon
-                color: MyApp.blueMain,
+            child:Padding(
+              padding: const EdgeInsets.only(right: 20.0), // Adjust the padding as needed
+              child: FutureBuilder<String>(
+                future: getGroupCategory(widget.groupId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // If the Future is still running, you can return a placeholder or loading image
+                    return const CircleAvatar(
+                      radius: 25.0,
+                      backgroundColor: MyApp.blueMain,
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return CircleAvatar(
+                      radius: 25.0,
+                      backgroundColor: MyApp.blueMain,
+                      child: Image.asset(
+                        getCategoryPic(snapshot.data ?? ""),
+                        fit: BoxFit.cover,
+                        width: 56.0,
+                        height: 56.0,
+                      ),
+                    );
+                  }
+                },
               ),
             ),
           ),
@@ -201,6 +219,45 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         messageEditingController.text = "";
       });
+    }
+  }
+
+  String getCategoryPic(String category) {
+    switch (category) {
+      case 'Creative':
+        return "assets/creative_noStory.png";
+      case 'Sports':
+        return "assets/sports_noStory.png";
+      case 'Games':
+        return "assets/gaming_noStory.png";
+      case 'Education':
+        return "assets/education_noStory.png";
+      case 'Nightlife':
+        return "assets/nightLife_noStory.png";
+      case 'Culinary':
+        return "assets/culinary_noStory.png";
+      case 'Off Topic':
+        return "assets/offTopic_noStory.png";
+      case 'Archives':
+        return "assets/archive_noStory.png";
+      default:
+        return "assets/offTopic_noStory.png";
+    }
+  }
+
+  final CollectionReference groupCollection = FirebaseFirestore.instance.collection('groups');
+
+  Future<String> getGroupCategory(String groupId) async {
+    try {
+      DocumentSnapshot groupDoc = await groupCollection.doc(groupId).get();
+
+      if (groupDoc.exists) {
+        return groupDoc['category'];
+      } else {
+        return "";
+      }
+    } catch (e) {
+      return "";
     }
   }
 

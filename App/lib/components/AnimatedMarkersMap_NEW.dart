@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
@@ -19,6 +18,8 @@ const MARKER_SIZE_SHRINK = 30.0;
 
 final List<String> filtersCategory = [];
 List<MapMarker> _markers = [];
+
+var categorySave = "";
 
 List<int> indexToShow = [];
 
@@ -103,23 +104,33 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
           final nameActivity = await alldata[0];
           final description = await alldata[1];
           final location = await alldata[4];
-          /*Map<String, dynamic> category; // Assuming this is your category variable
+          final category = await alldata[6];
+          categorySave = category;
 
-          if (alldata.length > 6) {
-            category = await alldata[6];
-          } else {
-            // Handle the case where category is not available or assign a default value
-            category = {}; // You can assign an empty map or handle it based on your logic
-          }*/
-
+          var imagePic = 'assets/Marker.png';
+          switch (category) {
+            case 'Creative':
+              imagePic = "assets/creative_noStory.png";
+            case 'Sports':
+              imagePic = "assets/sports_noStory.png";
+            case 'Games':
+              imagePic = "assets/gaming_noStory.png";
+            case 'Education':
+              imagePic = "assets/education_noStory.png";
+            case 'Nightlife':
+              imagePic = "assets/nightLife_noStory.png";
+            case 'Culinary':
+              imagePic = "assets/culinary_noStory.png";
+            case 'Off Topic':
+              imagePic = "assets/offTopic_noStory.png";
+            case 'Archives':
+              imagePic = "assets/archive_noStory.png";
+            default:
+              imagePic = "assets/offTopic_noStory.png";
+          }
 
           if (location != null && location is GeoPoint) {
             var address = await _convertAddressToCoordinates(location);
-
-            var imagePic = 'assets/Marker.png';
-            if (nameActivity.toString().contains("Volleyball")) {
-              imagePic = 'assets/Volleyball.png';
-            }
 
             // Use the title as a unique identifier
             String title = nameActivity.toString();
@@ -178,7 +189,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                   _animateCameraToMarker(marker);
                 }
               });
-            },
+            }, category: categorySave,
           );
         },
       );
@@ -268,7 +279,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
               height: MediaQuery.of(context).size.height * 0.08,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/cliqueConnect.png'),
+                  image: AssetImage("assets/cliqueConnect.png"),
                   fit: BoxFit.contain,
                 ),
               ),
@@ -628,20 +639,18 @@ class YourCustomMarkerWidget extends StatelessWidget {
   final MapMarker marker;
   final bool selected;
   final void Function() onTap;
+  final category;
 
   const YourCustomMarkerWidget({
     Key? key,
     required this.marker,
     required this.selected,
     required this.onTap,
+    required this.category,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String titleMarker = "Marker";
-    if (marker.title.contains("Volleyball")) {
-      titleMarker = "Volleyball_marker";
-    }
     final size = selected ? MARKER_SIZE_EXPAND : MARKER_SIZE_SHRINK;
     return GestureDetector(
       onTap: () {
@@ -652,9 +661,32 @@ class YourCustomMarkerWidget extends StatelessWidget {
           height: size,
           width: size,
           duration: const Duration(milliseconds: 400),
-          child: Image.asset('assets/$titleMarker.png'),
+          child: Image.asset(_getMarkers(category)),
         ),
       ),
     );
+  }
+
+  String _getMarkers(String category){
+    switch (category) {
+      case 'Creative':
+        return "assets/Marker_creative_noStory.png";
+      case 'Sports':
+        return"assets/Marker_sports_noStory.png";
+      case 'Games':
+        return "assets/Marker_gaming_noStory.png";
+      case 'Education':
+        return "assets/Marker_education_noStory.png";
+      case 'Nightlife':
+        return "assets/Marker_nightLife_noStory.png";
+      case 'Culinary':
+        return "assets/Marker_culinary_noStory.png";
+      case 'Off Topic':
+        return "assets/Marker_offTopic_noStory.png";
+      case 'Archives':
+        return "assets/Marker_archive_noStory.png";
+      default:
+        return "assets/Marker_offTopic_noStory.png";
+    }
   }
 }
