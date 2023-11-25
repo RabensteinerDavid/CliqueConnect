@@ -31,7 +31,7 @@ class DatabaseService {
     }
   }
 
-  Future<void> createGroup(String userName, String groupName) async {
+  Future<void> createGroup(String userName, String groupName, String category) async {
     try {
       DocumentReference groupDocRef = await groupCollection.add({
         'groupName': groupName,
@@ -41,6 +41,7 @@ class DatabaseService {
         'groupId': '',
         'recentMessage': '',
         'recentMessageSender': '',
+        'category': category,
       });
 
       await groupDocRef.update({

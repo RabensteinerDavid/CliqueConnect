@@ -95,6 +95,14 @@ flutter:
     - assets/Marker.png
     - assets/Volleyball.png
     - assets/Volleyball_marker.png
+    - assets/creative_noStory.png
+    - assets/sports_noStory.png
+    - assets/gaming_noStory.png
+    - assets/education_noStory.png
+    - assets/nightLife_noStory.png
+    - assets/culinary_noStory.png
+    - assets/offTopic_noStory.png
+    - assets/archive_noStory.png
     - icons/home_grey.png
     - icons/home_white.png
     - icons/chat_all_grey.png

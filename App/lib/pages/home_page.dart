@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:test_clique_connect/components/AuthGate.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
-import '../components/AuthGate.dart';
-import '../pages/profile_page.dart';
 import '../pages/search_page.dart';
 import '../services/auth_service.dart';
 import '../services/database_service.dart';
@@ -24,7 +21,7 @@ class _HomePageState extends State<HomePageChat> {
   User? _user;
   String _userName = '';
   String _email = '';
-/*  late Stream<Map<String, dynamic>> _groups = Stream.empty();*/
+
   late StreamController<Map<String, dynamic>> _groupsController = StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get _groups => _groupsController.stream;
 
@@ -96,7 +93,7 @@ class _HomePageState extends State<HomePageChat> {
             return noGroupWidget(context);
           }
         } else {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -156,57 +153,6 @@ class _HomePageState extends State<HomePageChat> {
     return res.substring(res.indexOf('_') + 1);
   }
 
-  void _popupDialog(BuildContext context) {
-    Widget cancelButton = TextButton(
-      child: Text("Cancel"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-    Widget createButton = TextButton(
-      child: Text("Create"),
-      onPressed: () async {
-        if (_groupName != null && _user != null) {
-          await HelperFunctions.getUserNameSharedPreference().then((val) {
-            DatabaseService(uid: _user!.uid).createGroup(val!, _groupName);
-          });
-          Navigator.of(context).pop();
-        } else {
-          // Handle the case where _groupName or _user is null
-          // You might want to show a message or handle it in a way that makes sense for your app
-          print("Error: _groupName or _user is null");
-        }
-      },
-    );
-
-
-    AlertDialog alert = AlertDialog(
-      title: Text("Create a group"),
-      content: TextField(
-        onChanged: (val) {
-          _groupName = val;
-        },
-        style: TextStyle(
-          fontSize: 15.0,
-          height: 2.0,
-          color: Colors.black,
-        ),
-      ),
-      actions: [
-        cancelButton,
-        createButton,
-      ],
-    );
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -235,7 +181,7 @@ class _HomePageState extends State<HomePageChat> {
 
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
-      preferredSize: Size.fromHeight(kToolbarHeight),
+      preferredSize: const Size.fromHeight(kToolbarHeight),
       child: AppBar(
        title: Image.asset('assets/cliqueConnect.png',  fit: BoxFit.contain,
          height: 50,),
@@ -255,19 +201,6 @@ class _HomePageState extends State<HomePageChat> {
           )
         ],
       ),
-    );
-  }
-
-
-
-  Widget buildFloatingActionButton() {
-    return FloatingActionButton(
-      onPressed: () {
-        _popupDialog(context);
-      },
-      backgroundColor: Colors.grey[700],
-      elevation: 0.0,
-      child: const Icon(Icons.add, color: Colors.white, size: 30.0),
     );
   }
 }

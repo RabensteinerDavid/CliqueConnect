@@ -913,7 +913,7 @@ class _EventState extends State<AddEventForm> {
       _user = FirebaseAuth.instance.currentUser;
       if (newActivity != null && _user != null) {
         await HelperFunctions.getUserNameSharedPreference().then((val) {
-          DatabaseService(uid: _user!.uid).createGroup(val!, newActivity);
+          DatabaseService(uid: _user!.uid).createGroup(val!, newActivity, selectedCategory!);
         });
         Navigator.of(context).pop();
       } else {
