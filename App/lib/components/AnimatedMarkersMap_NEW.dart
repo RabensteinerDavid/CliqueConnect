@@ -92,7 +92,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
       final querySnapshot = await activitiesCollectionRef.get();
       final now = Timestamp.now();
 
-      // Use a map to track markers by title
       Map<String, MapMarker> uniqueMarkers = {};
 
       for (final activityDoc in querySnapshot.docs) {
@@ -201,7 +200,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    // Use filteredMapMarkers instead of _markers when building markers
     filteredMapMarkers = _markers.where((marker) {
       return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
     }).toList();
@@ -213,13 +211,13 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             stream: Geolocator.getPositionStream(),
             builder: (context, positionSnapshot) {
               if (positionSnapshot.hasData) {
+                print("first");
                 final userPosition = positionSnapshot.data;
-
                 return FutureBuilder<List<MapMarker>>(
                   future: _markersFuture,
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
-                      List<MapMarker> markers = markersSnapshot.data ?? [];
+                      print("second");
                       return _markers.isNotEmpty
                           ? FlutterMap(
                         mapController: mapController,
@@ -257,6 +255,8 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                           ),
                           MarkerClusterLayerWidget(
                             options: MarkerClusterLayerOptions(
+                              onClusterTap: (MarkerClusterNode node) {
+                              },
                               maxClusterRadius: 25,
                               size: const Size(30, 30),
                               fitBoundsOptions: const FitBoundsOptions(
@@ -287,7 +287,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                     return const CircularProgressIndicator();
                   },
                 );
-
               }
               return const CircularProgressIndicator();
               },
@@ -415,26 +414,20 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     final destLocation = marker.location;
     final destZoom = 18.0;
 
-    // Create some tweens. These serve to split up the transition from one location to another.
-    // In our case, we want to split the transition between our current map center and the destination.
     final latTween =
     Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
     final lngTween =
     Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
 
-    // Create an animation controller that has a duration and a TickerProvider.
     final controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this, // Use the TickerProvider from the current state
     );
 
-    // The animation determines what path the animation will take.
-    // You can try different Curves values; I found fastOutSlowIn to be a good choice.
     final Animation<double> animation =
     CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
-    // Update the map position during each animation frame.
     controller.addListener(() {
       mapController.move(
         latlong.LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
@@ -442,14 +435,12 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
       );
     });
 
-    // Dispose of the controller when the animation is completed or dismissed.
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
         controller.dispose();
       }
     });
 
-    // Start the animation.
     controller.forward();
   }
 
