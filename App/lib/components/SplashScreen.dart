@@ -9,6 +9,8 @@ import 'package:video_player/video_player.dart';
 import 'AuthGate.dart';
 import 'NavigationBar.dart';
 
+import '../helper/helper_functions.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -76,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         );
       }
-      else if(await getYourLogin() == true && await isProfileCreated() == false){
+      else if(await getYourLogin() == true && await isProfileCreated() == false && await HelperFunctions.getUserName() == "false" && await HelperFunctions.getCourse() == "false" && await HelperFunctions.getUniversity() == "false" && await HelperFunctions.getAboutMeText() == "false"){
         // Navigating to the AuthGate screen with a custom transition
         Navigator.pushReplacement(
           context,
