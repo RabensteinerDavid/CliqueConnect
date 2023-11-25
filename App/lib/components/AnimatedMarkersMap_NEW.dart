@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart' as latlong;
@@ -172,6 +173,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
         point: marker.location,
         builder: (BuildContext context) {
           return YourCustomMarkerWidget(
+            category: marker.category,
             marker: marker,
             selected: index == selectedCardIndex,
             onTap: () {
@@ -189,7 +191,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                   _animateCameraToMarker(marker);
                 }
               });
-            }, category: categorySave,
+            },
           );
         },
       );
@@ -218,7 +220,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
                       List<MapMarker> markers = markersSnapshot.data ?? [];
-                      return  _markers.isNotEmpty
+                      return _markers.isNotEmpty
                           ? FlutterMap(
                         mapController: mapController,
                         options: MapOptions(
@@ -253,15 +255,39 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                               ),
                             ],
                           ),
-                          MarkerLayer(
-                            markers: _buildMarkersWithFilter(filteredMapMarkers),
+                          MarkerClusterLayerWidget(
+                            options: MarkerClusterLayerOptions(
+                              maxClusterRadius: 25,
+                              size: const Size(30, 30),
+                              fitBoundsOptions: const FitBoundsOptions(
+                                padding: EdgeInsets.all(50),
+                                maxZoom: 15,
+                              ),
+                              markers: _buildMarkersWithFilter(filteredMapMarkers),
+                              builder: (context, markers) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(130),
+                                    color: MyApp.blueMain,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      markers.length.toString(),
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
-                      ): const CircularProgressIndicator();
+                      )
+                          : const CircularProgressIndicator();
                     }
                     return const CircularProgressIndicator();
                   },
                 );
+
               }
               return const CircularProgressIndicator();
               },
