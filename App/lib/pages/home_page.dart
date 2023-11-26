@@ -170,7 +170,9 @@ class _HomePageState extends State<HomePageChat> {
               ),
             ),
           ),
-          groupsList(),
+          Expanded(
+            child: groupsList(),
+          ),
         ],
       ),
       /*floatingActionButton: buildFloatingActionButton(),*/
