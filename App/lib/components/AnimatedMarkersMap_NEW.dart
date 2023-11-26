@@ -17,6 +17,11 @@ const MARKER_COLOR = Color(0xFF3DC5A7);
 const MARKER_SIZE_EXPAND = 55.0;
 const MARKER_SIZE_SHRINK = 30.0;
 
+const LocationSettings locationSettings = LocationSettings(
+  accuracy: LocationAccuracy.high,
+  distanceFilter: 5,
+);
+
 final List<String> filtersCategory = [];
 List<MapMarker> _markers = [];
 
@@ -203,12 +208,11 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     filteredMapMarkers = _markers.where((marker) {
       return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
     }).toList();
-
     return Scaffold(
       body: Stack(
         children: [
           StreamBuilder<Position>(
-            stream: Geolocator.getPositionStream(),
+            stream: Geolocator.getPositionStream(locationSettings: locationSettings),
             builder: (context, positionSnapshot) {
               if (positionSnapshot.hasData) {
                 print("first");
