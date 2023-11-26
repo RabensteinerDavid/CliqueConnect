@@ -591,7 +591,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                       Expanded(
                         child: Text(
                           widget.mapMarker.title,
-                          overflow: TextOverflow.ellipsis,
+                          overflow: TextOverflow.visible,
                           maxLines: 1,
                           style: const TextStyle(
                             fontSize: 20, // Adjust the font size as needed
@@ -601,7 +601,18 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                         // Adjust the number of lines to show
                         ),
                       ),
-                      Flexible(
+                      const Expanded(
+                        child: Text(
+                          "",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 20, // Adjust the font size as needed
+                          ),
+                          // Adjust the number of lines to show
+                        ),
+                      ),
+                      Expanded(
                         child: Text(
                           "Description: ${ widget.mapMarker.description}",
                           overflow: TextOverflow.ellipsis,
@@ -630,19 +641,16 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                           // Adjust the number of lines to show
                         ),
                       ),
-
-
-                        Expanded(
+                      Expanded(
                         child: Text(
                         "${widget.mapMarker.rule?.byWeekDays != null ? 'When: ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' in ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        ),
+                      ),
                     ),
-                    ),
-                    ),
-
                       Expanded(
                         child: Align(
                           alignment: Alignment.bottomRight, // Adjust the alignment as needed
