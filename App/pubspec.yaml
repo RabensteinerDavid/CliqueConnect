@@ -56,6 +56,7 @@ dependencies:
   flutter_neat_and_clean_calendar: ^0.3.14+32
   carousel_slider: ^4.2.1
   flutter_map_marker_cluster: ^1.2.0
+  rrule: ^0.2.14
 
 flutter_native_splash:
   color: "#817FBF"

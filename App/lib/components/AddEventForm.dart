@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:rrule/rrule.dart';
 import '../helper/helper_functions.dart';
 import '../main.dart';
 import 'package:path/path.dart';
@@ -38,6 +39,9 @@ class _EventState extends State<AddEventForm> {
   final FocusNode _endDateFocus = FocusNode();
   final FocusNode _endTimeFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
+  final FocusNode _weeklyFocus = FocusNode();
+  final FocusNode _endMonthFocus = FocusNode();
+  final FocusNode _intervallFocus = FocusNode();
 
   Color _nameLabelColor = MyApp.greyDark;
   Color _descriptionlColor = MyApp.greyDark;
@@ -47,6 +51,9 @@ class _EventState extends State<AddEventForm> {
   Color _endDateLabelColor = MyApp.greyDark;
   Color _endTimeLabelColor = MyApp.greyDark;
   Color _categoryLabelColor = MyApp.greyDark;
+  Color _weeklyLabelColor = MyApp.greyDark;
+  Color _endMonthLabelColor = MyApp.greyDark;
+  Color _intervalLabelColor = MyApp.greyDark;
 
   bool _startDateText = false;
   bool _startTimeText = false;
@@ -56,6 +63,11 @@ class _EventState extends State<AddEventForm> {
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+
+  RecurrenceRule? recurrenceRule;
+  String? selectedFrequency;
+  String? selectedTillMonth;
+  int? selectedInterval;
 
   File? _photo;
   final ImagePicker _picker = ImagePicker();
@@ -78,13 +90,35 @@ class _EventState extends State<AddEventForm> {
     _endDateFocus.dispose();
     _endTimeFocus.dispose();
     _categoryFocus.dispose();
+    _weeklyFocus.dispose();
+    _endMonthFocus.dispose();
+    _intervallFocus.dispose();
     // Dispose of other focus nodes if needed
     super.dispose();
   }
 
+
+  bool showAdditionalFields = false;
+  bool showSwecondDate = false;
+
+  List<String> frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+  List<String> tillMonth = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
         onTap: () {
       // Close keyboard when tapping outside text fields
@@ -100,6 +134,9 @@ class _EventState extends State<AddEventForm> {
         _endDateLabelColor = MyApp.greyDark;
         _endTimeLabelColor = MyApp.greyDark;
         _categoryLabelColor = MyApp.greyDark;
+        _weeklyLabelColor = MyApp.greyDark;
+        _endMonthLabelColor = MyApp.greyDark;
+        _intervalLabelColor = MyApp.greyDark;
       });
 
       // Set the last focused field to null
@@ -157,6 +194,9 @@ class _EventState extends State<AddEventForm> {
                 _endDateLabelColor = MyApp.greyDark;
                 _endTimeLabelColor = MyApp.greyDark;
                 _categoryLabelColor = MyApp.greyDark;
+                _weeklyLabelColor = MyApp.greyDark;
+                _endMonthLabelColor = MyApp.greyDark;
+                _intervalLabelColor = MyApp.greyDark;
                 });
                 },
                 decoration: InputDecoration(
@@ -182,6 +222,9 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
                     });
                   },
                   decoration: InputDecoration(
@@ -207,6 +250,9 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
                     });
                   },
                   decoration: InputDecoration(
@@ -262,6 +308,9 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
                     });
                   },
                   child: InputDecorator(
@@ -343,6 +392,9 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.greyDark;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
                     });
                   },
                   child: InputDecorator(
@@ -371,156 +423,177 @@ class _EventState extends State<AddEventForm> {
                   ),
                 ),
                 const SizedBox(height: 12.0),
-                InkWell(
-                  onTap: () async {
-                    DateTime? pickedDate = await showCupertinoModalPopup<DateTime>(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          color: Colors.white,
-                          height: 200.0,
-                          child: CupertinoDatePicker(
-                            mode: CupertinoDatePickerMode.date,
-                            initialDateTime: DateTime.now(),
-                            minimumDate: null,
-                            maximumDate: DateTime(2101),
-                            onDateTimeChanged: (DateTime newDate) {
-                              if (newDate != null && newDate != endDate) {
-                                setState(() {
-                                  endDate = newDate;
-                                  _endDateText = true; // Update the variable for 'End Date'
-                                });
-                              }
-                            },
-                          ),
+             if (showSwecondDate)
+                  Column(
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        DateTime? pickedDate = await showCupertinoModalPopup<DateTime>(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              color: Colors.white,
+                              height: 200.0,
+                              child: CupertinoDatePicker(
+                                mode: CupertinoDatePickerMode.date,
+                                initialDateTime: DateTime.now(),
+                                minimumDate: null,
+                                maximumDate: DateTime(2101),
+                                onDateTimeChanged: (DateTime newDate) {
+                                  if (newDate != null && newDate != endDate) {
+                                    setState(() {
+                                      endDate = newDate;
+                                      _endDateText = true; // Update the variable for 'End Date'
+                                    });
+                                  }
+                                },
+                              ),
+                            );
+                          },
                         );
-                      },
-                    );
-                    if (pickedDate != null && pickedDate != endDate) {
-                      setState(() {
-                        endDate = pickedDate;
-                      });
-                    }
-                    FocusScope.of(context).requestFocus(_endDateFocus);
+                        if (pickedDate != null && pickedDate != endDate) {
+                          setState(() {
+                            endDate = pickedDate;
+                          });
+                        }
+                        FocusScope.of(context).requestFocus(_endDateFocus);
 
-                    // Update the color logic
-                    setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = _endDateText ? MyApp.blueMain : MyApp.greyDark; // Update based on the variable
-                      _endTimeLabelColor = MyApp.greyDark;
-                      _categoryLabelColor = MyApp.greyDark;
-                    });
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'End Date',
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
-                      labelStyle: TextStyle(
-                        color: _endDateFocus.hasFocus ? MyApp.blueMain : _endDateLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? "${endDate!.toLocal()}".split(' ')[0]
-                              : 'Select end date',
-                          style: TextStyle(
-                            color: _endDateText ? MyApp.black : _endDateLabelColor,
+                        // Update the color logic
+                        setState(() {
+                          _nameLabelColor = MyApp.greyDark;
+                          _descriptionlColor = MyApp.greyDark;
+                          _addressLabelColor = MyApp.greyDark;
+                          _startDateLabelColor = MyApp.greyDark;
+                          _startTimeLabelColor = MyApp.greyDark;
+                          _endDateLabelColor = _endDateText ? MyApp.blueMain : MyApp.greyDark; // Update based on the variable
+                          _endTimeLabelColor = MyApp.greyDark;
+                          _categoryLabelColor = MyApp.greyDark;
+                          _weeklyLabelColor = MyApp.greyDark;
+                          _endMonthLabelColor = MyApp.greyDark;
+                          _intervalLabelColor = MyApp.greyDark;
+                        });
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Second Date',
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                          labelStyle: TextStyle(
+                            color: _endDateFocus.hasFocus ? MyApp.blueMain : _endDateLabelColor,
                           ),
                         ),
-                        const Icon(Icons.calendar_today),
-                      ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              endDate != null
+                                  ? "${endDate!.toLocal()}".split(' ')[0]
+                                  : 'Select Second start date',
+                              style: TextStyle(
+                                color: _endDateText ? MyApp.black : _endDateLabelColor,
+                              ),
+                            ),
+                            const Icon(Icons.calendar_today),
+                          ],
+                        ),
+                      ),
                     ),
+
+                    const SizedBox(height: 12.0),
+                    InkWell(
+                      onTap: () async {
+                        TimeOfDay? pickedTime = await showCupertinoModalPopup<TimeOfDay>(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              color: Colors.white, // Set the background color to white
+                              height: 200.0,
+                              child: CupertinoDatePicker(
+                                mode: CupertinoDatePickerMode.time,
+                                initialDateTime: DateTime.now(),
+                                use24hFormat: true,
+                                onDateTimeChanged: (DateTime newDateTime) {
+                                  if (newDateTime != null && newDateTime != endDate) {
+                                    _endDateText = true;
+                                    setState(() {
+                                      endDate = DateTime(
+                                        endDate!.year,
+                                        endDate!.month,
+                                        endDate!.day,
+                                        newDateTime.hour,
+                                        newDateTime.minute,
+                                      );
+                                    });
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                        );
+                        if (pickedTime != null && pickedTime != endDate) {
+                          setState(() {
+                            endDate = DateTime(
+                              endDate!.year,
+                              endDate!.month,
+                              endDate!.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                          });
+                        }
+
+                        FocusScope.of(context).requestFocus(_endTimeFocus);
+                        // Update the color logic
+                        setState(() {
+                          _nameLabelColor = MyApp.greyDark;
+                          _descriptionlColor = MyApp.greyDark;
+                          _addressLabelColor = MyApp.greyDark;
+                          _startDateLabelColor = MyApp.greyDark;
+                          _startTimeLabelColor = MyApp.greyDark;
+                          _endDateLabelColor = MyApp.greyDark;
+                          _endTimeLabelColor = MyApp.blueMain;
+                          _categoryLabelColor = MyApp.greyDark;
+                          _weeklyLabelColor = MyApp.greyDark;
+                          _endMonthLabelColor = MyApp.greyDark;
+                          _intervalLabelColor = MyApp.greyDark;
+                        });
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Second Time',
+                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                          labelStyle: TextStyle(
+                            color: _endTimeFocus.hasFocus ? MyApp.blueMain : _endTimeLabelColor,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              endDate != null
+                                  ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
+                                  : 'Second start time',
+                              style: TextStyle(
+                                color: _endDateText ? MyApp.black : _endTimeLabelColor,
+                              ),
+                            ),
+                            const Icon(Icons.access_time),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ]
                   ),
-                ),
 
                 const SizedBox(height: 12.0),
-                InkWell(
-                  onTap: () async {
-                    TimeOfDay? pickedTime = await showCupertinoModalPopup<TimeOfDay>(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          color: Colors.white, // Set the background color to white
-                          height: 200.0,
-                          child: CupertinoDatePicker(
-                            mode: CupertinoDatePickerMode.time,
-                            initialDateTime: DateTime.now(),
-                            use24hFormat: true,
-                            onDateTimeChanged: (DateTime newDateTime) {
-                              if (newDateTime != null && newDateTime != endDate) {
-                                _endDateText = true;
-                                setState(() {
-                                  endDate = DateTime(
-                                    endDate!.year,
-                                    endDate!.month,
-                                    endDate!.day,
-                                    newDateTime.hour,
-                                    newDateTime.minute,
-                                  );
-                                });
-                              }
-                            },
-                          ),
-                        );
-                      },
-                    );
-                    if (pickedTime != null && pickedTime != endDate) {
-                      setState(() {
-                        endDate = DateTime(
-                          endDate!.year,
-                          endDate!.month,
-                          endDate!.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
-                        );
-                      });
-                    }
-
-                    FocusScope.of(context).requestFocus(_endTimeFocus);
-                    // Update the color logic
+                ElevatedButton(
+                  onPressed: () {
                     setState(() {
-                      _nameLabelColor = MyApp.greyDark;
-                      _descriptionlColor = MyApp.greyDark;
-                      _addressLabelColor = MyApp.greyDark;
-                      _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.greyDark;
-                      _endDateLabelColor = MyApp.greyDark;
-                      _endTimeLabelColor = MyApp.blueMain;
-                      _categoryLabelColor = MyApp.greyDark;
+                      showSwecondDate = !showSwecondDate;
                     });
                   },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'End Time',
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _endTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                      labelStyle: TextStyle(
-                        color: _endTimeFocus.hasFocus ? MyApp.blueMain : _endTimeLabelColor,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          endDate != null
-                              ? '${"${endDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${endDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select end time',
-                          style: TextStyle(
-                            color: _endDateText ? MyApp.black : _endTimeLabelColor,
-                          ),
-                        ),
-                        const Icon(Icons.access_time),
-                      ],
-                    ),
-                  ),
+                  child: Text(showSwecondDate ? 'No additional Date' : 'Additional Date'),
                 ),
                 const SizedBox(height: 12.0),
                 DropdownButtonFormField<String>(
@@ -548,6 +621,9 @@ class _EventState extends State<AddEventForm> {
                       _endDateLabelColor = MyApp.greyDark;
                       _endTimeLabelColor = MyApp.greyDark;
                       _categoryLabelColor = MyApp.blueMain;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
                     });
                   },
                   decoration: InputDecoration(
@@ -559,6 +635,149 @@ class _EventState extends State<AddEventForm> {
                       color: _categoryFocus.hasFocus ? MyApp.blueMain : _categoryLabelColor,
                     ),
                   ),
+                ),
+                if (showAdditionalFields)
+                   Column(
+                    children: [
+                      const SizedBox(height: 12.0),
+                      Column(
+                        children: [
+                          const Divider(
+                            color: Colors.black12,
+                            height: 20, // Adjust the height of the line
+                            thickness: 1, // Adjust the thickness of the line
+                          ),
+                          const SizedBox(height: 12.0),
+                          DropdownButtonFormField<String>(
+                            value: selectedFrequency,
+                            items: frequencies.map((frequency) {
+                              return DropdownMenuItem<String>(
+                                value: frequency,
+                                child: Text(frequency),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedFrequency = value;
+                              });
+                            },
+                            onTap: () {
+                              setState(() {
+                                _nameLabelColor = MyApp.greyDark;
+                                _descriptionlColor = MyApp.greyDark;
+                                _addressLabelColor = MyApp.greyDark;
+                                _startDateLabelColor = MyApp.greyDark;
+                                _startTimeLabelColor = MyApp.greyDark;
+                                _endDateLabelColor = MyApp.greyDark;
+                                _endTimeLabelColor = MyApp.greyDark;
+                                _categoryLabelColor = MyApp.greyDark;
+                                _weeklyLabelColor = MyApp.blueMain;
+                                _endMonthLabelColor = MyApp.greyDark;
+                                _intervalLabelColor = MyApp.greyDark;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Weekly',
+                              hintText: 'Select your Interval',
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0, horizontal: 10.0),
+                              labelStyle: TextStyle(
+                                color: _weeklyFocus.hasFocus
+                                    ? MyApp.blueMain
+                                    : _weeklyLabelColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12.0),
+
+                          DropdownButtonFormField<String>(
+                            value: selectedTillMonth,
+                            items: tillMonth.map((month) {
+                              return DropdownMenuItem<String>(
+                                value: month,
+                                child: Text(month),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTillMonth = value;
+                              });
+                            },
+                            onTap: () {
+                              setState(() {
+                                _nameLabelColor = MyApp.greyDark;
+                                _descriptionlColor = MyApp.greyDark;
+                                _addressLabelColor = MyApp.greyDark;
+                                _startDateLabelColor = MyApp.greyDark;
+                                _startTimeLabelColor = MyApp.greyDark;
+                                _endDateLabelColor = MyApp.greyDark;
+                                _endTimeLabelColor = MyApp.greyDark;
+                                _categoryLabelColor = MyApp.greyDark;
+                                _weeklyLabelColor = MyApp.greyDark;
+                                _endMonthLabelColor = MyApp.blueMain;
+                                _intervalLabelColor = MyApp.greyDark;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Till which Months',
+                              hintText: 'Select till month',
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0, horizontal: 10.0),
+                              labelStyle: TextStyle(
+                                color: _endMonthFocus.hasFocus
+                                    ? MyApp.blueMain
+                                    : _endMonthLabelColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12.0),
+                          TextField(
+                            focusNode: _intervallFocus,
+                            onTap: () {
+                              setState(() {
+                                _nameLabelColor = MyApp.greyDark;
+                                _descriptionlColor = MyApp.greyDark;
+                                _addressLabelColor = MyApp.greyDark;
+                                _startDateLabelColor = MyApp.greyDark;
+                                _startTimeLabelColor = MyApp.greyDark;
+                                _endDateLabelColor = MyApp.greyDark;
+                                _endTimeLabelColor = MyApp.greyDark;
+                                _categoryLabelColor = MyApp.greyDark;
+                                _weeklyLabelColor = MyApp.greyDark;
+                                _endMonthLabelColor = MyApp.greyDark;
+                                _intervalLabelColor = MyApp.blueMain;
+                              });
+                            },
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              selectedInterval = int.tryParse(value);
+                            },
+
+                            decoration:  InputDecoration(
+                              labelText: 'Repeat every e.g. 2 Weeks',
+                              labelStyle: TextStyle(
+                                color: _intervallFocus.hasFocus ? MyApp.blueMain : _intervalLabelColor,
+                              ),
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 12.0, horizontal: 10.0),
+                              // Other input properties...
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 12.0),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showAdditionalFields = !showAdditionalFields;
+                    });
+                  },
+                  child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
                 ),
                 const SizedBox(height: 40.0),
                 ElevatedButton(
@@ -806,7 +1025,7 @@ class _EventState extends State<AddEventForm> {
           final urlDownload = await snapshot.ref.getDownloadURL();
           await addCreativActivity(urlDownload, context);
         } else {
-          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect.png?alt=media&token=1c1c6b52-ac5f-402d-8535-ab06708d0fbb", context);
+          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect.png?alt=media&token=aabf2ba4-33ff-412e-9b51-3e1e749a69b2", context);
           // Display an error message if the photo is not selected
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -825,8 +1044,12 @@ class _EventState extends State<AddEventForm> {
         );
       }
     } catch (e) {
-      print('Error in savePictureToFirestore: $e');
-      // You may also want to show an error message to the user.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not be saved'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -853,9 +1076,64 @@ class _EventState extends State<AddEventForm> {
     return course;
   }
 
+  Set<ByWeekDayEntry> _buildByWeekDays(DateTime date) {
+    Set<ByWeekDayEntry> byWeekDays = {};
+
+    if (date.weekday == 1) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.monday));
+    }
+    if (date.weekday == 2) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.tuesday));
+    }
+    if (date.weekday == 3) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.wednesday));
+    }
+    if (date.weekday == 4) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.thursday));
+    }
+    if (date.weekday == 5) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.friday));
+    }
+    if (date.weekday == 6) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.saturday));
+    }
+    if (date.weekday == 7) {
+      byWeekDays.add(ByWeekDayEntry(DateTime.sunday));
+    }
+
+    return byWeekDays;
+  }
+
+  Set<int> _buildByMonths(String? selectedTillMonth) {
+    Set<int> byMonths = {};
+
+    // Map month names to their corresponding index
+    Map<String, int> monthIndexMap = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+    };
+
+    // Check if the selected month is not null and exists in the map
+    if (selectedTillMonth != null && monthIndexMap.containsKey(selectedTillMonth)) {
+      byMonths.add(monthIndexMap[selectedTillMonth]!);
+    }
+
+    return byMonths;
+  }
+
   Future<void> addCreativActivity(String urlDownload, context) async {
+
     try {
-      // Check if any required field is empty or null
       if (activityNameController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -876,15 +1154,16 @@ class _EventState extends State<AddEventForm> {
         return;
       }
 
-      if (startDate == null || endDate == null) {
+      if (startDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select both start and end dates for the activity.'),
+            content: Text('Please select start date for the activity.'),
             duration: Duration(seconds: 2),
           ),
         );
         return;
       }
+
       await _convertAddressToCoordinates();
 
       if (_result.isEmpty) {
@@ -925,13 +1204,58 @@ class _EventState extends State<AddEventForm> {
       Map<String, dynamic> users = {};
       users.addEntries([MapEntry(await getUsername(), true)]);
 
+      Frequency frequency = Frequency.weekly;
+      switch (selectedFrequency) {
+        case 'Daily':
+          frequency = Frequency.daily;
+          break;
+        case 'Weekly':
+          frequency = Frequency.weekly;
+          break;
+        case 'Monthly':
+          frequency = Frequency.monthly;
+          break;
+        case 'Yearly':
+          frequency = Frequency.yearly;
+          break;
+      }
+
+      var rrule;
+      if(selectedInterval != null && startDate != null && selectedTillMonth != null){
+        rrule = RecurrenceRule(
+          frequency: frequency,
+          interval: selectedInterval!,
+          byWeekDays: _buildByWeekDays(startDate!),
+          byMonths: _buildByMonths(selectedTillMonth),
+        );
+      }
+
+      var addRRule = rrule != null ? rrule.toString() : "No Regular Event";
+
       try {
-        await creativCollection.doc(selectedCategory).update({
+        final Map<String, dynamic> activityData = {
           newActivity: [
             activityNameController.text,
             descriptionController.text,
             Timestamp.fromDate(startDate!),
-            Timestamp.fromDate(endDate!),
+            Timestamp.fromDate(endDate != null ? endDate! : startDate!),
+            GeoPoint(
+              double.parse(extractNumbers(_result.split(',')[0].trim())),
+              double.parse(extractNumbers(_result.split(',')[1].trim())),
+            ),
+            urlDownload,
+            selectedCategory,
+            users,
+            addRRule,
+          ],
+        };
+
+        final Map<String, dynamic> activityDataWithourRules = {
+          newActivity: [
+            activityNameController.text,
+            descriptionController.text,
+            Timestamp.fromDate(startDate!),
+            Timestamp.fromDate(endDate != null ? endDate! : startDate!),
             GeoPoint(
               double.parse(extractNumbers(_result.split(',')[0].trim())),
               double.parse(extractNumbers(_result.split(',')[1].trim())),
@@ -940,7 +1264,17 @@ class _EventState extends State<AddEventForm> {
             selectedCategory,
             users,
           ],
-        });
+        };
+
+        if (addRRule != "No Regular Event") {
+          print("With rules");
+          await creativCollection.doc(selectedCategory).update(activityData);
+
+        } else {
+          print("without rules");
+          await creativCollection.doc(selectedCategory).update(activityDataWithourRules);
+
+        }
 
         // Clear the text fields after adding the entry
         activityNameController.clear();
