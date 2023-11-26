@@ -104,7 +104,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
 
               if (filters.contains(activityName)) {
                 setState(() {
-                  mapMarkers.add(
+             /*     mapMarkers.add(
                     MapMarker(
                       image: imagePic,
                       title: nameActivity,
@@ -116,7 +116,7 @@ class _LocationPageState extends State<AnimatedMarkersMap> {
                       description: description,
                       category: catergory,
                     ),
-                  );
+                  );*/
                 });
               }
             });

@@ -6,6 +6,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart' as latlong;
+import 'package:rrule/rrule.dart';
 import '../main.dart';
 import '../shema/MapMarker.dart';
 import 'ProfileView.dart';
@@ -112,6 +113,11 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
           final location = await alldata[4];
           final category = await alldata[6];
           categorySave = category;
+          var ruleNew = "RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH;BYMONTH=12";
+          if (alldata.length > 8) {
+            ruleNew = await alldata[8];
+          }
+          final rrule = RecurrenceRule.fromString(ruleNew);
 
           var imagePic = 'assets/Marker.png';
           switch (category) {
@@ -153,6 +159,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                 end: now,
                 description: description,
                 category: category,
+                rule: rrule,
               );
             }
           }
@@ -496,6 +503,24 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
   double _offset = 0.0;
   final double _threshold = 50.0;
 
+  String _getMonthNames(Set<int> monthNumbers) {
+    final monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+
+    final List<String> selectedMonthNames = monthNumbers.map((monthNumber) {
+      if (monthNumber >= 1 && monthNumber <= 12) {
+        return monthNames[monthNumber - 1];
+      } else {
+        return 'Unknown';
+      }
+    }).toList();
+
+    return selectedMonthNames.join('');
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -552,7 +577,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
               child: Align(
                 alignment: Alignment.center,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 5.0),
+                  padding: const EdgeInsets.fromLTRB(30.0, 15.0, 15.0, 10.0),
                   // Add left padding of 10
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,9 +606,37 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                         child: Text(
                           "Address: ${widget.mapMarker.address}",
                           overflow: TextOverflow.visible,
+                          style: const TextStyle(
+                              fontSize: 12,
+                            // You can adjust the font weight as well
+                          ),
                           // Remove the maxLines property to allow the text to expand vertically
                         ),
                       ),
+                      const Expanded(
+                        child: Text(
+                          "",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 20, // Adjust the font size as needed
+                          ),
+                          // Adjust the number of lines to show
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "When: ${widget.mapMarker.rule.byWeekDays} in ${_getMonthNames(widget.mapMarker.rule.byMonths)}",
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey// Adjust the font size as needed
+                            // You can adjust the font weight as well
+                          ),
+                          // Remove the maxLines property to allow the text to expand vertically
+                        ),
+                      ),
+
                       Expanded(
                         child: Align(
                           alignment: Alignment.bottomRight, // Adjust the alignment as needed
@@ -625,8 +678,8 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
             left: 18, // Adjust the left position as needed
             child: Image.asset(
               widget.mapMarker.image,
-              width: 70,
-              height: 70,
+              width: 60,
+              height: 60,
             ),
           ),
         ],

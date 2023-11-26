@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latlong2/latlong.dart'; // Import LatLng from 'latlong2' package
+import 'package:rrule/rrule.dart';
+import 'package:rrule/rrule.dart';
 
 class MapMarker {
   final String image;
@@ -10,6 +12,7 @@ class MapMarker {
   final String address;
   final LatLng location; // Assuming LatLng is from the 'latlong2' package
   final String category;
+  final RecurrenceRule rule;
 
   MapMarker({
     required this.image,
@@ -20,5 +23,6 @@ class MapMarker {
     required this.address,
     required this.location,
     required this.category,
+    required this.rule,
   });
 }
