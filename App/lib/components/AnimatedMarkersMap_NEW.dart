@@ -643,7 +643,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                       ),
                       Expanded(
                         child: Text(
-                        "${widget.mapMarker.rule?.byWeekDays != null ? 'When: ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' in ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
+                        "${widget.mapMarker.rule?.byWeekDays != null ? 'When: Every ${widget.mapMarker.rule?.interval} ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' till ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                         fontSize: 12,
