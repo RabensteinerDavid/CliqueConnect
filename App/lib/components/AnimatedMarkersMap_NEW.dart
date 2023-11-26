@@ -11,6 +11,8 @@ import '../main.dart';
 import '../shema/MapMarker.dart';
 import 'ProfileView.dart';
 import 'Event.dart';
+import 'package:intl/intl.dart';
+
 
 // Replace with your Mapbox access token
 const MAPBOX_ACCESS_TOKEN = 'sk.eyJ1IjoiYm9uaXRoYW4iLCJhIjoiY2xvaGFydjR1MGV5bDJqbnZ6cWg0dXh4cyJ9.m3uRWclpqOdSgYfUegOlTg';
@@ -110,14 +112,16 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
           final nameActivity = await alldata[0];
           final description = await alldata[1];
+          final start = await alldata[2];
           final location = await alldata[4];
           final category = await alldata[6];
           categorySave = category;
-          var ruleNew = "RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH;BYMONTH=12";
+          var ruleNew = "";
+          var rrule;
           if (alldata.length > 8) {
             ruleNew = await alldata[8];
+            rrule = RecurrenceRule.fromString(ruleNew);
           }
-          final rrule = RecurrenceRule.fromString(ruleNew);
 
           var imagePic = 'assets/Marker.png';
           switch (category) {
@@ -155,7 +159,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                 title: title,
                 address: address,
                 location: latlong.LatLng(location.latitude, location.longitude),
-                start: now,
+                start: start,
                 end: now,
                 description: description,
                 category: category,
@@ -503,13 +507,13 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
   double _offset = 0.0;
   final double _threshold = 50.0;
 
-  String _getMonthNames(Set<int> monthNumbers) {
+  String? _getMonthNames(Set<int>? monthNumbers) {
     final monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December',
     ];
 
-    final List<String> selectedMonthNames = monthNumbers.map((monthNumber) {
+    final List<String>? selectedMonthNames = monthNumbers?.map((monthNumber) {
       if (monthNumber >= 1 && monthNumber <= 12) {
         return monthNames[monthNumber - 1];
       } else {
@@ -517,12 +521,14 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
       }
     }).toList();
 
-    return selectedMonthNames.join('');
+    return selectedMonthNames?.join('');
   }
 
 
   @override
   Widget build(BuildContext context) {
+    DateTime startDate = widget.mapMarker.start.toDate();
+    String formattedStartDate = DateFormat.yMMMMd().add_jm().format(startDate);
     return GestureDetector(
       onHorizontalDragStart: (details) {
         _dragStartX = details.localPosition.dx;
@@ -624,18 +630,18 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                           // Adjust the number of lines to show
                         ),
                       ),
-                      Expanded(
+
+
+                        Expanded(
                         child: Text(
-                          "When: ${widget.mapMarker.rule.byWeekDays} in ${_getMonthNames(widget.mapMarker.rule.byMonths)}",
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey// Adjust the font size as needed
-                            // You can adjust the font weight as well
-                          ),
-                          // Remove the maxLines property to allow the text to expand vertically
-                        ),
-                      ),
+                        "${widget.mapMarker.rule?.byWeekDays != null ? 'When: ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' in ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    ),
+                    ),
+                    ),
 
                       Expanded(
                         child: Align(
