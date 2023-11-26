@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart' as latlong;
 import '../main.dart';
 import '../shema/MapMarker.dart';
 import 'ProfileView.dart';
+import 'Event.dart';
 
 // Replace with your Mapbox access token
 const MAPBOX_ACCESS_TOKEN = 'sk.eyJ1IjoiYm9uaXRoYW4iLCJhIjoiY2xvaGFydjR1MGV5bDJqbnZ6cWg0dXh4cyJ9.m3uRWclpqOdSgYfUegOlTg';
@@ -19,7 +20,7 @@ const MARKER_SIZE_SHRINK = 30.0;
 
 const LocationSettings locationSettings = LocationSettings(
   accuracy: LocationAccuracy.high,
-  distanceFilter: 5,
+  distanceFilter: 10,
 );
 
 final List<String> filtersCategory = [];
@@ -498,91 +499,138 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onHorizontalDragStart: (details) {
-          _dragStartX = details.localPosition.dx;
-        },
-        onHorizontalDragUpdate: (details) {
-          _currentX = details.localPosition.dx;
-          final delta = _currentX - _dragStartX;
-          setState(() {
-            _offset = delta;
-          });
-        },
-        onHorizontalDragEnd: (details) {
-          if (_offset.abs() > _threshold) {
-            if (_offset > 0 && widget.currentIndex > 0) {
-              // Swiped right
-              final newIndex = widget.currentIndex - 1;
-              widget.pageController.previousPage(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.ease,
-              );
-              widget.onCardSwiped(newIndex); // Notify the parent about the swipe
-            } else if (_offset < 0 && widget.currentIndex < filteredMapMarkers.length - 1) {
-              // Swiped left
-              final newIndex = widget.currentIndex + 1;
-              widget.pageController.nextPage(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.ease,
-              );
-              widget.onCardSwiped(newIndex); // Notify the parent about the swipe
-            }
-            setState(() {
-              _offset = 0.0;
-            });
-          } else {
-            setState(() {
-              _offset = 0.0;
-            });
+      onHorizontalDragStart: (details) {
+        _dragStartX = details.localPosition.dx;
+      },
+      onHorizontalDragUpdate: (details) {
+        _currentX = details.localPosition.dx;
+        final delta = _currentX - _dragStartX;
+        setState(() {
+          _offset = delta;
+        });
+      },
+      onHorizontalDragEnd: (details) {
+        if (_offset.abs() > _threshold) {
+          if (_offset > 0 && widget.currentIndex > 0) {
+            // Swiped right
+            final newIndex = widget.currentIndex - 1;
+            widget.pageController.previousPage(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.ease,
+            );
+            widget.onCardSwiped(newIndex); // Notify the parent about the swipe
+          } else if (_offset < 0 &&
+              widget.currentIndex < filteredMapMarkers.length - 1) {
+            // Swiped left
+            final newIndex = widget.currentIndex + 1;
+            widget.pageController.nextPage(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.ease,
+            );
+            widget.onCardSwiped(newIndex); // Notify the parent about the swipe
           }
-        },
-
-        child:
-        Stack(
-          children: [
-            // Positioned widget for the Card
-            Positioned(
-              child: Card(
-                color: Colors.white,
-                margin: const EdgeInsets.all(50.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0.0), // Set the radius to 0 for sharp corners
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(35.0, 20.0, 10.0, 20.0), // Add left padding of 10
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
+          setState(() {
+            _offset = 0.0;
+          });
+        } else {
+          setState(() {
+            _offset = 0.0;
+          });
+        }
+      },
+      child: Stack(
+        children: [
+          // Positioned widget for the Card
+          Positioned(
+            child: Card(
+              color: Colors.white,
+              margin: const EdgeInsets.all(50.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    0.0), // Set the radius to 0 for sharp corners
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 5.0),
+                  // Add left padding of 10
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
                           widget.mapMarker.title,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: const TextStyle(
-                            fontSize: 34, // Adjust the font size as needed
-                            fontWeight: FontWeight.bold, // You can adjust the font weight as well
+                            fontSize: 20, // Adjust the font size as needed
+                            fontWeight: FontWeight
+                                .bold, // You can adjust the font weight as well
+                          ),
+                        // Adjust the number of lines to show
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          "Description: ${ widget.mapMarker.description}",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1, // Adjust the number of lines to show
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Address: ${widget.mapMarker.address}",
+                          overflow: TextOverflow.visible,
+                          // Remove the maxLines property to allow the text to expand vertically
+                        ),
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.bottomRight, // Adjust the alignment as needed
+                          child: GestureDetector(
+                            onTap: () {
+                              // Handle the tap on the "Read More" text
+                              debugPrint('Read More tapped');
+                              // Navigate to the EventPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Event(
+                                    eventName: widget.mapMarker.title,
+                                    eventCategory: widget.mapMarker.category,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Read More...',
+                              style: TextStyle(
+                                color: MyApp.blueMain,
+                                overflow: TextOverflow.clip,
+                              ),
+                            ),
                           ),
                         ),
-                        Text(widget.mapMarker.description),
-                        Text("Address: ${widget.mapMarker.address}"),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
 
-            // Positioned widget for the image in the foreground
-            Positioned(
-              top: 18, // Adjust the top position as needed
-              left: 18, // Adjust the left position as needed
-              child: Image.asset(
-                widget.mapMarker.image,
-                width: 70,
-                height: 70,
-              ),
+          // Positioned widget for the image in the foreground
+          Positioned(
+            top: 18, // Adjust the top position as needed
+            left: 18, // Adjust the left position as needed
+            child: Image.asset(
+              widget.mapMarker.image,
+              width: 70,
+              height: 70,
             ),
-          ],
-        )
+          ),
+        ],
+      ),
     );
   }
 }
