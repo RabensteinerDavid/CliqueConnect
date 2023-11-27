@@ -1,26 +1,23 @@
-import 'dart:ffi';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/CreateProfile.dart';
-import 'package:test_clique_connect/components/Home.dart';
 import 'package:video_player/video_player.dart';
 import 'AuthGate.dart';
 import 'NavigationBar.dart';
-
 import '../helper/helper_functions.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  // video controller
+class SplashScreenState extends State<SplashScreen> {
+
   late VideoPlayerController _controller;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -34,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     /*..setVolume(0.0)*/
 
-    _playVideo();
+    _playVideo(context);
   }
 
   Future<bool?> getYourLogin() async {
@@ -51,63 +48,54 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(userID!);
+    return prefs.getBool(userID);
   }
 
-  void _playVideo() async {
-    // playing video
+  void _playVideo(context) async {
     _controller.play();
-
     // add delay until the video is complete
     await Future.delayed(const Duration(seconds: 2));
 
     if(await isProfileCreated() == null ){
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => AuthGate(),
+          builder: (context) => const AuthGate(),
         ),
       );
     }
-    else{
-      if(await getYourLogin() == true && await isProfileCreated() == true){
-        Navigator.pushReplacement(
-          context,
+    else {
+      if (await getYourLogin() == true && await isProfileCreated() == true) {
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) =>BottomNavigationBarExample(),
+            builder: (context) => const BottomNavigationBarExample(),
           ),
         );
-      }
-      else if(await getYourLogin() == true && await isProfileCreated() == false && await HelperFunctions.getUserName() == "false" && await HelperFunctions.getCourse() == "false" && await HelperFunctions.getUniversity() == "false" && await HelperFunctions.getAboutMeText() == "false"){
-        // Navigating to the AuthGate screen with a custom transition
-        Navigator.pushReplacement(
-          context,
+      } else if (await getYourLogin() == true &&
+          await isProfileCreated() == false &&
+          await HelperFunctions.getUserName() == "false" &&
+          await HelperFunctions.getCourse() == "false" &&
+          await HelperFunctions.getUniversity() == "false" &&
+          await HelperFunctions.getAboutMeText() == "false") {
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => CreateProfile(),
+            builder: (context) => const CreateProfile(),
           ),
         );
-      }
-      else if(await getYourLogin() == false && await isProfileCreated() == false){
-        // Navigating to the AuthGate screen with a custom transition
-        Navigator.pushReplacement(
-          context,
+      } else if (await getYourLogin() == false && await isProfileCreated() == false) {
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => AuthGate(),
+            builder: (context) => const AuthGate(),
           ),
         );
-      }
-      else{
+      } else {
         // Navigating to the AuthGate screen with a custom transition
-        Navigator.pushReplacement(
-          context,
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => AuthGate(),
+            builder: (context) => const AuthGate(),
           ),
         );
       }
     }
-
-
   }
 
   @override
