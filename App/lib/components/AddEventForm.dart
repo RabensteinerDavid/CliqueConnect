@@ -64,7 +64,6 @@ class _EventState extends State<AddEventForm> {
   bool _startTimeText = false;
   bool _secondStartDateText = false;
   bool _thirdStartDateText = false;
-  bool _endTimeText = false;
 
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -101,13 +100,12 @@ class _EventState extends State<AddEventForm> {
     _weeklyFocus.dispose();
     _endMonthFocus.dispose();
     _intervallFocus.dispose();
-    // Dispose of other focus nodes if needed
+
     super.dispose();
   }
 
-
   bool showAdditionalFields = false;
-  bool showSwecondDate = false;
+  bool showSecondDate = false;
 
   List<String> frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
   List<String> tillMonth = [
@@ -129,28 +127,23 @@ class _EventState extends State<AddEventForm> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-      // Close keyboard when tapping outside text fields
-      FocusScope.of(context).unfocus();
-
-      // Reset label colors
-      setState(() {
-        _nameLabelColor = MyApp.greyDark;
-        _descriptionlColor = MyApp.greyDark;
-        _addressLabelColor = MyApp.greyDark;
-        _startDateLabelColor = MyApp.greyDark;
-        _startTimeLabelColor = MyApp.greyDark;
-        _secondDateLabelColor = MyApp.greyDark;
-        _secondTimeLabelColor = MyApp.greyDark;
-        _thirdDateLabelColor = MyApp.greyDark;
-        _thirdTimeLabelColor = MyApp.greyDark;
-        _categoryLabelColor = MyApp.greyDark;
-        _weeklyLabelColor = MyApp.greyDark;
-        _endMonthLabelColor = MyApp.greyDark;
-        _intervalLabelColor = MyApp.greyDark;
-      });
-
-      // Set the last focused field to null
-    },
+         FocusScope.of(context).unfocus();
+          setState(() {
+            _nameLabelColor = MyApp.greyDark;
+            _descriptionlColor = MyApp.greyDark;
+            _addressLabelColor = MyApp.greyDark;
+            _startDateLabelColor = MyApp.greyDark;
+            _startTimeLabelColor = MyApp.greyDark;
+            _secondDateLabelColor = MyApp.greyDark;
+            _secondTimeLabelColor = MyApp.greyDark;
+            _thirdDateLabelColor = MyApp.greyDark;
+            _thirdTimeLabelColor = MyApp.greyDark;
+            _categoryLabelColor = MyApp.greyDark;
+            _weeklyLabelColor = MyApp.greyDark;
+            _endMonthLabelColor = MyApp.greyDark;
+            _intervalLabelColor = MyApp.greyDark;
+          });
+        },
     child: Scaffold(
       body: Material(
         child: SingleChildScrollView(
@@ -175,50 +168,50 @@ class _EventState extends State<AddEventForm> {
                   ),
                 ),
                 Positioned(
-                  top: 40, // Adjust the top position as needed
-                  left: 20, // Adjust the left position as needed
+                  top: 40,
+                  left: 20,
                   child: IconButton(
                     icon: const Icon(
                       Icons.arrow_back_ios,
-                      color: Colors.white, // Set the color as needed
+                      color: Colors.white,
                     ),
                     onPressed: () {
-                      Navigator.pop(context); // This will navigate back
+                      Navigator.pop(context);
                     },
                   ),
                 ),
-         Padding(
+            Padding(
             padding: const EdgeInsets.fromLTRB(46.0, 380.0,46.0, 60.0),
-            child: Column(
-              children: [
+              child: Column(
+                children: [
                 TextField(
                 controller: activityNameController,
                 focusNode: _nameFocus,
-                onTap: () {
-                setState(() {
-                _nameLabelColor = MyApp.blueMain;
-                _descriptionlColor = MyApp.greyDark;
-                _addressLabelColor = MyApp.greyDark;
-                _startDateLabelColor = MyApp.greyDark;
-                _startTimeLabelColor = MyApp.greyDark;
-                _secondDateLabelColor = MyApp.greyDark;
-                _secondTimeLabelColor = MyApp.greyDark;
-                _thirdDateLabelColor = MyApp.greyDark;
-                _thirdTimeLabelColor = MyApp.greyDark;
-                _categoryLabelColor = MyApp.greyDark;
-                _weeklyLabelColor = MyApp.greyDark;
-                _endMonthLabelColor = MyApp.greyDark;
-                _intervalLabelColor = MyApp.greyDark;
-                });
-                },
-                decoration: InputDecoration(
-                labelText: 'Activity name',
-                border: const OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                labelStyle: TextStyle(
-                color: _nameFocus.hasFocus ? MyApp.blueMain : _nameLabelColor,
-                ),
-                ),
+                  onTap: () {
+                  setState(() {
+                      _nameLabelColor = MyApp.blueMain;
+                      _descriptionlColor = MyApp.greyDark;
+                      _addressLabelColor = MyApp.greyDark;
+                      _startDateLabelColor = MyApp.greyDark;
+                      _startTimeLabelColor = MyApp.greyDark;
+                      _secondDateLabelColor = MyApp.greyDark;
+                      _secondTimeLabelColor = MyApp.greyDark;
+                      _thirdDateLabelColor = MyApp.greyDark;
+                      _thirdTimeLabelColor = MyApp.greyDark;
+                      _categoryLabelColor = MyApp.greyDark;
+                      _weeklyLabelColor = MyApp.greyDark;
+                      _endMonthLabelColor = MyApp.greyDark;
+                      _intervalLabelColor = MyApp.greyDark;
+                    });
+                  },
+                    decoration: InputDecoration(
+                    labelText: 'Activity name',
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                    labelStyle: TextStyle(
+                      color: _nameFocus.hasFocus ? MyApp.blueMain : _nameLabelColor,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12.0),
                 TextField(
@@ -287,7 +280,7 @@ class _EventState extends State<AddEventForm> {
                       context: context,
                       builder: (context) {
                         return Container(
-                          color: Colors.white, // Set the background color to white
+                          color: Colors.white,
                           height: 200.0,
                           child: CupertinoDatePicker(
                             mode: CupertinoDatePickerMode.date,
@@ -313,8 +306,6 @@ class _EventState extends State<AddEventForm> {
                       });
                     }
                     FocusScope.of(context).requestFocus(_startDateFocus);
-
-                    // Update the color logic
                     setState(() {
                       _nameLabelColor = MyApp.greyDark;
                       _descriptionlColor = MyApp.greyDark;
@@ -363,7 +354,7 @@ class _EventState extends State<AddEventForm> {
                       context: context,
                       builder: (context) {
                         return Container(
-                          color: Colors.white, // Set the background color to white
+                          color: Colors.white,
                           height: 200.0,
                           child: CupertinoDatePicker(
                             mode: CupertinoDatePickerMode.time,
@@ -399,14 +390,12 @@ class _EventState extends State<AddEventForm> {
                       });
                     }
                     FocusScope.of(context).requestFocus(_startTimeFocus);
-
-                    // Update the color logic
                     setState(() {
                       _nameLabelColor = MyApp.greyDark;
                       _descriptionlColor = MyApp.greyDark;
                       _addressLabelColor = MyApp.greyDark;
                       _startDateLabelColor = MyApp.greyDark;
-                      _startTimeLabelColor = MyApp.blueMain; // Update to the desired color
+                      _startTimeLabelColor = MyApp.blueMain;
                       _secondDateLabelColor = MyApp.greyDark;
                       _secondTimeLabelColor = MyApp.greyDark;
                       _thirdDateLabelColor = MyApp.greyDark;
@@ -419,7 +408,7 @@ class _EventState extends State<AddEventForm> {
                   },
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Start Time', // Update to 'Start Time'
+                      labelText: 'Start Time',
                       contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
                       labelStyle: TextStyle(
@@ -443,7 +432,7 @@ class _EventState extends State<AddEventForm> {
                   ),
                 ),
                 const SizedBox(height: 12.0),
-             if (showSwecondDate)
+             if (showSecondDate)
                   Column(
                   children: [
                     InkWell(
@@ -463,7 +452,7 @@ class _EventState extends State<AddEventForm> {
                                   if (newDate != null && newDate != secondStartDate) {
                                     setState(() {
                                       secondStartDate = newDate;
-                                      _secondStartDateText = true; // Update the variable for 'End Date'
+                                      _secondStartDateText = true;
                                     });
                                   }
                                 },
@@ -477,15 +466,13 @@ class _EventState extends State<AddEventForm> {
                           });
                         }
                         FocusScope.of(context).requestFocus(_secondStartDateFocus);
-
-                        // Update the color logic
                         setState(() {
                           _nameLabelColor = MyApp.greyDark;
                           _descriptionlColor = MyApp.greyDark;
                           _addressLabelColor = MyApp.greyDark;
                           _startDateLabelColor = MyApp.greyDark;
                           _startTimeLabelColor = MyApp.greyDark;
-                          _secondDateLabelColor = _secondStartDateText ? MyApp.blueMain : MyApp.greyDark; // Update based on the variable
+                          _secondDateLabelColor = _secondStartDateText ? MyApp.blueMain : MyApp.greyDark;
                           _secondTimeLabelColor = MyApp.greyDark;
                           _thirdDateLabelColor = MyApp.greyDark;
                           _thirdTimeLabelColor = MyApp.greyDark;
@@ -520,7 +507,6 @@ class _EventState extends State<AddEventForm> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 12.0),
                     InkWell(
                       onTap: () async {
@@ -528,7 +514,7 @@ class _EventState extends State<AddEventForm> {
                           context: context,
                           builder: (context) {
                             return Container(
-                              color: Colors.white, // Set the background color to white
+                              color: Colors.white,
                               height: 200.0,
                               child: CupertinoDatePicker(
                                 mode: CupertinoDatePickerMode.time,
@@ -565,7 +551,6 @@ class _EventState extends State<AddEventForm> {
                         }
 
                         FocusScope.of(context).requestFocus(_secondEndTimeFocus);
-                        // Update the color logic
                         setState(() {
                           _nameLabelColor = MyApp.greyDark;
                           _descriptionlColor = MyApp.greyDark;
@@ -627,7 +612,7 @@ class _EventState extends State<AddEventForm> {
                                         if (newDate != null && newDate != thirdStartDate) {
                                           setState(() {
                                             thirdStartDate = newDate;
-                                            _thirdStartDateText = true; // Update the variable for 'End Date'
+                                            _thirdStartDateText = true;
                                           });
                                         }
                                       },
@@ -641,8 +626,6 @@ class _EventState extends State<AddEventForm> {
                                 });
                               }
                               FocusScope.of(context).requestFocus(_thirdStartDateFocus);
-
-                              // Update the color logic
                               setState(() {
                                 _nameLabelColor = MyApp.greyDark;
                                 _descriptionlColor = MyApp.greyDark;
@@ -691,7 +674,7 @@ class _EventState extends State<AddEventForm> {
                                 context: context,
                                 builder: (context) {
                                   return Container(
-                                    color: Colors.white, // Set the background color to white
+                                    color: Colors.white,
                                     height: 200.0,
                                     child: CupertinoDatePicker(
                                       mode: CupertinoDatePickerMode.time,
@@ -726,9 +709,7 @@ class _EventState extends State<AddEventForm> {
                                   );
                                 });
                               }
-
                               FocusScope.of(context).requestFocus(_thirdEndTimeFocus);
-                              // Update the color logic
                               setState(() {
                                 _nameLabelColor = MyApp.greyDark;
                                 _descriptionlColor = MyApp.greyDark;
@@ -771,19 +752,18 @@ class _EventState extends State<AddEventForm> {
                             ),
                           ),
                         ]
-                    ),
+                      ),
                     ]
                   ),
                 const SizedBox(height: 12.0),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      showSwecondDate = !showSwecondDate;
+                      showSecondDate = !showSecondDate;
                     });
                   },
-                  child: Text(showSwecondDate ? 'No additional Date' : 'Additional Date'),
+                  child: Text(showSecondDate ? 'No additional Date' : 'Additional Date'),
                 ),
-
                 const SizedBox(height: 12.0),
                 DropdownButtonFormField<String>(
                   value: selectedCategory,
@@ -835,8 +815,8 @@ class _EventState extends State<AddEventForm> {
                         children: [
                           const Divider(
                             color: Colors.black12,
-                            height: 20, // Adjust the height of the line
-                            thickness: 1, // Adjust the thickness of the line
+                            height: 20,
+                            thickness: 1,
                           ),
                           const SizedBox(height: 12.0),
                           DropdownButtonFormField<String>(
@@ -883,7 +863,6 @@ class _EventState extends State<AddEventForm> {
                             ),
                           ),
                           const SizedBox(height: 12.0),
-
                           DropdownButtonFormField<String>(
                             value: selectedTillMonth,
                             items: tillMonth.map((month) {
@@ -951,53 +930,51 @@ class _EventState extends State<AddEventForm> {
                             onChanged: (value) {
                               selectedInterval = int.tryParse(value);
                             },
-
                             decoration:  InputDecoration(
                               labelText: 'Repeat every e.g. 2 Weeks',
                               labelStyle: TextStyle(
                                 color: _intervallFocus.hasFocus ? MyApp.blueMain : _intervalLabelColor,
                               ),
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12.0, horizontal: 10.0),
-                              // Other input properties...
-                            ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showAdditionalFields = !showAdditionalFields;
+                          });
+                        },
+                        child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
+                      ),
+                      const SizedBox(height: 40.0),
+                      ElevatedButton(
+                        onPressed: () => savePictureToFirestore(context),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white, backgroundColor: MyApp.blueMain,
+
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          elevation: 3.0,
+                        ),
+                        child: const Text(
+                          'Add Creativ Activity',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                const SizedBox(height: 12.0),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showAdditionalFields = !showAdditionalFields;
-                    });
-                  },
-                  child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
                 ),
-                const SizedBox(height: 40.0),
-                ElevatedButton(
-                  onPressed: () => savePictureToFirestore(context),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: MyApp.blueMain, // Text color
-
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    elevation: 3.0, // Elevation (shadow)
-                  ),
-                  child: const Text(
-                    'Add Creativ Activity',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
                 Positioned(
                   top: MediaQuery.of(context).size.height * 0.3 - 75,
                   left: MediaQuery.of(context).size.width * 0.5 - 100,
@@ -1021,28 +998,24 @@ class _EventState extends State<AddEventForm> {
                           height: 150,
                           fit: BoxFit.fitHeight,
                         ),
-                      )
-                          : Container(
+                      ): Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(0),
                         ),
                         width: 150,
                         height: 150,
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.grey[800],
-                        ),
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Colors.grey[800],
+                          ),
                       ),
                     ),
-
                   ),
                 ),
               ],
-
           ),
         ),
-
       ),
     ));
   }
@@ -1176,7 +1149,6 @@ class _EventState extends State<AddEventForm> {
     }
   }
 
-  //48.36611, 14.51646
   Future<String?> getCatergoryActivities() async {
     try {
       final activitiesCollectionRef =
@@ -1225,7 +1197,6 @@ class _EventState extends State<AddEventForm> {
           await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2.png?alt=media&token=b1f13cb5-60ef-417e-b266-e516b9c94ce1", context);
         }
       } else {
-        // Display an error message if the photo is not selected
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a name activity.'),
@@ -1266,29 +1237,16 @@ class _EventState extends State<AddEventForm> {
     return course;
   }
 
-  Set<ByWeekDayEntry> _buildByWeekDays(DateTime date) {
+  Set<ByWeekDayEntry> _buildByWeekDays(List<DateTime> dates) {
     Set<ByWeekDayEntry> byWeekDays = {};
 
-    if (date.weekday == 1) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.monday));
-    }
-    if (date.weekday == 2) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.tuesday));
-    }
-    if (date.weekday == 3) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.wednesday));
-    }
-    if (date.weekday == 4) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.thursday));
-    }
-    if (date.weekday == 5) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.friday));
-    }
-    if (date.weekday == 6) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.saturday));
-    }
-    if (date.weekday == 7) {
-      byWeekDays.add(ByWeekDayEntry(DateTime.sunday));
+    for (DateTime date in dates) {
+      for (int i = DateTime.monday; i <= DateTime.sunday; i++) {
+        if (date.weekday == i) {
+          byWeekDays.add(ByWeekDayEntry(i));
+          break;
+        }
+      }
     }
 
     return byWeekDays;
@@ -1297,7 +1255,6 @@ class _EventState extends State<AddEventForm> {
   Set<int> _buildByMonths(String? selectedTillMonth) {
     Set<int> byMonths = {};
 
-    // Map month names to their corresponding index
     Map<String, int> monthIndexMap = {
       'January': 1,
       'February': 2,
@@ -1313,7 +1270,6 @@ class _EventState extends State<AddEventForm> {
       'December': 12,
     };
 
-    // Check if the selected month is not null and exists in the map
     if (selectedTillMonth != null && monthIndexMap.containsKey(selectedTillMonth)) {
       byMonths.add(monthIndexMap[selectedTillMonth]!);
     }
@@ -1386,8 +1342,6 @@ class _EventState extends State<AddEventForm> {
         });
         Navigator.of(context).pop();
       } else {
-        // Handle the case where _groupName or _user is null
-        // You might want to show a message or handle it in a way that makes sense for your app
         print("Error: _groupName or _user is null");
       }
 
@@ -1410,26 +1364,31 @@ class _EventState extends State<AddEventForm> {
           break;
       }
 
-      var rrule;
-      if(selectedInterval != null && startDate != null && selectedTillMonth != null){
-        rrule = RecurrenceRule(
-          frequency: frequency,
-          interval: selectedInterval!,
-          byWeekDays: _buildByWeekDays(startDate!),
-          byMonths: _buildByMonths(selectedTillMonth),
-        );
-      }
-
-      var addRRule = rrule != null ? rrule.toString() : "No Regular Event";
+      List<DateTime> dates = [];
+      dates.add(startDate!);
 
       Map<String, dynamic> events = {};
-      if(showSwecondDate){
+      if(showSecondDate){
+        dates.add(secondStartDate!);
+        dates.add(thirdStartDate != null ? thirdStartDate! : secondStartDate!);
         events['1'] = Timestamp.fromDate(secondStartDate!);
         events['2'] = Timestamp.fromDate(thirdStartDate != null ? thirdStartDate! : secondStartDate!);
       }
       else{
         events['noMoreDates'] = "noMore";
       }
+
+      var rrule;
+      if(selectedInterval != null && startDate != null && selectedTillMonth != null){
+        rrule = RecurrenceRule(
+          frequency: frequency,
+          interval: selectedInterval!,
+          byWeekDays: _buildByWeekDays(dates!),
+          byMonths: _buildByMonths(selectedTillMonth),
+        );
+      }
+
+      var addRRule = rrule != null ? rrule.toString() : "No Regular Event";
 
       try {
         final Map<String, dynamic> activityData = {
@@ -1468,34 +1427,28 @@ class _EventState extends State<AddEventForm> {
         if (addRRule != "No Regular Event") {
           print("With rules");
           await creativCollection.doc(selectedCategory).update(activityData);
-
         } else {
           print("without rules");
           await creativCollection.doc(selectedCategory).update(activityDataWithourRules);
-
         }
 
-        // Clear the text fields after adding the entry
-        activityNameController.clear();
-        descriptionController.clear();
-        _addressController.clear();
-        setState(() {
-          startDate = null;
-          secondStartDate = null;
-          selectedCategory = null;
-          _photo = null;
+        if (mounted) {
+          setState(() {
+            activityNameController.clear();
+            descriptionController.clear();
+            _addressController.clear();
+            startDate = null;
+            secondStartDate = null;
+            selectedCategory = null;
+            _photo = null;
+          });
         }
-        );
-
       } catch (e) {
         print('Error updating Firestore in addCreativActivity: $e');
       }
     } catch (e) {
       print('Error in addCreativActivity: $e');
-      // You may also want to show an error message to the user.
     }
   }
-
-
 }
 
