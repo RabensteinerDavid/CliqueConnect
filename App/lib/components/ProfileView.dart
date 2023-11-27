@@ -14,10 +14,10 @@ class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
 
   @override
-  _YourCurrentScreenState createState() => _YourCurrentScreenState();
+  YourCurrentScreenState createState() => YourCurrentScreenState();
 }
 
-class _YourCurrentScreenState extends State<ProfileView> {
+class YourCurrentScreenState extends State<ProfileView> {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   final firestore = FirebaseFirestore.instance;
@@ -41,7 +41,7 @@ class _YourCurrentScreenState extends State<ProfileView> {
     interestsFuture = getInterests();
   }
 
-  void _deleteAccount(BuildContext context) async {
+  void _deleteAccount(context) async {
     try {
       await firestore.collection("users").doc(user?.uid).delete();
 
@@ -64,13 +64,13 @@ class _YourCurrentScreenState extends State<ProfileView> {
     return await prefs.remove('isLoggedIn');
   }
 
-  void _signOut(BuildContext context) async {
+  void _signOut(context) async {
     await deleteYourLogin();
     try {
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) =>
-            AuthGate()), // Replace with your authentication gate screen
+            const AuthGate()), // Replace with your authentication gate screen
       );
     } catch (e) {
       print('Error signing out: $e');
