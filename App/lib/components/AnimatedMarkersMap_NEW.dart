@@ -573,117 +573,126 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
         children: [
           // Positioned widget for the Card
           Positioned(
-            child: Card(
-              color: Colors.white,
-              margin: const EdgeInsets.all(50.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                    0.0), // Set the radius to 0 for sharp corners
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30.0, 15.0, 15.0, 10.0),
-                  // Add left padding of 10
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.mapMarker.title,
-                          overflow: TextOverflow.visible,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 20, // Adjust the font size as needed
-                            fontWeight: FontWeight
-                                .bold, // You can adjust the font weight as well
-                          ),
-                        // Adjust the number of lines to show
-                        ),
-                      ),
-                      const Expanded(
-                        child: Text(
-                          "",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 20, // Adjust the font size as needed
-                          ),
-                          // Adjust the number of lines to show
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Description: ${ widget.mapMarker.description}",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1, // Adjust the number of lines to show
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Address: ${widget.mapMarker.address}",
-                          overflow: TextOverflow.visible,
-                          style: const TextStyle(
-                              fontSize: 12,
-                            // You can adjust the font weight as well
-                          ),
-                          // Remove the maxLines property to allow the text to expand vertically
-                        ),
-                      ),
-                      const Expanded(
-                        child: Text(
-                          "",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 20, // Adjust the font size as needed
-                          ),
-                          // Adjust the number of lines to show
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                        "${widget.mapMarker.rule?.byWeekDays != null ? 'When: Every ${widget.mapMarker.rule?.interval} ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays.toString().replaceAll("{", "(").replaceAll("}", ")")}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' till ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        ),
-                      ),
+            child: GestureDetector(
+              onTap: () {
+                // Handle the tap on the entire Card
+                debugPrint('Card tapped');
+                // Navigate to the EventPage or perform other actions as needed
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Event(
+                      eventName: widget.mapMarker.title,
+                      eventCategory: widget.mapMarker.category,
                     ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.bottomRight, // Adjust the alignment as needed
-                          child: GestureDetector(
-                            onTap: () {
-                              // Handle the tap on the "Read More" text
-                              debugPrint('Read More tapped');
-                              // Navigate to the EventPage
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Event(
-                                    eventName: widget.mapMarker.title,
-                                    eventCategory: widget.mapMarker.category,
+                  ),
+                );
+              },
+              child: Card(
+                color: Colors.white,
+                margin: const EdgeInsets.all(50.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0.0),
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(25.0, 20.0, 20.0, 15.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.mapMarker.title,
+                            overflow: TextOverflow.visible,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Description: ${widget.mapMarker.description}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Address: ${widget.mapMarker.address}",
+                            overflow: TextOverflow.visible,
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "${widget.mapMarker.rule?.byWeekDays != null ? 'When: Every ${widget.mapMarker.rule?.interval} ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays.toString().replaceAll("{", "(").replaceAll("}", ")")}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' till ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Handle the tap on the "Read More" text
+                                debugPrint('Read More tapped');
+                                // Navigate to the EventPage
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Event(
+                                      eventName: widget.mapMarker.title,
+                                      eventCategory: widget.mapMarker.category,
+                                    ),
                                   ),
+                                );
+                              },
+                              child: const Text(
+                                'Read More...',
+                                style: TextStyle(
+                                  color: MyApp.blueMain,
+                                  overflow: TextOverflow.clip,
                                 ),
-                              );
-                            },
-                            child: const Text(
-                              'Read More...',
-                              style: TextStyle(
-                                color: MyApp.blueMain,
-                                overflow: TextOverflow.clip,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            )
+
           ),
 
           // Positioned widget for the image in the foreground
