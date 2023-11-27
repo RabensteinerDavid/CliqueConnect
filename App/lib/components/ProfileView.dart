@@ -126,7 +126,11 @@ class YourCurrentScreenState extends State<ProfileView> {
                               const SizedBox(height: 60),
                               Text(
                                 '$username',
-                                style: const TextStyle(fontSize: 20, fontFamily: 'DINNextLTPro-Bold'),
+                                style: const TextStyle(fontSize: 20,
+                                    fontFamily: 'DINNextLTPro-Bold',
+                                    fontWeight: FontWeight.bold,
+                                    color: MyApp.blueMain
+                                ),
                               ),
                               const SizedBox(height: 40),
                               Column(
@@ -201,13 +205,20 @@ class YourCurrentScreenState extends State<ProfileView> {
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  Row(
+                                  const Row(
                                     children: [
                                       Text(
-                                        'Interests: $interests',
-                                        style: const TextStyle(fontSize: 18, color: MyApp.blueMain, fontFamily: 'DIN-Next-LT-Pro-Regular'),
+                                        'Interests:',
+                                        style: TextStyle(fontSize: 18, color: MyApp.blueMain, fontFamily: 'DIN-Next-LT-Pro-Regular'),
                                       ),
                                     ],
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(right: 20.0), // Adjust the right padding as needed
+                                    child: const SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: FilterChipExample(),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -333,12 +344,6 @@ class YourCurrentScreenState extends State<ProfileView> {
       ),
     );
   }
-
-
-
-
-
-
 
   Future<bool> getImgUrl() async {
     var userID = user?.uid;
@@ -491,4 +496,79 @@ class YourCurrentScreenState extends State<ProfileView> {
     }
   }
 
+}
+
+class FilterChipExample extends StatefulWidget {
+  const FilterChipExample({super.key});
+
+  @override
+  State<FilterChipExample> createState() => _FilterChipExampleState();
+}
+
+class _FilterChipExampleState extends State<FilterChipExample> {
+  late User? user; // Make sure user is initialized
+
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+  }
+
+  Future<List<String>> getInterests() async {
+    final firestore = FirebaseFirestore.instance;
+    var userID = user?.uid;
+    final data = await firestore.collection("users").doc(userID).get();
+
+    if (data.exists) {
+      final activityList = data.data()!['interests'] as List<dynamic>;
+      var activities = activityList.map((item) => item.toString()).toList();
+
+      return activities;
+    } else {
+      return ["No Interests"]; // Add a default return statement
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: getInterests(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Return a loading indicator while waiting for data
+          return const CircularProgressIndicator();
+        }
+
+        if (snapshot.hasError) {
+          // Return an error message if there's an error
+          return Text('Error: ${snapshot.error}');
+        }
+
+        // Extract categories from the snapshot data
+        List<String> interests = snapshot.data ?? ["No Interests"];
+
+        return Wrap(
+          // Use Wrap instead of Row to handle multiple rows
+          children: interests.map((String interest) {
+            return Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: FilterChip(
+                label: Text(interest),
+                selected: filters.contains(interest),
+                onSelected: (bool selected) {
+                  setState(() {
+                    if (selected) {
+                      filters.add(interest);
+                    } else {
+                      filters.remove(interest);
+                    }
+                  });
+                },
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
 }
