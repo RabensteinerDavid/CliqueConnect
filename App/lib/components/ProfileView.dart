@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'AuthGate.dart';
 
 import '../main.dart';
 
@@ -40,42 +41,52 @@ class _YourCurrentScreenState extends State<ProfileView> {
     interestsFuture = getInterests();
   }
 
+  void _deleteAccount(BuildContext context) async {
+    try {
+      await firestore.collection("users").doc(user?.uid).delete();
+
+      // Delete the user account
+      await user?.delete();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => AuthGate()),
+        // Replace AuthGate with your authentication gate screen
+      );
+    } catch (e) {
+      print('Error deleting account: $e');
+      // Handle the error, show a message, etc.
+    }
+  }
+
+  Future<bool> deleteYourLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Remove the counter key-value pair from persistent storage.
+    return await prefs.remove('isLoggedIn');
+  }
+
+  void _signOut(BuildContext context) async {
+    await deleteYourLogin();
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) =>
+            AuthGate()), // Replace with your authentication gate screen
+      );
+    } catch (e) {
+      print('Error signing out: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        clipBehavior: Clip.none,
         children: [
           Container(
             width: double.infinity,
             height: double.infinity,
             color: MyApp.blueMain,
-          ),
-          Positioned(
-            top: 80, // Adjust the top position as needed
-            left: 0,
-            right: 0,
-            child: Align(
-              alignment: Alignment.center,
-              child: CircleAvatar(
-                radius: 55,
-                backgroundColor: const Color(0xff8179b4),
-                child: ClipOval(
-                  child: imageURL.isNotEmpty
-                      ? Image.network(
-                    imageURL,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  )
-                      : Image.asset(
-                    'assets/cliqueConnect.png',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
           ),
           Positioned(
             top: MediaQuery.of(context).size.height * 0.2, // Adjust the top position as needed
@@ -108,84 +119,100 @@ class _YourCurrentScreenState extends State<ProfileView> {
                         var username = snapshot.data![5];
 
                         return Padding (
-                            padding: EdgeInsets.only(left: 20), // Adjust the left padding as needed
-                    child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 60),
-                             Text(
-                              '$username',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 16),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Image.asset(
-                                      'icons/hat_rose.png',
-                                      width: 40,
-                                      height: 40,
-                                    ),
-                                    const SizedBox(width: 20), // Adjust the spacing as needed
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '$course',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            color: MyApp.blueMain,
+                          padding: const EdgeInsets.only(left: 20), // Adjust the left padding as needed
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 60),
+                              Text(
+                                '$username',
+                                style: const TextStyle(fontSize: 20, fontFamily: 'DINNextLTPro-Bold'),
+                              ),
+                              const SizedBox(height: 40),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        'icons/hat_rose.png',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      const SizedBox(width: 20), // Adjust the spacing as needed
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$course',
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                color: MyApp.blueMain,
+                                                fontFamily: 'DIN-Next-LT-Pro-Regular'
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '$university',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20), // Adjust the vertical spacing between rows
-                                Row(
-                                  children: [
-                                    Image.asset(
-                                      'icons/profile_rose.png',
-                                      width: 40,
-                                      height: 40,
-                                    ),
-                                    const SizedBox(width: 20), // Adjust the spacing as needed
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'About Me',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: MyApp.blueMain,
+                                          Text(
+                                            '$university',
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                fontFamily: 'DIN-Next-LT-Pro-Regular'
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '$aboutMe',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10), // Adjust the vertical spacing between rows
+                                  Container(
+                                    padding: const EdgeInsets.only(right: 20.0), // Ändern Sie den Abstand nach Bedarf
+                                    child: const Divider(
+                                      color: MyApp.greyMedium,
+                                      thickness: 1,
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Interests: $interests',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                  ),
+                                  const SizedBox(height: 10), // Adjust the vertical spacing between rows
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        'icons/profile_rose.png',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      const SizedBox(width: 20), // Adjust the spacing as needed
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'About Me',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: MyApp.blueMain,
+                                                fontFamily: 'DIN-Next-LT-Pro-Regular'
+                                            ),
+                                          ),
+                                          Text(
+                                            '$aboutMe',
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                fontFamily: 'DIN-Next-LT-Pro-Regular'
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Interests: $interests',
+                                        style: const TextStyle(fontSize: 18, color: MyApp.blueMain, fontFamily: 'DIN-Next-LT-Pro-Regular'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         );
                       } else {
                         // Handle the case where data is not available
@@ -204,10 +231,110 @@ class _YourCurrentScreenState extends State<ProfileView> {
                 ),
               ),
             ),
-          ), ],
+          ),
+          Positioned(
+            top: 80, // Adjust the top position as needed
+            left: 0,
+            right: 0,
+            child: Align(
+              alignment: Alignment.center,
+              child: CircleAvatar(
+                radius: 55,
+                backgroundColor: const Color(0xff8179b4),
+                child: ClipOval(
+                  child: imageURL.isNotEmpty
+                      ? Image.network(
+                    imageURL,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  )
+                      : Image.asset(
+                    'assets/cliqueConnect.png',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          AppBar(
+            backgroundColor: Colors.transparent, // Set the background color to transparent
+            elevation: 0, // Remove the shadow
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white, // Set the color to white
+              ),
+              onPressed: () {
+                // Handle the back button press, e.g., navigate to the previous screen
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            actions: [
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  // Handle menu item selection here
+                  if (value == 'edit') {
+                    // Handle "Edit Account" press
+                  } else if (value == 'logout') {
+                    // Handle "Log-out" press
+                    _signOut(context); // Call your sign-out method
+                  } else if (value == 'delete') {
+                    _deleteAccount(context);
+                    // Handle "Delete Account" press
+                  } else if (value == 'impressum') {
+                    // Handle "Impressum" press
+                  }
+                },
+                icon: const Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                ),
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit),
+                      title: Text('Edit Account'),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.exit_to_app),
+                      title: Text('Log-out'),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete),
+                      title: Text('Delete Account'),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'impressum',
+                    child: ListTile(
+                      leading: Icon(Icons.info),
+                      title: Text('Impressum'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
+
+
 
 
 
