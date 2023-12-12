@@ -273,36 +273,41 @@ class _EventState extends State<Event> {
                     future: getImageUrlForUser(username),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        // If the Future is still running, show a loading indicator or placeholder
                         return LinearProgressIndicator(color: Color(0xFF2E148C),  minHeight: 0.2,);
                       } else if (snapshot.hasError) {
-                        // If an error occurred, show an error message or handle it accordingly
                         return Text('Error loading image');
                       } else {
-                        // If the Future is complete, build the widget with the loaded image URL
                         String imageUrl = snapshot.data ?? ''; // Use a default value if null
-                        return Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                username,
-                                style: const TextStyle(
-                                  color: Color(0xFF2E148C),
+                        return SizedBox(
+                          height: 75, // Adjust the height as needed
+                          child: Column(
+                            children: [
+                              ListTile(
+                                title: Text(
+                                  username,
+                                  style: const TextStyle(
+                                    color: Color(0xFF2E148C),
+                                    fontFamily: "DINNextLtPro",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(imageUrl),
                                 ),
                               ),
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(imageUrl),
-                              ),
-                            ),
-                            if (index < userNames.length - 1)
-                              Divider(color: Colors.black12, thickness: 0.5),
-                          ],
+                              if (index < userNames.length - 1)
+                                const Divider(color: Colors.black12, thickness: 0.5),
+                            ],
+                          ),
                         );
                       }
                     },
                   );
                 },
-              ),
+              )
+
 
             ],
           ),
@@ -398,8 +403,8 @@ class _EventState extends State<Event> {
 
       // Hier wird die Liste aktualisiert und ein neues State-Update ausgelöst
       setState(() {
-        eventList[7] = users;
-        userNames.add(userData["username"]);
+        userNames.remove(userData["username"]);
+        userNames.insert(0, userData["username"]);
       });
 
       await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
