@@ -43,6 +43,9 @@ class _EventState extends State<Event> {
   String myUserName = ""; // Benutzername des aktuellen Benutzers
 
   String icon = "assets/cliqueConnect.png";
+  String buttonText = "Connect";
+  Color buttonColor = const Color(0xFF220690);
+
 
   final firestore = FirebaseFirestore.instance;
 
@@ -193,7 +196,7 @@ class _EventState extends State<Event> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 10, width: 10),
+                  SizedBox(height: 8, width: 12),
                   const Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
@@ -211,32 +214,51 @@ class _EventState extends State<Event> {
                   ),
                   Align(
                     alignment: Alignment.centerRight,
-                    // Align to the bottom right corner
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
-                      // Adjust padding as needed
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          // Überprüfe, ob der Benutzername bereits auf der Liste steht
-                          if (userNames.contains(users["username"])) {
-                            // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
-                            _countMeOut();
-                          } else {
-                            // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
-                            _countMeIn(widget.eventName, widget.eventCategory);
-                          }
-                        },
-                        backgroundColor: Colors.pink,
-                        elevation: 0,
-                        child: Icon(
-                          (userNames.contains(myUserName))
-                              ? Icons.link_off
-                              : Icons.insert_link,
-                          color: Colors.white,
+                      child: SizedBox(
+                        width: 100, // Set the width
+                        height: 40, // Set the height
+                        child: FloatingActionButton(
+                          onPressed: () {
+                              // Überprüfe, ob der Benutzername bereits auf der Liste steht
+                              if (userNames.contains(users["username"])) {
+                                // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
+                                _countMeOut();
+                              } else {
+                                // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
+                                _countMeIn(widget.eventName, widget.eventCategory);
+                              }
+                              // Hier den Text des Buttons aktualisieren
+                              setState(() {
+                                buttonText = (userNames.contains(myUserName)) ? "Connect" : "I'm in!";
+                                buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
+                              });
+                          },
+                          backgroundColor: buttonColor,
+                          elevation: 0,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(15),
+                              right: Radius.circular(15),
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 4, width: 12),
+                              Text(
+                                buttonText,
+                                style: const TextStyle(fontSize: 15, fontFamily: "DINNextLtPro"),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  )
+
+
                 ],
               ),
 
