@@ -66,7 +66,7 @@ class _MessageTileState extends State<MessageTile> {
             child: Text(
               widget.message,
               textAlign: TextAlign.start,
-              style: TextStyle(fontSize: 15.0, color: widget.sentByMe ? MyApp.white : MyApp.black),
+              style: TextStyle(fontSize: 15.0, color: widget.sentByMe ? MyApp.white : MyApp.black,  fontFamily: "DINNextLtPro",),
             ),
           ),
         ),
