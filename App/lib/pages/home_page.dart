@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePageChat> {
             "You've not joined any group. You have to connect to be in a group",
             textAlign: TextAlign.center,
             style: TextStyle(
+              fontFamily: "DINNextLtPro",
               fontSize: 16.0, // Adjust the font size as needed
             ),
           ),
@@ -86,7 +87,9 @@ class _HomePageState extends State<HomePageChat> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 int reqIndex = snapshot.data?['groups'].length - index - 1; // Use groupsData instead of snapshot.data['groups']
-                return GroupTile(userName: snapshot.data?['username'], groupId: _destructureId(snapshot.data?['groups'][reqIndex]), groupName: _destructureName(snapshot.data?['groups'][reqIndex]));
+                return GroupTile(userName: snapshot.data?['username'],
+                    groupId: _destructureId(snapshot.data?['groups'][reqIndex]),
+                    groupName: _destructureName(snapshot.data?['groups'][reqIndex]));
               },
             );
           } else {
@@ -166,7 +169,7 @@ class _HomePageState extends State<HomePageChat> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Messages',
-                style: TextStyle(fontSize: 18.0, color: MyApp.blueMain),
+                style: TextStyle(fontSize: 18.0, color: MyApp.blueMain,  fontFamily: "DINNextLtPro"),
               ),
             ),
           ),
