@@ -56,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.groupName, style: const TextStyle(color: MyApp.blueMain)),
+        title: Text(widget.groupName, style: const TextStyle(color: MyApp.blueMain, fontFamily: "DINNextLtPro",)),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.0,
@@ -159,10 +159,11 @@ class _ChatPageState extends State<ChatPage> {
                   Expanded(
                     child: TextField(
                       controller: messageEditingController,
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.black,  fontFamily: "DINNextLtPro"),
                       decoration: const InputDecoration(
                         hintText: "Send a message ...",
                         hintStyle: TextStyle(
+                          fontFamily: "DINNextLtPro",
                           color: Colors.black54,
                           fontSize: 16,
                         ),
@@ -194,6 +195,8 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+
 
 
   _sendMessage() async {
