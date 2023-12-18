@@ -161,7 +161,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Colors.black87,
+        backgroundColor: Color(0xFF2E148C),
         title: Text('Search', style: TextStyle(fontSize: 27.0, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
       body: Container(
@@ -169,7 +169,7 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-              color: Colors.grey[700],
+              color: Colors.white,
               child: Row(
                 children: [
                   Expanded(
@@ -178,7 +178,7 @@ class _SearchPageState extends State<SearchPage> {
                       style: TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: "Search groups...",
-                        hintStyle: TextStyle(color: Colors.white38, fontSize: 16),
+                        hintStyle: TextStyle(color: Colors.black, fontSize: 16),
                         border: InputBorder.none,
                       ),
                     ),
@@ -191,7 +191,7 @@ class _SearchPageState extends State<SearchPage> {
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent,
+                        color: Color(0xFF6059F0),
                         borderRadius: BorderRadius.circular(40),
                       ),
                       child: Icon(Icons.search, color: Colors.white),
