@@ -38,6 +38,44 @@ class _BottomNavigationBarExampleState
         ],
       ),
       bottomNavigationBar: Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(0, 'icons/home_grey.png','icons/home_white.png'),
+            _buildNavItem(1, 'icons/chat_all_grey.png','icons/chat_all_white.png'),
+            _buildNavItem(2, 'icons/calendar_grey.png','icons/calendar_white.png'),
+            _buildNavItem(3, 'icons/map_color.png','icons/map_white.png'),
+          ],
+        ),
+      ),
+    );
+  }
+  /*
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          _getBodyForIndex(_selectedIndex),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildGradientShadow(),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
         height: 120, // Set your desired height
         child: ResponsiveNavigationBar(
           items: <BottomNavigationBarItem>[
@@ -47,7 +85,7 @@ class _BottomNavigationBarExampleState
                 width: 25,
                 height: 25,
               ),
-              label: 'Home',
+              label: '',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -55,7 +93,7 @@ class _BottomNavigationBarExampleState
                 width: 25,
                 height: 25,
               ),
-              label: 'Chat',
+              label: '',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -63,7 +101,7 @@ class _BottomNavigationBarExampleState
                 width: 25,
                 height: 25,
               ),
-              label: 'Calendar',
+              label: '',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -71,7 +109,7 @@ class _BottomNavigationBarExampleState
                 width: 25,
                 height: 25,
               ),
-              label: 'Map',
+              label: '',
             ),
           ],
           currentIndex: _selectedIndex,
@@ -80,6 +118,37 @@ class _BottomNavigationBarExampleState
       ),
     );
   }
+  */
+
+
+  Widget _buildNavItem(int index, String iconData, String iconDataHover) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+        // Handle navigation or other actions based on the selected index
+      },
+      child: Container(
+        width: _selectedIndex == 0 || _selectedIndex == 3 ? MediaQuery.of(context).size.width*0.25 : 80, // Set your desired width for the container
+        height: _selectedIndex == 0 || _selectedIndex == 3 ? 100 : 80, // Set your desired width for the container
+        decoration: BoxDecoration(
+          color: _selectedIndex == index ? MyApp.blueMain : Colors.transparent,
+          borderRadius: BorderRadius.circular(0),
+        ),
+        child: Center(
+          child: Image.asset(
+            _selectedIndex == index ? iconDataHover : iconData,
+            width: 40,
+            height: 40,
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+
   Widget _getBodyForIndex(int index) {
     switch (index) {
       case 0:
@@ -97,7 +166,7 @@ class _BottomNavigationBarExampleState
 
   Widget _buildGradientShadow() {
     return Container(
-      height: kBottomNavigationBarHeight, // Set to the height of the navigation bar
+      height: kBottomNavigationBarHeight,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -114,7 +183,7 @@ class _BottomNavigationBarExampleState
       ),
     );
   }
-}
+
 
 class ResponsiveNavigationBar extends StatelessWidget {
   final List<BottomNavigationBarItem> items;
