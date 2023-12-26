@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 import '../widgets/message_tile.dart';
 import '../main.dart';
+import '../components/Event.dart';
 
 class ChatPage extends StatefulWidget {
   final String groupId;
@@ -68,28 +69,31 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.groupName, style: const TextStyle(color: MyApp.blueMain, fontFamily: "DINNextLtPro",)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        actions: [
-          GestureDetector(
-            onTap: () {
-            },
-            child:Padding(
-              padding: const EdgeInsets.only(right: 20.0), // Adjust the padding as needed
-              child: FutureBuilder<String>(
-                future: getGroupCategory(widget.groupId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // If the Future is still running, you can return a placeholder or loading image
-                    return const CircleAvatar(
-                      radius: 25.0,
-                      backgroundColor: MyApp.blueMain,
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    return CircleAvatar(
+        title: Row(
+          children: [  SizedBox(width: MediaQuery.of(context).size.width*0.1),
+            FutureBuilder<String>(
+              future: getGroupCategory(widget.groupId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // If the Future is still running, you can return a placeholder or loading image
+                  return const CircleAvatar(
+                    radius: 25.0,
+                    backgroundColor: MyApp.blueMain,
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return GestureDetector(
+                    onTap: () {
+                      print("here");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Event(
+                            eventName: widget.groupName, eventCategory: snapshot.data ?? "",
+                          ),
+                        ),
+                      );        },
+                    child: CircleAvatar(
                       radius: 25.0,
                       backgroundColor: MyApp.blueMain,
                       child: Image.asset(
@@ -98,13 +102,24 @@ class _ChatPageState extends State<ChatPage> {
                         width: 56.0,
                         height: 56.0,
                       ),
-                    );
-                  }
-                },
+                    ),
+                  );
+              }
+              },
+            ),
+            const SizedBox(width: 10), // Add some spacing between the image and the title
+            Text(
+              widget.groupName,
+              style: const TextStyle(
+                color: MyApp.blueMain,
+                fontFamily: "DINNextLtPro",
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+        centerTitle: false, // Centering is handled manually in the Row widget
+        backgroundColor: Colors.white,
+        elevation: 0.0,
         // Add a line at the bottom of the AppBar
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2.0),
@@ -115,6 +130,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
+
       body: Stack(
         children: <Widget>[
           Column(
