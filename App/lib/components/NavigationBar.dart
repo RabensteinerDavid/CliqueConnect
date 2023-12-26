@@ -17,10 +17,13 @@ class _BottomNavigationBarExampleState
     extends State<BottomNavigationBarExample> {
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  @override
+  void didChangeDependencies() {
+    precacheImage(const AssetImage('icons/home_white.png'),context);
+    precacheImage(const AssetImage('icons/chat_all_white.png'),context);
+    precacheImage(const AssetImage('icons/calendar_white.png'),context);
+    precacheImage(const AssetImage('icons/map_white.png'),context);
+    super.didChangeDependencies();
   }
 
   @override
