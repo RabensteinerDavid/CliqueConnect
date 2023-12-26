@@ -70,7 +70,7 @@ class YourCurrentScreenState extends State<ProfileView> {
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) =>
-            const AuthGate()), // Replace with your authentication gate screen
+        const AuthGate()), // Replace with your authentication gate screen
       );
     } catch (e) {
       print('Error signing out: $e');
@@ -271,22 +271,17 @@ class YourCurrentScreenState extends State<ProfileView> {
             ),
           ),
           AppBar(
-            backgroundColor: Colors.transparent, // Set the background color to transparent
-            elevation: 0, // Remove the shadow
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             leading: IconButton(
               icon: const Icon(
                 Icons.arrow_back,
-                color: Colors.white, // Set the color to white
+                color: Colors.white,
               ),
               onPressed: () {
-                // Handle the back button press, e.g., navigate to the previous screen
                 Navigator.pop(context);
               },
             ),
-          ),
-          AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
             actions: [
               PopupMenuButton<String>(
                 onSelected: (value) {
@@ -338,6 +333,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                   ),
                 ],
               ),
+              // Add more action buttons as needed
             ],
           )
         ],
