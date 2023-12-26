@@ -10,7 +10,7 @@ class ChatPage extends StatefulWidget {
   final String userName;
   final String groupName;
 
-  ChatPage({
+  const ChatPage({super.key,
     required this.groupId,
     required this.userName,
     required this.groupName,
@@ -21,36 +21,48 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  late Stream<QuerySnapshot> _chats;
+
   TextEditingController messageEditingController = TextEditingController();
-  ScrollController _scrollController = ScrollController();
-
+  final ScrollController _scrollController = ScrollController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  late Stream<QuerySnapshot> _chats;
+  var lastMessageLength = 0;
+  bool _isChatsLoaded = false;
 
-  // Get the current user
   User? get currentUser {
     return _auth.currentUser;
+  }
+
+  Future<void> _initializeChats() async {
+    _chats = DatabaseService(uid: currentUser!.uid).getChats(widget.groupId);
+
+    await _chats.first;
+
+    setState(() {
+      _isChatsLoaded = true;
+    });
   }
 
   @override
   void initState() {
     super.initState();
 
-    _chats = DatabaseService(uid: currentUser!.uid).getChats(widget.groupId);
-
-    // Add a post-frame callback to scroll to the bottom after the widgets are built
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 1),
-          curve: Curves.easeOut,
-        );
+    _initializeChats();
+    if (!_isChatsLoaded) {
+      // Add a post-frame callback to scroll to the bottom after the widgets are built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 1),
+              curve: Curves.easeOut,
+            );
+          }
+        });
       });
-    });
+    }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +126,24 @@ class _ChatPageState extends State<ChatPage> {
                   child: StreamBuilder<QuerySnapshot>(
                     stream: _chats,
                     builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data!.docs != null) {
+                        if (lastMessageLength != snapshot.data!.docs.length) {
+                          lastMessageLength = snapshot.data!.docs.length;
+                          WidgetsBinding.instance!.addPostFrameCallback((_) {
+                            Future.delayed(const Duration(milliseconds: 100), () {
+                              if (_scrollController?.hasClients == true) {
+                                _scrollController!.animateTo(
+                                  _scrollController!.position.maxScrollExtent,
+                                  duration: const Duration(milliseconds: 1),
+                                  curve: Curves.easeOut,
+                                );
+                              }
+                            });
+                          });
+                        }
+                      } else {
+                        return Container();
+                      }
                       return snapshot.hasData
                           ? ListView.builder(
                         shrinkWrap: true,
@@ -159,7 +189,7 @@ class _ChatPageState extends State<ChatPage> {
                   Expanded(
                     child: TextField(
                       controller: messageEditingController,
-                      style: TextStyle(color: Colors.black,  fontFamily: "DINNextLtPro"),
+                      style: const TextStyle(color: Colors.black,  fontFamily: "DINNextLtPro"),
                       decoration: const InputDecoration(
                         hintText: "Send a message ...",
                         hintStyle: TextStyle(
@@ -176,7 +206,7 @@ class _ChatPageState extends State<ChatPage> {
                     onTap: () {
                       _sendMessage();
                     },
-                    child: Container(
+                    child: SizedBox(
                       height: 30.0,
                       width: 30.0,
                       child: Image.asset(
@@ -196,9 +226,6 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-
-
-
   _sendMessage() async {
     if (messageEditingController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
@@ -206,18 +233,8 @@ class _ChatPageState extends State<ChatPage> {
         "sender": widget.userName,
         'time': DateTime.now().millisecondsSinceEpoch,
       };
-
+      messageEditingController.text = "";
       DatabaseService(uid: currentUser!.uid).sendMessage(widget.groupId, chatMessageMap);
-
-      // Wait for a short duration to ensure the message is added before scrolling
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      // Scroll to the bottom after sending a message
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
 
       setState(() {
         messageEditingController.text = "";
@@ -263,8 +280,6 @@ class _ChatPageState extends State<ChatPage> {
       return "";
     }
   }
-
-
 
   @override
   void dispose() {

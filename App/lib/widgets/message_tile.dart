@@ -71,7 +71,6 @@ class _MessageTileState extends State<MessageTile> {
           ),
         ),
         const SizedBox(height: 7.0),
-        // Inside your MessageTile widget
         Padding(
           padding: const EdgeInsets.only(),
           child:Row(
@@ -82,27 +81,23 @@ class _MessageTileState extends State<MessageTile> {
                 future: getImageUrlForUser(widget.sender),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    // If the Future is still running, show a loading indicator or placeholder
-                    return const SizedBox(
-                      width: 24.0, // Adjust the width as needed
-                      height: 24.0, // Adjust the height as needed
+                         return const SizedBox(
+                      width: 24.0,
+                      height: 24.0,
                       child: Text(""),
                     );
                   } else if (snapshot.hasError) {
-                    // If an error occurred, show an error message or handle it accordingly
-                    return const Text('Error loading image');
+                     return const Text('Error loading image');
                   } else {
-                    // If the Future is complete, build the widget with the loaded image URL
-                    String imageUrl = snapshot.data ?? ''; // Use a default value if null
-                    // Only build the Row if the image URL is not empty
-                    if (imageUrl.isNotEmpty) {
+                     String imageUrl = snapshot.data ?? '';
+                     if (imageUrl.isNotEmpty) {
                       return Row(
                         children: [
                           CircleAvatar(
                             radius: 6,
                             backgroundImage: NetworkImage(imageUrl),
                           ),
-                          const SizedBox(width: 4), // Add spacing between CircleAvatar and sender's name
+                          const SizedBox(width: 4),
                           Text(
                             widget.sender.toUpperCase(),
                             textAlign: TextAlign.start,
@@ -115,7 +110,7 @@ class _MessageTileState extends State<MessageTile> {
                         ],
                       );
                     } else {
-                      return const SizedBox(); // Return an empty SizedBox if the image URL is empty
+                      return const SizedBox();
                     }
                   }
                 },
@@ -156,9 +151,6 @@ class _MessageTileState extends State<MessageTile> {
     final firestore = FirebaseFirestore.instance;
     var userID = user?.uid;
 
-    print("userID");
-    print(userID);
-
     if (userID != null) {
       final snapshot = await firestore.collection("users").doc(userID).get();
 
@@ -168,14 +160,11 @@ class _MessageTileState extends State<MessageTile> {
 
         if (imageName != null) {
           imageURL = imageName;
-          print("Image Name: $imageName");
           return true;
         } else {
-          print("Image Name not found in the document.");
           return false;
         }
       } else {
-        print("Document not found for user with ID: $userID");
         final Reference storageRef = FirebaseStorage.instance.ref('files/cliqueConnect.png');
 
         try {
@@ -183,14 +172,11 @@ class _MessageTileState extends State<MessageTile> {
 
           if (imageUrl != null) {
             imageURL = imageUrl;
-            print("Image URL: $imageUrl");
             return true;
           } else {
-            print("Image URL not found.");
             return false;
           }
         } catch (e) {
-          print("Error retrieving image URL: $e");
           return false;
         }
       }
