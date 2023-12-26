@@ -18,8 +18,8 @@ import 'package:intl/intl.dart';
 const MAPBOX_ACCESS_TOKEN = 'sk.eyJ1IjoiYm9uaXRoYW4iLCJhIjoiY2xvaGFydjR1MGV5bDJqbnZ6cWg0dXh4cyJ9.m3uRWclpqOdSgYfUegOlTg';
 const MAPBOX_STYLE = 'mapbox://styles/bonithan/cloh3lx0f000d01qoh3okhz10';
 const MARKER_COLOR = Color(0xFF3DC5A7);
-const MARKER_SIZE_EXPAND = 55.0;
-const MARKER_SIZE_SHRINK = 30.0;
+const MARKER_SIZE_EXPAND = 100.0;
+const MARKER_SIZE_SHRINK = 40.0;
 
 const LocationSettings locationSettings = LocationSettings(
   accuracy: LocationAccuracy.high,
