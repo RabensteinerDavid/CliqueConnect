@@ -58,6 +58,7 @@ class _ChatPageState extends State<ChatPage> {
               _scrollController.position.maxScrollExtent,
               duration: const Duration(milliseconds: 1),
               curve: Curves.easeOut,
+
             );
           }
         });
@@ -70,12 +71,12 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: [  SizedBox(width: MediaQuery.of(context).size.width*0.1),
+          children: [
+            SizedBox(width: MediaQuery.of(context).size.width * 0.01),
             FutureBuilder<String>(
               future: getGroupCategory(widget.groupId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // If the Future is still running, you can return a placeholder or loading image
                   return const CircleAvatar(
                     radius: 25.0,
                     backgroundColor: MyApp.blueMain,
@@ -85,16 +86,18 @@ class _ChatPageState extends State<ChatPage> {
                   return GestureDetector(
                     onTap: () {
                       print("here");
-                      Navigator.push(
+                      Navigator.pop(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Event(
-                            eventName: widget.groupName, eventCategory: snapshot.data ?? "",
+                            eventName: widget.groupName,
+                            eventCategory: snapshot.data ?? "",
                           ),
                         ),
-                      );        },
+                      );
+                    },
                     child: CircleAvatar(
-                      radius: 25.0,
+                      radius: 20.0,
                       backgroundColor: MyApp.blueMain,
                       child: Image.asset(
                         getCategoryPic(snapshot.data ?? ""),
@@ -104,10 +107,10 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   );
-              }
+                }
               },
             ),
-            const SizedBox(width: 10), // Add some spacing between the image and the title
+            const SizedBox(width: 10),
             Text(
               widget.groupName,
               style: const TextStyle(
@@ -117,16 +120,31 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
-        centerTitle: false, // Centering is handled manually in the Row widget
+        centerTitle: false,
         backgroundColor: Colors.white,
         elevation: 0.0,
-        // Add a line at the bottom of the AppBar
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'icons/ arrow_white.png', // Set the correct path to your image
+              width: 30,
+              height: 30,
+            ),
+          ),
+        ),
+        iconTheme: const IconThemeData(
+          color: Colors.black, // Ändern Sie die Farbe hier
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2.0),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.8,
-            height: 1.0, // Adjust the height to change the width of the line
-            color: Colors.grey.withOpacity(0.5), // Adjust opacity and color
+            height: 1.0,
+            color: Colors.grey.withOpacity(0.5),
           ),
         ),
       ),
