@@ -344,7 +344,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                       )
                           : const CircularProgressIndicator();
                     }
-                    return const CircularProgressIndicator();
+                    return Container();
                   },
                 );
               }
