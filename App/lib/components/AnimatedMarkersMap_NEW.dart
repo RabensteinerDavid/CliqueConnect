@@ -56,9 +56,48 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
   @override
   void initState() {
     super.initState();
+    _checkAndRequestLocationPermission();
     _updateMarkers();
     _markersFuture = getMarkersAsFuture();
     _markers = [];
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location services are disabled. Please enable the services')));
+      return false;
+    }
+    print("CheckPermission()");
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _checkAndRequestLocationPermission() async {
+    final bool hasLocationPermission = await _handleLocationPermission();
+    if (hasLocationPermission) {
+      print("Permission activated");
+    } else {
+      print("Permission not granted");
+    }
   }
 
   void _updateMarkers() async {
@@ -108,63 +147,67 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
         final Map<String, dynamic> data = activityDoc.data();
 
         for (final key in data.keys) {
-          List<dynamic> alldata = List.from(data[key]);
+          final alldata = List.from(data[key] ?? []);
+          if (alldata.isNotEmpty) {
+            final nameActivity = await alldata[0];
+            final description = await alldata[1];
+            final start = await alldata[2];
+            final location = await alldata[4];
+            final category = await alldata[6];
+            categorySave = category;
+            var ruleNew = "";
+            var rrule;
+            if (alldata.length > 8) {
+              ruleNew = await alldata[8];
+              rrule = RecurrenceRule.fromString(ruleNew);
+            }
 
-          final nameActivity = await alldata[0];
-          final description = await alldata[1];
-          final start = await alldata[2];
-          final location = await alldata[4];
-          final category = await alldata[6];
-          categorySave = category;
-          var ruleNew = "";
-          var rrule;
-          if (alldata.length > 8) {
-            ruleNew = await alldata[8];
-            rrule = RecurrenceRule.fromString(ruleNew);
-          }
+            var imagePic = 'assets/Marker.png';
+            switch (category) {
+              case 'Creative':
+                imagePic = "assets/creative_noStory.png";
+              case 'Sports':
+                imagePic = "assets/sports_noStory.png";
+              case 'Games':
+                imagePic = "assets/gaming_noStory.png";
+              case 'Education':
+                imagePic = "assets/education_noStory.png";
+              case 'Nightlife':
+                imagePic = "assets/nightLife_noStory.png";
+              case 'Culinary':
+                imagePic = "assets/culinary_noStory.png";
+              case 'Off Topic':
+                imagePic = "assets/offTopic_noStory.png";
+              case 'Archives':
+                imagePic = "assets/archive_noStory.png";
+              default:
+                imagePic = "assets/offTopic_noStory.png";
+            }
 
-          var imagePic = 'assets/Marker.png';
-          switch (category) {
-            case 'Creative':
-              imagePic = "assets/creative_noStory.png";
-            case 'Sports':
-              imagePic = "assets/sports_noStory.png";
-            case 'Games':
-              imagePic = "assets/gaming_noStory.png";
-            case 'Education':
-              imagePic = "assets/education_noStory.png";
-            case 'Nightlife':
-              imagePic = "assets/nightLife_noStory.png";
-            case 'Culinary':
-              imagePic = "assets/culinary_noStory.png";
-            case 'Off Topic':
-              imagePic = "assets/offTopic_noStory.png";
-            case 'Archives':
-              imagePic = "assets/archive_noStory.png";
-            default:
-              imagePic = "assets/offTopic_noStory.png";
-          }
+            if (location != null && location is GeoPoint) {
+              var address = await _convertAddressToCoordinates(location);
 
-          if (location != null && location is GeoPoint) {
-            var address = await _convertAddressToCoordinates(location);
+              // Use the title as a unique identifier
+              String title = nameActivity.toString();
+              final category = alldata.length > 6
+                  ? await alldata[6].toString()
+                  : '';
 
-            // Use the title as a unique identifier
-            String title = nameActivity.toString();
-            final category = alldata.length > 6 ? await alldata[6].toString() : '';
-
-            // Check if the title is already in the map
-            if (!uniqueMarkers.containsKey(title)) {
-              uniqueMarkers[title] = MapMarker(
-                image: imagePic,
-                title: title,
-                address: address,
-                location: latlong.LatLng(location.latitude, location.longitude),
-                start: start,
-                end: now,
-                description: description,
-                category: category,
-                rule: rrule,
-              );
+              // Check if the title is already in the map
+              if (!uniqueMarkers.containsKey(title)) {
+                uniqueMarkers[title] = MapMarker(
+                  image: imagePic,
+                  title: title,
+                  address: address,
+                  location: latlong.LatLng(
+                      location.latitude, location.longitude),
+                  start: start,
+                  end: now,
+                  description: description,
+                  category: category,
+                  rule: rrule,
+                );
+              }
             }
           }
         }
