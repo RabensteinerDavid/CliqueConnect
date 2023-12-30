@@ -121,7 +121,8 @@ flutter:
     - icons/calendar_white.png
     - icons/map_color.png
     - icons/map_white.png
-    - icons/ arrow_white.png
+    - icons/arrow_white.png
+    - icons/arrow_white_noBG.png
     - icons/send_blue.png
     - icons/hat_rose.png
     - icons/profile_rose.png

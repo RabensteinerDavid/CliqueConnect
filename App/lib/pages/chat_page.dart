@@ -72,7 +72,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.1),
             FutureBuilder<String>(
               future: getGroupCategory(widget.groupId),
               builder: (context, snapshot) {
@@ -86,7 +86,7 @@ class _ChatPageState extends State<ChatPage> {
                   return GestureDetector(
                     onTap: () {
                       print("here");
-                      Navigator.pop(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Event(
@@ -123,6 +123,7 @@ class _ChatPageState extends State<ChatPage> {
         centerTitle: false,
         backgroundColor: Colors.white,
         elevation: 0.0,
+        automaticallyImplyLeading: false,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -130,7 +131,7 @@ class _ChatPageState extends State<ChatPage> {
           child: Container(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(
-              'icons/ arrow_white.png', // Set the correct path to your image
+              'icons/arrow_white_noBG.png', // Set the correct path to your image
               width: 30,
               height: 30,
             ),
