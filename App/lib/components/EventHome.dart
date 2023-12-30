@@ -245,13 +245,16 @@ class _EventHomeState extends State<EventHome> {
       List<Map<String, dynamic>> tempList = [];
 
       querySnapshot.docs.forEach((activityDoc) {
+        final Map<String, dynamic> data = activityDoc.data();
         activityDoc.data().forEach((key, value) {
+          final alldata = List.from(data[key] ?? []);
+          if (alldata.isNotEmpty) {
           tempList.add({
             'eventName': key,
             'eventCategory': activityDoc.id,
             'imgURL': value[5],
           });
-        });
+        }});
       });
 
       setState(() {
