@@ -123,6 +123,7 @@ flutter:
     - icons/map_white.png
     - icons/arrow_white.png
     - icons/arrow_white_noBG.png
+    - icons/arrow_white_noBG_white.png
     - icons/send_blue.png
     - icons/hat_rose.png
     - icons/profile_rose.png
