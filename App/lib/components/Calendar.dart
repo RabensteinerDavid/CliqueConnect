@@ -111,32 +111,35 @@ import 'package:rrule/rrule.dart';
         for (final activityDoc in querySnapshot.docs) {
           final Map<String, dynamic> data = activityDoc.data();
           for (final key in data.keys) {
-            alldata = List.from(data[key]);
-            final nameActivity = await alldata[0];
-            nameActivityCalender = nameActivity;
+            alldata = List.from(data[key] ?? []);
+            if (alldata.isNotEmpty) {
+              final nameActivity = await alldata[0];
+              nameActivityCalender = nameActivity;
 
-            final startTimestamp = await alldata[2]; // Assuming this is a Timestamp object
-            final start = startTimestamp.seconds * 1000 + (startTimestamp.nanoseconds / 1e6).round();
+              final startTimestamp = await alldata[2]; // Assuming this is a Timestamp object
+              final start = startTimestamp.seconds * 1000 +
+                  (startTimestamp.nanoseconds / 1e6).round();
 
-            final description = await alldata[1];
-            final location = await alldata[4];
-            final category = await alldata[6];
-            var ruleNew = "";
-            var rrule;
-            if (alldata.length > 8) {
-              ruleNew = await alldata[8];
-              rrule = RecurrenceRule.fromString(ruleNew);
+              final description = await alldata[1];
+              final location = await alldata[4];
+              final category = await alldata[6];
+              var ruleNew = "";
+              var rrule;
+              if (alldata.length > 8) {
+                ruleNew = await alldata[8];
+                rrule = RecurrenceRule.fromString(ruleNew);
+              }
+              print(rrule);
+              eventDataList.add(EventData(
+                title: nameActivity,
+                startTime: DateTime.fromMillisecondsSinceEpoch(start),
+                endTime: DateTime.fromMillisecondsSinceEpoch(start),
+                description: description,
+                location: location,
+                category: category,
+                rrule: rrule,
+              ));
             }
-            print(rrule);
-            eventDataList.add(EventData(
-              title: nameActivity,
-              startTime: DateTime.fromMillisecondsSinceEpoch(start),
-              endTime: DateTime.fromMillisecondsSinceEpoch(start),
-              description: description,
-              location: location,
-              category: category,
-              rrule: rrule,
-            ));
           }
         }
 
