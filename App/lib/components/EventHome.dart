@@ -25,25 +25,42 @@ class _EventHomeState extends State<EventHome> {
     getEventData();
   }
 
+  PreferredSizeWidget buildAppBar() {
+    return PreferredSize(
+      preferredSize: Size(
+        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.height * 0.08,
+      ),
+      child: AppBar(
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset('icons/arrow_white_noBG_white.png', // Set the correct path to your image
+              width: 30,
+              height: 30,
+            ),
+          ),
+        ),
+        title: Image.asset('assets/cliqueConnect.png', fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.08),
+        centerTitle: true,
+        backgroundColor: MyApp.blueMain,
+        elevation: 0.0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: buildAppBar(),
       body: Material(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: MediaQuery.of(context).size.height * 0.2,
-              decoration: const BoxDecoration(
-                color: MyApp.blueMain,
-                image: DecorationImage(
-                  image: AssetImage('assets/cliqueConnect.png'),
-                  fit: BoxFit.scaleDown,
-                  scale: 8,
-                  alignment: Alignment(0.0, 2.0 / 4.0),
-                ),
-              ),
-            ),
             Align(
               alignment: Alignment.topLeft,
               child: Container(

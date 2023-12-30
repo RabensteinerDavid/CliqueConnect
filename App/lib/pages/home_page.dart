@@ -182,18 +182,18 @@ class _HomePageState extends State<HomePageChat> {
     );
   }
 
-
-
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight),
+      preferredSize: Size(
+        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.height * 0.08,
+      ),
       child: AppBar(
-       title: Image.asset('assets/cliqueConnect.png',  fit: BoxFit.contain,
-         height: 50,),
-        centerTitle: true, // Center the title (icon) in the middle
+        title: Image.asset('assets/cliqueConnect.png', fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.08),
+        centerTitle: true,
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
-        iconTheme: const IconThemeData(color: Colors.white), // Set the color of the back arrow to white
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: <Widget>[
           IconButton(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -208,4 +208,5 @@ class _HomePageState extends State<HomePageChat> {
       ),
     );
   }
+
 }

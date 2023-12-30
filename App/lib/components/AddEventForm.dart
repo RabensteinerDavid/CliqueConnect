@@ -172,17 +172,16 @@ class _EventState extends State<AddEventForm> {
                   left: 20,
                   child: GestureDetector(
                     onTap: () {
-      Navigator.pop(context);
-      },
-        child: Container(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(
-            'icons/arrow_white_noBG_white.png', // Set the correct path to your image
-            width: 30,
-            height: 30,
-          ),
-        ),
-      ),
+                      Navigator.pop(context);
+                      },
+                    child: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset('icons/arrow_white_noBG_white.png', // Set the correct path to your image
+                        width: 30,
+                        height: 30,
+                      ),
+                    ),
+                  ),
                 ),
             Padding(
             padding: const EdgeInsets.fromLTRB(46.0, 380.0,46.0, 60.0),

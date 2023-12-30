@@ -264,6 +264,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
       return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
     }).toList();
     return Scaffold(
+      appBar: buildAppBar(),
       body: Stack(
         children: [
           StreamBuilder<Position>(
@@ -350,26 +351,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
               return const CircularProgressIndicator();
               },
             ),
-
-          Container(
-            height: MediaQuery.of(context).size.height * 0.18,
-            color: MyApp.blueMain,
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.07,
-            left: MediaQuery.of(context).size.width * 0.08,
-            right: MediaQuery.of(context).size.width * 0.1,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.08,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/cliqueConnect.png"),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-
           Positioned(
             bottom: 30,
             left: 0,
@@ -400,7 +381,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             ),
           ),
           Positioned(
-            top: 160,
+            top: 0,
             left: 10,
             right: 10,
             child: Opacity(
@@ -451,6 +432,22 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget buildAppBar() {
+    return PreferredSize(
+      preferredSize: Size(
+        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.height * 0.08,
+      ),
+      child: AppBar(
+        title: Image.asset('assets/cliqueConnect.png', fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.08),
+        centerTitle: true,
+        backgroundColor: MyApp.blueMain,
+        elevation: 0.0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
     );
   }
