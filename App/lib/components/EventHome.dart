@@ -1,6 +1,8 @@
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 import 'package:test_clique_connect/main.dart';
 
 import 'event.dart';
@@ -16,7 +18,8 @@ class EventHome extends StatefulWidget {
 
 class _EventHomeState extends State<EventHome> {
   final firestore = FirebaseFirestore.instance;
-
+  static const eventBoxSice = 230.0;
+  static const textLength = 30;
   List<Map<String, dynamic>> eventList = [];
 
   @override
@@ -149,6 +152,7 @@ class _EventHomeState extends State<EventHome> {
                 ),
               ),
             ),
+
             const Align(
               alignment: Alignment.center,
               child: SingleChildScrollView(
@@ -156,74 +160,84 @@ class _EventHomeState extends State<EventHome> {
                 child: FilterChipExample(),
               ),
             ),
-            SingleChildScrollView(
-              child: Container(
-                margin: const EdgeInsets.only(top: 0.0), // Adjust the top margin as needed
-                child: Transform(
-                  transform: Matrix4.translationValues(00 / 8, 0, 0),
-                  child: CarouselSlider.builder(
-                    itemCount: eventList.length,
-                    options: CarouselOptions(
-                      height: MediaQuery.sizeOf(context).width, // Increase the height as needed
-                      enlargeCenterPage: true,
-                      enableInfiniteScroll: false,
-                      viewportFraction: 1,
-                      scrollDirection: Axis.vertical,
-                    ),
-                    itemBuilder: (context, index, realIndex) {
-                      return GestureDetector(
-                        onTap: () {
-                          // Navigate to the EventPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Event(
-                                eventName: eventList[index]['eventName'],
-                                eventCategory: eventList[index]['eventCategory'],
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          child: Stack(
-                            children: [
-                              Image.network(
-                                eventList[index]['imgURL'],
-                                height: 300.0, // Adjust the image height as needed
-                                fit: BoxFit.cover, // Use BoxFit.cover to fill the container
-                              ),
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: null,
-                                child: _buildGradientShadow(), // Add the gradient shadow between the picture and text
-                              ),
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.only(left: 16.0, bottom: 100),
-                                  child: Text(
-                                    eventList[index]['eventName'],
-                                    style: const TextStyle(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
 
-                             // Add the gradient shadow on top of the text
-                            ],
+            Expanded(
+              child: StackedCardCarousel(
+                initialOffset: 20,
+                spaceBetweenItems: eventBoxSice * 1.1,
+                type: StackedCardCarouselType.fadeOutStack,
+                items: eventList.map((item) {
+                  String eventName = item['eventName'];
+                  if (eventName.length > textLength) {
+                    // Begrenze den Text auf 64 Zeichen
+                    eventName = eventName.substring(0, textLength) + '...';
+                  }
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Event(
+                            eventName: item['eventName'],
+                            eventCategory: item['eventCategory'],
                           ),
                         ),
                       );
                     },
-                  ),
-                ),
+                    child: Container(
+                      child: Stack(
+                        alignment: Alignment.bottomLeft, // Text links unten positionieren
+                        children: [
+                          // Bild
+                          Image.network(
+                            item['imgURL'],
+                            height: eventBoxSice,
+                            fit: BoxFit.cover,
+                          ),
+                          // Gradienten-Overlay über dem Bild
+                          Container(
+                            width: 309, // TODO: An Bild anpassen
+                            height: eventBoxSice, // Set to the height of the image
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black12,
+                                  Colors.black87,
+                                  // Adjust the color as needed
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Text
+                          Container(
+                            margin: const EdgeInsets.only(left: 16.0, bottom: 16.0), // Anpassen, wie es dir gefällt
+                            child: Text(
+                              eventName,
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
+
+
+
+
 
           ],
         ),
@@ -233,7 +247,7 @@ class _EventHomeState extends State<EventHome> {
 
   Widget _buildGradientShadow() {
     return Container(
-      height: 300, // Set to the height of the image
+      height: eventBoxSice, // Set to the height of the image
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -266,12 +280,12 @@ class _EventHomeState extends State<EventHome> {
         activityDoc.data().forEach((key, value) {
           final alldata = List.from(data[key] ?? []);
           if (alldata.isNotEmpty) {
-          tempList.add({
-            'eventName': key,
-            'eventCategory': activityDoc.id,
-            'imgURL': value[5],
-          });
-        }});
+            tempList.add({
+              'eventName': key,
+              'eventCategory': activityDoc.id,
+              'imgURL': value[5],
+            });
+          }});
       });
 
       setState(() {
