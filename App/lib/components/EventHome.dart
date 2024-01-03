@@ -1,9 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
+import 'package:test_clique_connect/components/Calendar.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
 import 'package:test_clique_connect/main.dart';
 
@@ -20,17 +22,55 @@ class EventHome extends StatefulWidget {
 
 class _EventHomeState extends State<EventHome> {
   final firestore = FirebaseFirestore.instance;
-  static const eventBoxSize = 230.0;
+  User? user = FirebaseAuth.instance.currentUser;
+
+  static const eventBoxSize = 260.0;
   static const textLength = 30;
   List<Map<String, dynamic>> eventList = [];
   List<Map<String, dynamic>> eventListShowing = [];
   static Set<String> filterCategories = <String>{};
 
+  List<String> connectedEventsName = [];
+  List<Map<String, dynamic>> connectedEvents = [];
+
+
   @override
   void initState() {
     super.initState();
-    getEventData();
+    _initializeData();
+    getConnectedEvents();
   }
+
+  Future<void> _initializeData() async {
+    //macht das die daten erst geladen werden bevor weitergeben werden
+    await getEventData().then((_) {
+      getConnectedEvents();
+    });
+  }
+
+  Future<void> getConnectedEvents() async {
+    List<String> connectedEventNames = await getConnectedEventsNames();
+    List<Map<String, dynamic>> connectedEvents = [];
+
+    List<Map<String, dynamic>> personalEventData = eventList;
+
+    for (String eventName in connectedEventNames) {
+      Map<String, dynamic>? foundEvent = personalEventData.firstWhere(
+            (event) => event['eventName'] == eventName,
+        orElse: () => {},
+      );
+
+      if (foundEvent.isNotEmpty) {
+        connectedEvents.add(foundEvent);
+      }
+    }
+
+    setState(() {
+      this.connectedEvents = connectedEvents;
+    });
+  }
+
+
 
   void setFilterCategories(Set<String> newFilterCategories) {
     setState(() {
@@ -46,6 +86,25 @@ class _EventHomeState extends State<EventHome> {
       eventListShowing =
           eventList.where((event) => filters.contains(event['eventCategory'])).toList();
     }
+  }
+
+  Future<List<String>> getConnectedEventsNames() async {
+    List<String> connectedEvents = [];
+    var userID = user?.uid;
+
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        var userGroup = data["groups"];
+
+        for(var group in userGroup) {
+          connectedEvents.add(group.split("_")[1]);
+        }
+      }
+    }
+    return connectedEvents;    return connectedEvents;
   }
 
   PreferredSizeWidget buildAppBar() {
@@ -104,18 +163,22 @@ class _EventHomeState extends State<EventHome> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: buildAppBar(),
       body: Material(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
+            if (connectedEvents.isNotEmpty)
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                margin: const EdgeInsets.only(left: 16.0, top: 6.0, bottom: 0),
+                margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
                 child: const Text(
                   "Connected",
                   style: TextStyle(
@@ -126,62 +189,68 @@ class _EventHomeState extends State<EventHome> {
                 ),
               ),
             ),
+            if (connectedEvents.isNotEmpty)
             Container(
-              margin: const EdgeInsets.only(top: 0.0),
+              margin: const EdgeInsets.only(top: 0.0, left: 30),
               child: Transform(
-                transform: Matrix4.translationValues(-300 / 8, 0, 0),
+                transform: Matrix4.translationValues(0, 0, 0),
                 child: CarouselSlider.builder(
-                  itemCount: eventList.length,
+                  itemCount: connectedEvents.length,
                   options: CarouselOptions(
+                    scrollPhysics: const BouncingScrollPhysics(),
                     height: 150.0,
-                    enlargeCenterPage: true,
                     enableInfiniteScroll: false,
                     viewportFraction: 0.5,
+                    pageSnapping: false,
+                    padEnds: false,
                   ),
                   itemBuilder: (context, index, realIndex) {
-                    String eventName = eventList[index]['eventName'];
+                    String eventName = connectedEvents[index]['eventName'];
                     if (eventName.length > textLength) {
                       eventName = eventName.substring(0, textLength) + '...';
                     }
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Event(
-                              eventName: eventList[index]['eventName'],
-                              eventCategory: eventList[index]['eventCategory'],
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8), // Adjust spacing as needed
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Event(
+                                eventName: connectedEvents[index]['eventName'],
+                                eventCategory: connectedEvents[index]['eventCategory'],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        child: Stack(
-                          children: [
-                            Image.network(
-                              eventList[index]['imgURL'],
-                              height: 150.0,
-                              fit: BoxFit.fitHeight,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height: 50,
-                                color: MyApp.blueMain,
-                                child: Center(
-                                  child: Text(
-                                    eventName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                          );
+                        },
+                        child: Container(
+                          child: Stack(
+                            children: [
+                              Image.network(
+                                connectedEvents[index]['imgURL'],
+                                height: 150.0,
+                                fit: BoxFit.fitHeight,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 50,
+                                  color: MyApp.blueMain,
+                                  child: Center(
+                                    child: Text(
+                                      eventName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -190,10 +259,11 @@ class _EventHomeState extends State<EventHome> {
               ),
             ),
 
+
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                margin: const EdgeInsets.only(left: 16.0, top: 12.0, bottom: 0),
+                margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
                 child: const Text(
                   "Explore",
                   style: TextStyle(
@@ -207,10 +277,14 @@ class _EventHomeState extends State<EventHome> {
 
             const Align(
               alignment: Alignment.center,
-              child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 30),
+                child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: FilterChipExample(),
+                ),
               ),
+
             ),
 
             Expanded(
@@ -333,7 +407,7 @@ class _EventHomeState extends State<EventHome> {
               });
             }
 
-            print('Event: $key, Category: ${activityDoc.id}');
+            //print('Event: $key, Category: ${activityDoc.id}');
           }
         });
       });
