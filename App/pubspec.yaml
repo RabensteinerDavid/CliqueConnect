@@ -94,6 +94,16 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/Event/Creative.png
+    - assets/Event/Sports.png
+    - assets/Event/Games.png
+    - assets/Event/Education.png
+    - assets/Event/NightLife.png
+    - assets/Event/Culinary.png
+    - assets/Event/OffTopic.png
+
+
+    - assets/icons/
     - assets/cliqueConnect.png
     - assets/intro.mp4
     - assets/Marker.png
@@ -130,6 +140,8 @@ flutter:
     - icons/hat_rose.png
     - icons/profile_rose.png
     - icons/plus_pink.png
+    - icons/plus_white.png
+    - icons/profile_rose.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
