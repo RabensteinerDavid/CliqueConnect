@@ -32,7 +32,7 @@ class _EventHomeState extends State<EventHome> {
   static const eventBoxSize = 260.0;
   static const textLength = 30;
   List<Map<String, dynamic>> eventList = [];
-  List<Map<String, dynamic>> eventListShowing = [];
+  List<Map<String, dynamic>> filteredEvents = [];
   static Set<String> filterCategories = <String>{};
 
   List<String> connectedEventsName = [];
@@ -51,6 +51,21 @@ class _EventHomeState extends State<EventHome> {
     //macht das die daten erst geladen werden bevor weitergeben werden
     await getEventData().then((_) {
       getConnectedEvents();
+      _filterEvents();
+    });
+  }
+
+  Future<void> _filterEvents() async {
+    List<Map<String, dynamic>> tempList = [];
+
+    for (String category in filterCategories) {
+      tempList.addAll(eventList.where((event) =>
+      event['eventCategory'] == category &&
+          !tempList.contains(event)));
+    }
+
+    setState(() {
+      filteredEvents = tempList;
     });
   }
 
@@ -76,23 +91,6 @@ class _EventHomeState extends State<EventHome> {
     });
   }
 
-
-
-  void setFilterCategories(Set<String> newFilterCategories) {
-    setState(() {
-      filterCategories = newFilterCategories;
-      filterEvents(filterCategories);
-    });
-  }
-
-  void filterEvents(Set<String> filters) {
-    if (filters.isEmpty) {
-      eventListShowing = eventList;
-    } else {
-      eventListShowing =
-          eventList.where((event) => filters.contains(event['eventCategory'])).toList();
-    }
-  }
 
   Future<List<String>> getConnectedEventsNames() async {
     List<String> connectedEvents = [];
@@ -120,247 +118,267 @@ class _EventHomeState extends State<EventHome> {
         MediaQuery.of(context).size.width,
         MediaQuery.of(context).size.height * 0.09,
       ),
-      child: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: MyApp.blueMain,
-        elevation: 0.0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        centerTitle: true,
-        title: Container(
-          padding: const EdgeInsets.only(top: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: Image.asset(
-                  'icons/plus_white.png',
-                  width: 30,
-                  height: 30,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddEventForm()),
-                  );
-                },
-              ),
-              Image.asset(
-                'assets/cliqueConnect.png',
-                fit: BoxFit.contain,
-                height: MediaQuery.of(context).size.height * 0.08,
-              ),
-              IconButton(
-                icon: Image.asset(
-                  'icons/profile_rose.png',
-                  width: 30,
-                  height: 30,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileView()),
-                  );
-                },
-                color: Colors.white,
-              ),
-            ],
+      child: Column(
+        children: [
+          Container(
+            color: MyApp.blueMain, // Farbe der AppBar
+            height: 10.0, // oberer Abstand
           ),
-        ),
+          AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: MyApp.blueMain,
+            elevation: 0.0,
+            iconTheme: const IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: Container(
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Image.asset(
+                      'icons/plus_white.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddEventForm()),
+                      );
+                    },
+                  ),
+                  Image.asset(
+                    'assets/cliqueConnect.png',
+                    fit: BoxFit.contain,
+                    height: MediaQuery.of(context).size.height * 0.08,
+                  ),
+                  IconButton(
+                    icon: Image.asset(
+                      'icons/profile_rose.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileView()),
+                      );
+                    },
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            color: MyApp.blueMain, // Farbe der AppBar
+            height: 10.0, // unterer Abstand
+          ),
+        ],
       ),
     );
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      key: UniqueKey(), // Füge eine eindeutige Key hinzu
       appBar: buildAppBar(),
       body: Material(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        key: UniqueKey(), // Füge eine eindeutige Key hinzu
+        child: Builder(
+          builder: (BuildContext context) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (connectedEvents.isNotEmpty)
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      margin:
+                      const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
+                      child: const Text(
+                        "Connected",
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (connectedEvents.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 0.0, left: 30),
+                    child: Transform(
+                      transform: Matrix4.translationValues(0, 0, 0),
+                      child: CarouselSlider.builder(
+                        itemCount: connectedEvents.length,
+                        options: CarouselOptions(
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          height: 150.0,
+                          enableInfiniteScroll: false,
+                          viewportFraction: 0.5,
+                          pageSnapping: false,
+                          padEnds: false,
+                        ),
+                        itemBuilder: (context, index, realIndex) {
+                          String eventName =
+                          connectedEvents[index]['eventName'];
+                          if (eventName.length > textLength) {
+                            eventName =
+                                eventName.substring(0, textLength) + '...';
+                          }
 
-          children: [
-            if (connectedEvents.isNotEmpty)
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
-                child: const Text(
-                  "Connected",
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8), // Adjust spacing as needed
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Event(
+                                      eventName: connectedEvents[index]
+                                      ['eventName'],
+                                      eventCategory: connectedEvents[index]
+                                      ['eventCategory'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                child: Stack(
+                                  children: [
+                                    Image.network(
+                                      connectedEvents[index]['imgURL'],
+                                      height: 150.0,
+                                      fit: BoxFit.fitHeight,
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                        height: 50,
+                                        color: MyApp.blueMain,
+                                        child: Center(
+                                          child: Text(
+                                            eventName,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    margin:
+                    const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
+                    child: const Text(
+                      "Explore",
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            if (connectedEvents.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 0.0, left: 30),
-              child: Transform(
-                transform: Matrix4.translationValues(0, 0, 0),
-                child: CarouselSlider.builder(
-                  itemCount: connectedEvents.length,
-                  options: CarouselOptions(
-                    scrollPhysics: const BouncingScrollPhysics(),
-                    height: 150.0,
-                    enableInfiniteScroll: false,
-                    viewportFraction: 0.5,
-                    pageSnapping: false,
-                    padEnds: false,
+                const Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 30),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: FilterChipExample(),
+                    ),
                   ),
-                  itemBuilder: (context, index, realIndex) {
-                    String eventName = connectedEvents[index]['eventName'];
-                    if (eventName.length > textLength) {
-                      eventName = eventName.substring(0, textLength) + '...';
-                    }
+                ),
+                Expanded(
+                  child: filteredEvents.isNotEmpty
+                      ? StackedCardCarousel(
+                    initialOffset: 20,
+                    spaceBetweenItems: eventBoxSize * 1.1,
+                    type: StackedCardCarouselType.fadeOutStack,
+                    items: filteredEvents.map((item) {
+                      String eventName = item['eventName'];
+                      if (eventName.length > textLength) {
+                        eventName =
+                            eventName.substring(0, textLength) + '...';
+                      }
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8), // Adjust spacing as needed
-                      child: GestureDetector(
+                      return GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => Event(
-                                eventName: connectedEvents[index]['eventName'],
-                                eventCategory: connectedEvents[index]['eventCategory'],
+                                eventName: item['eventName'],
+                                eventCategory: item['eventCategory'],
                               ),
                             ),
                           );
                         },
                         child: Container(
                           child: Stack(
+                            alignment: Alignment.bottomLeft,
                             children: [
                               Image.network(
-                                connectedEvents[index]['imgURL'],
-                                height: 150.0,
-                                fit: BoxFit.fitHeight,
+                                item['imgURL'],
+                                height: eventBoxSize,
+                                fit: BoxFit.cover,
                               ),
+                              _buildGradientShadow(),
                               Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 50,
-                                  color: MyApp.blueMain,
-                                  child: Center(
-                                    child: Text(
-                                      eventName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                                top: eventBoxSize * 0.03,
+                                right: eventBoxSize * 0.03,
+                                child: Image.asset(
+                                  'assets/Event/${item['eventCategory']}.png',
+                                  height: 75,
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 16.0, bottom: 16.0),
+                                child: Text(
+                                  eventName,
+                                  style: const TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 10),
-                child: const Text(
-                  "Explore",
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                      );
+                    }).toList(),
+                  )
+                      : Container(
+                    child: Center(
+                      child: Text("No Events"),
+                    ),
                   ),
                 ),
-              ),
-            ),
-
-            const Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 30),
-                child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: FilterChipExample(),
-                ),
-              ),
-
-            ),
-
-            Expanded(
-              child: eventListShowing.isNotEmpty
-                  ? StackedCardCarousel(
-                initialOffset: 20,
-                spaceBetweenItems: eventBoxSize * 1.1,
-                type: StackedCardCarouselType.fadeOutStack,
-                items: eventListShowing.map((item) {
-                  String eventName = item['eventName'];
-                  if (eventName.length > textLength) {
-                    eventName = eventName.substring(0, textLength) + '...';
-                  }
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Event(
-                            eventName: item['eventName'],
-                            eventCategory: item['eventCategory'],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      child: Stack(
-                        alignment: Alignment.bottomLeft,
-                        children: [
-                          Image.network(
-                            item['imgURL'],
-                            height: eventBoxSize,
-                            fit: BoxFit.cover,
-                          ),
-                          _buildGradientShadow(),
-
-                          Positioned(
-                            top: eventBoxSize * 0.03,
-                            right: eventBoxSize * 0.03,
-                            child: Image.asset(
-                              'assets/Event/${item['eventCategory']}.png',
-                              height: 75,
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(left: 16.0, bottom: 16.0),
-                            child: Text(
-                              eventName,
-                              style: const TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              )
-                  : Container(
-                child: Center(
-                  child: Text("No Events"),
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
@@ -400,28 +418,20 @@ class _EventHomeState extends State<EventHome> {
         activityDoc.data().forEach((key, value) {
           final alldata = List.from(data[key] ?? []);
           if (alldata.isNotEmpty) {
-            if (activityDoc.id == 'Off Topic') {
-              tempList.add({
-                'eventName': key,
-                'eventCategory': "OffTopic",
-                'imgURL': value[5],
-              });
-            } else {
+
               tempList.add({
                 'eventName': key,
                 'eventCategory': activityDoc.id,
                 'imgURL': value[5],
               });
-            }
 
-            //print('Event: $key, Category: ${activityDoc.id}');
           }
         });
       });
 
       setState(() {
         eventList = tempList;
-        filterEvents(filterCategories); // Initial filter
+        _filterEvents();
       });
     } catch (e) {
       print("Error getting documents: $e");
@@ -496,8 +506,8 @@ class _FilterChipExampleState extends State<FilterChipExample> {
                       } else {
                         _EventHomeState.filterCategories = Set.from(filters);
                       }
-                      _EventHomeState().filterEvents(_EventHomeState.filterCategories);
-
+                      //_EventHomeState().filterEvents(_EventHomeState.filterCategories);
+                      //print("Events: ${_EventHomeState.eventListShowing.length}");
                       print("Filter Categories: ${_EventHomeState.filterCategories.join(', ')}");
                     });
                   },

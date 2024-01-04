@@ -9,7 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import '../services/database_service.dart';
 
 
-//TODO Das, dass sich der connect button umwandelt, wenn man ihn klickt, mach ich noch
+//TODo: Edit the Event Page as admin button instead of connect button
+//TODO: David sagen das wenn keine Richtige Adresse eingegben wird das ganze event nicht created wird
+//TODO: Standartbild für Events ins richtige Format bringen
 
 class Event extends StatefulWidget {
   const Event({Key? key, required this.eventCategory, required this.eventName})
@@ -25,6 +27,8 @@ class Event extends StatefulWidget {
 
 class _EventState extends State<Event> {
   String imageURLBanner = "";
+  double bannerHeight = 254.0;
+  double bannerWidth = 400.0;
 
   List<dynamic> eventList = [];
 
@@ -47,6 +51,8 @@ class _EventState extends State<Event> {
 
   final firestore = FirebaseFirestore.instance;
 
+
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +68,6 @@ class _EventState extends State<Event> {
   Future<void> _checkUserInList() async {
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
-
     setState(() {
       buttonText = (userNames.contains(myUserName)) ? "Connect" : "I'm in!";
       buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
@@ -101,8 +106,8 @@ class _EventState extends State<Event> {
                         // Das Bild konnte nicht geladen werden, zeige einen Platzhalter
                         return Center(
                           child: Container(
-                            width: 400.0, // Breite des Platzhalters
-                            height: 254.0, // Höhe des Platzhalters
+                            width: bannerWidth, // Breite des Platzhalters
+                            height: bannerHeight, // Höhe des Platzhalters
                             color: Colors.grey, // Farbe des Platzhalters
                           ),
                         );
@@ -112,8 +117,8 @@ class _EventState extends State<Event> {
                       // Ein Fehler ist aufgetreten, zeige ebenfalls einen Platzhalter
                       return Center(
                         child: Container(
-                          width: 400.0, // Breite des Platzhalters
-                          height: 254.0, // Höhe des Platzhalters
+                          width: bannerWidth, // Breite des Platzhalters
+                          height: bannerHeight, // Höhe des Platzhalters
                           color: Colors.grey, // Farbe des Platzhalters
                         ),
                       );
@@ -121,29 +126,17 @@ class _EventState extends State<Event> {
                   ),
 
                   Positioned(
-                    top: 220,
-                    right: 290.0,
+                    top: bannerHeight+15,
+                    right: 40,
                     child: GestureDetector(
                       onTap: () {
                         //TODO navigate to the stories site, if stories are available
                         // Handle button click action here
                         print("Button Clicked!");
                       },
-                      child: Container(
-                        width: 75.0,
-                        height: 75.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xff26168C),
-                          border: Border.all(
-                            color: Colors.pink,
-                            width: 3.0,
-                          ),
-                          image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: AssetImage(icon), // Asset image
-                          ),
-                        ),
+                      child: Image.asset(
+                        'assets/Event/${widget.eventCategory}.png',
+                        height: 75,
                       ),
                     ),
                   ),
@@ -265,7 +258,7 @@ class _EventState extends State<Event> {
 
               // Display user names in a ListView
               ListView.builder(
-
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: userNames.length,
                 itemBuilder: (context, index) {

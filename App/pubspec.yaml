@@ -98,9 +98,9 @@ flutter:
     - assets/Event/Sports.png
     - assets/Event/Games.png
     - assets/Event/Education.png
-    - assets/Event/NightLife.png
+    - assets/Event/Nightlife.png
     - assets/Event/Culinary.png
-    - assets/Event/OffTopic.png
+    - assets/Event/Off Topic.png
 
 
     - assets/cliqueConnect.png
