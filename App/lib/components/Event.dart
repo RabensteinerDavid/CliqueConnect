@@ -20,13 +20,11 @@ class Event extends StatefulWidget {
 
   @override
   _EventState createState() =>
-      _EventState(imageURL: 'events/zeichnen_banner.jpg');
+      _EventState();
 }
 
 class _EventState extends State<Event> {
-  String imageURL = "";
-
-  _EventState({required this.imageURL});
+  String imageURLBanner = "";
 
   List<dynamic> eventList = [];
 
@@ -52,8 +50,23 @@ class _EventState extends State<Event> {
   @override
   void initState() {
     super.initState();
-    getEvent(widget.eventName, widget.eventCategory);
-    getImageUrl("events/zeichnen_banner.jpg");
+    _initializeData();
+    _checkUserInList();
+  }
+
+  Future<void> _initializeData() async {
+    // Warte darauf, dass getEvent abgeschlossen ist
+    await getEvent(widget.eventName, widget.eventCategory);
+  }
+
+  Future<void> _checkUserInList() async {
+    var userData = await firestore.collection('users').doc(user?.uid).get();
+    myUserName = userData["username"];
+
+    setState(() {
+      buttonText = (userNames.contains(myUserName)) ? "Connect" : "I'm in!";
+      buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
+    });
   }
 
   @override
@@ -72,40 +85,41 @@ class _EventState extends State<Event> {
                 alignment: Alignment.center,
                 clipBehavior: Clip.none,
                 children: [
+
                   Image.network(
-                    imageURL,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
+                    imageURLBanner.isNotEmpty
+                        ? imageURLBanner
+                        : "https://example.com/placeholder-image.jpg", // Hier den Link zum Platzhalterbild einfügen
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
-                        return child; // Image is loaded
+                        return child; // Das Bild ist geladen
                       } else if (loadingProgress.expectedTotalBytes == null) {
                         return const Center(
-                          child:
-                          CircularProgressIndicator(), // Image is still loading
+                          child: CircularProgressIndicator(), // Das Bild wird noch geladen
                         );
                       } else {
-                        // Image failed to load, show placeholder
+                        // Das Bild konnte nicht geladen werden, zeige einen Platzhalter
                         return Center(
                           child: Container(
-                            width: 400.0, // Width of the placeholder
-                            height: 254.0, // Height of the placeholder
-                            color: Colors.grey, // Color of the placeholder
+                            width: 400.0, // Breite des Platzhalters
+                            height: 254.0, // Höhe des Platzhalters
+                            color: Colors.grey, // Farbe des Platzhalters
                           ),
                         );
                       }
                     },
-                    errorBuilder: (BuildContext context, Object error,
-                        StackTrace? stackTrace) {
-                      // Error occurred while loading the image, show placeholder
+                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                      // Ein Fehler ist aufgetreten, zeige ebenfalls einen Platzhalter
                       return Center(
                         child: Container(
-                          width: 400.0, // Width of the placeholder
-                          height: 254.0, // Height of the placeholder
-                          color: Colors.grey, // Color of the placeholder,
+                          width: 400.0, // Breite des Platzhalters
+                          height: 254.0, // Höhe des Platzhalters
+                          color: Colors.grey, // Farbe des Platzhalters
                         ),
                       );
                     },
                   ),
+
                   Positioned(
                     top: 220,
                     right: 290.0,
@@ -133,10 +147,6 @@ class _EventState extends State<Event> {
                       ),
                     ),
                   ),
-
-
-
-
                 ],
               ),
 
@@ -197,73 +207,65 @@ class _EventState extends State<Event> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 8, width: 12),
-                  const Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 25.0, top: 40),
-                      child: Text(
-                        'Participants:',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontFamily: 'DINNextLtPro',
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E148C),
+                  Padding(
+                    padding: EdgeInsets.only(left: 25.0, top: 40 , right: 25.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Participants:',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'DINNextLtPro',
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2E148C),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
-                      child: SizedBox(
-                        width: 100, // Set the width
-                        height: 40, // Set the height
-                        child: FloatingActionButton(
-                          onPressed: () {
-                              // Überprüfe, ob der Benutzername bereits auf der Liste steht
+                        Spacer(),
+                        SizedBox(
+                          width: 100,
+                          height: 40,
+                          child: FloatingActionButton(
+                            onPressed: () {
                               if (userNames.contains(users["username"])) {
-                                // Der Benutzer steht bereits auf der Liste, führe die Aktion für "link off" aus
                                 _countMeOut();
                               } else {
-                                // Der Benutzer steht nicht auf der Liste, führe die Aktion für "link insert" aus
                                 _countMeIn(widget.eventName, widget.eventCategory);
                               }
-                              // Hier den Text des Buttons aktualisieren
                               setState(() {
-                                buttonText = (userNames.contains(myUserName)) ? "Connect" : "I'm in!";
+                                buttonText = (userNames.contains(myUserName)) ? "Connect" :  "I'm in!";
                                 buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
                               });
-                          },
-                          backgroundColor: buttonColor,
-                          elevation: 0,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(15),
-                              right: Radius.circular(15),
+                            },
+
+                            backgroundColor: buttonColor,
+                            elevation: 0,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(15),
+                                right: Radius.circular(15),
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 4, width: 12),
+                                Text(
+                                  buttonText,
+                                  style: const TextStyle(fontSize: 15, fontFamily: "DINNextLtPro"),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 4, width: 12),
-                              Text(
-                                buttonText,
-                                style: const TextStyle(fontSize: 15, fontFamily: "DINNextLtPro"),
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  )
-
-
+                  ),
                 ],
               ),
 
               // Display user names in a ListView
               ListView.builder(
+
                 shrinkWrap: true,
                 itemCount: userNames.length,
                 itemBuilder: (context, index) {
@@ -331,7 +333,7 @@ class _EventState extends State<Event> {
                         },
                         elevation: 0,
                         child: Image.asset(
-                          'icons/ arrow_white.png', // Set the correct path to your image
+                          'icons/arrow_white.png', // Set the correct path to your image
 
                         ),
                       ),
@@ -353,6 +355,7 @@ class _EventState extends State<Event> {
 
 
   Future<String> getImageUrlForUser(String username) async {
+    print(imageURLBanner);
     try {
       final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
 
@@ -476,25 +479,10 @@ class _EventState extends State<Event> {
     }
   }
 
-  Future<String?> getImageUrl(String imagePath) async {
-    try {
-      final Reference storageRef = FirebaseStorage.instance.ref(imagePath);
-      String imageURL = await storageRef.getDownloadURL();
-
-      print(imageURL);
-      setState(() {
-        this.imageURL = imageURL;
-      });
-      return imageURL;
-    } catch (e) {
-      print('Error retrieving image URL: $e');
-      return null;
-    }
-  }
-
   Future<void> getEvent(String eventName, String eventCategory) async {
-    final snapshot =
-        await firestore.collection("activities").doc(eventCategory).get();
+    final snapshot = await firestore.collection("activities").doc(eventCategory).get();
+    var userData = await firestore.collection('users').doc(user?.uid).get();
+    myUserName = userData["username"];
 
     if (snapshot.exists) {
       eventList = snapshot.data()?[eventName] ?? [];
@@ -509,6 +497,10 @@ class _EventState extends State<Event> {
 
         GeoPoint locationData = eventList[4];
         _convertCoordinatesToAddress(locationData);
+        this.imageURLBanner=eventList[5];
+        print("This is a imageBanner: "+imageURLBanner);
+
+
 
         users = eventList[7];
 
@@ -516,6 +508,7 @@ class _EventState extends State<Event> {
         users.forEach((userName, value) {
           if (value == true) {
             userNames.add(userName);
+            print("userNames: $userNames + myUserName: $myUserName");
           }
         });
       }
