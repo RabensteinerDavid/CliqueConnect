@@ -3,6 +3,7 @@ import 'package:test_clique_connect/main.dart'; // Import your main file to acce
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import '../pages/home_page.dart';
 import 'Calendar.dart';
+import 'EventHome.dart';
 import 'Home.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
@@ -155,7 +156,7 @@ class _BottomNavigationBarExampleState
   Widget _getBodyForIndex(int index) {
     switch (index) {
       case 0:
-        return const HomeScreen();
+        return const EventHome();
       case 1:
         return HomePageChat();
       case 2:
