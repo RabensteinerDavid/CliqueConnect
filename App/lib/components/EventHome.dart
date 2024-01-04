@@ -2,13 +2,17 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/Calendar.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
 import 'package:test_clique_connect/main.dart';
+import  'package:test_clique_connect/components/NavigationBar.dart';
 
+
+import 'AnimatedMarkersMap.dart';
 import 'event.dart';
 
 final filters = <String>{};
@@ -21,6 +25,7 @@ class EventHome extends StatefulWidget {
 }
 
 class _EventHomeState extends State<EventHome> {
+
   final firestore = FirebaseFirestore.instance;
   User? user = FirebaseAuth.instance.currentUser;
 
@@ -32,6 +37,7 @@ class _EventHomeState extends State<EventHome> {
 
   List<String> connectedEventsName = [];
   List<Map<String, dynamic>> connectedEvents = [];
+
 
 
   @override
@@ -106,6 +112,7 @@ class _EventHomeState extends State<EventHome> {
     }
     return connectedEvents;    return connectedEvents;
   }
+
 
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
@@ -349,7 +356,7 @@ class _EventHomeState extends State<EventHome> {
               )
                   : Container(
                 child: Center(
-                  child: Text("No events to display"),
+                  child: Text("No Events"),
                 ),
               ),
             ),
