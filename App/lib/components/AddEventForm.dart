@@ -1197,7 +1197,7 @@ class _EventState extends State<AddEventForm> {
           final urlDownload = await snapshot.ref.getDownloadURL();
           await addCreativActivity(urlDownload, context);
         } else {
-          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2.png?alt=media&token=b1f13cb5-60ef-417e-b266-e516b9c94ce1", context);
+          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2%20_big.png?alt=media&token=4371317c-3183-4c8e-abae-3ff07f4e31ba", context);
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
