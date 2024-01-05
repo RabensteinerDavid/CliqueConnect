@@ -26,7 +26,7 @@ class Event extends StatefulWidget {
 }
 
 class _EventState extends State<Event> {
-  String imageURLBanner = "";
+  String imageURLBanner= "" ;
   double bannerHeight = 254.0;
   double bannerWidth = 400.0;
 
@@ -38,7 +38,7 @@ class _EventState extends State<Event> {
   String location = "";
 
   Map<String, dynamic> users =
-      {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben
+      {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
   final List<dynamic> userNames =
       []; // Liste für Benutzernamen --> zum Anzeigen
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
@@ -57,20 +57,23 @@ class _EventState extends State<Event> {
   void initState() {
     super.initState();
     _initializeData();
-    _checkUserInList();
   }
 
   Future<void> _initializeData() async {
     // Warte darauf, dass getEvent abgeschlossen ist
     await getEvent(widget.eventName, widget.eventCategory);
+
+    _checkUserInList();
   }
 
   Future<void> _checkUserInList() async {
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
+    print("checkUserInList: userNames: $userNames + myUserName: $myUserName");
     setState(() {
-      buttonText = (userNames.contains(myUserName)) ? "Connect" : "I'm in!";
-      buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
+
+      buttonText = (userNames.contains(myUserName)) ? "Disconnect" : "Connect";
+      buttonColor = (userNames.contains(myUserName)) ?  Color(0xFFF199F2) : Color(0xFF220690);
     });
   }
 
@@ -92,9 +95,8 @@ class _EventState extends State<Event> {
                 children: [
 
                   Image.network(
-                    imageURLBanner.isNotEmpty
-                        ? imageURLBanner
-                        : "https://example.com/placeholder-image.jpg", // Hier den Link zum Platzhalterbild einfügen
+                    //TODO: Change the default image
+          imageURLBanner.isNotEmpty ? imageURLBanner : 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2F3fk45j6p0cad2PzAURCTOaIGgmE2%2Fimage_cropper_C244C1D3-467C-46CB-90F1-3CBB8C862AE1-75989-00028C6D7F089556.jpg?alt=media&token=ea67af55-b058-4c1a-87fc-67de0f0ae640',
                     loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
                         return child; // Das Bild ist geladen
@@ -225,8 +227,8 @@ class _EventState extends State<Event> {
                                 _countMeIn(widget.eventName, widget.eventCategory);
                               }
                               setState(() {
-                                buttonText = (userNames.contains(myUserName)) ? "Connect" :  "I'm in!";
-                                buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFF6059F0);
+                                buttonText = (userNames.contains(myUserName)) ? "Connect" :  "Disconnect";
+                                buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFFF199F2);
                               });
                             },
 
@@ -348,7 +350,6 @@ class _EventState extends State<Event> {
 
 
   Future<String> getImageUrlForUser(String username) async {
-    print(imageURLBanner);
     try {
       final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
 
@@ -501,9 +502,12 @@ class _EventState extends State<Event> {
         users.forEach((userName, value) {
           if (value == true) {
             userNames.add(userName);
-            print("userNames: $userNames + myUserName: $myUserName");
+
+
           }
+
         });
+        print("userNames: $userNames + myUserName: $myUserName");
       }
     } else {
       print("Document does not exist");
