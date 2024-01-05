@@ -39,77 +39,62 @@ class _EventHomeState extends State<EventHome> {
     _updateFilteredEvents();
   }
 
+
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
       preferredSize: Size(
-        MediaQuery.of(context).size.width,
-        MediaQuery.of(context).size.height * 0.09,
+        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.height * 0.08,
       ),
-      child: Column(
-        children: [
-          Container(
-            color: MyApp.blueMain,
-            height: 10.0,
-          ),
-          AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: MyApp.blueMain,
-            elevation: 0.0,
-            iconTheme: const IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: Container(
-              height: MediaQuery.of(context).size.height * 0.1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Image.asset(
-                      'icons/plus_white.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddEventForm(),
-                        ),
-                      );
-                    },
-                  ),
-                  Image.asset(
-                    'assets/cliqueConnect.png',
-                    fit: BoxFit.contain,
-                    height: MediaQuery.of(context).size.height * 0.08,
-                  ),
-                  IconButton(
-                    icon: Image.asset(
-                      'icons/profile_rose.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileView(),
-                        ),
-                      );
-                    },
-                    color: Colors.white,
-                  ),
-                ],
+      child: AppBar(
+        title: Image.asset('assets/cliqueConnect.png', fit: BoxFit.contain, height: MediaQuery.of(context).size.height * 0.08),
+        centerTitle: true,
+        backgroundColor: MyApp.blueMain,
+        elevation: 0.0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: IconButton(
+              icon: Image.asset(
+                'icons/profile_white.png',
+                width: 25,
+                height: 25,
               ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileView(),
+                  ),
+                );
+              },
+              color: Colors.white,
             ),
           ),
-          Container(
-            color: MyApp.blueMain,
-            height: 10.0,
-          ),
         ],
+        leading: IconButton(
+          icon: Image.asset(
+            'icons/plus_white.png',
+            width: 30,
+            height: 30,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddEventForm(),
+              ),
+            );
+          },
+        ),
+        leadingWidth: 65,
       ),
     );
   }
+
+
+
 
   Future<List<Map<String, dynamic>>> getEventData() async {
     final activitiesCollectionRef =
