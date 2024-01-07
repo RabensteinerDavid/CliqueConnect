@@ -1,13 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../services/database_service.dart';
-
 
 //TODo: Edit the Event Page as admin button instead of connect button
 //TODO: David sagen das wenn keine Richtige Adresse eingegben wird das ganze event nicht created wird
@@ -64,9 +60,28 @@ class _EventState extends State<Event> {
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
     print("checkUserInList: userNames: $userNames + myUserName: $myUserName");
+    bool isJoined = false;
+
+    await DatabaseService(uid: user!.uid).searchByName(widget.eventName).then((snapshot) async {
+      if (snapshot != null && snapshot.docs.isNotEmpty) {
+        var doc = snapshot.docs.first; // Assuming you're interested in the first document
+        String groupId = doc['groupId']; // Replace with the actual field name
+        String groupName = doc['groupName']; // Replace with the actual field name
+
+        try {
+          isJoined = await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"]);
+
+        } catch (e) {
+          print('Error adding user to the group: $e');
+        }
+      } else {
+        print('Snapshot is null or does not contain any documents');
+      }
+    });
+
     setState(() {
-      buttonText = (userNames.contains(myUserName)) ? "Connect" : "Disconnect";
-      buttonColor = (userNames.contains(myUserName)) ?  Color(0xFFF199F2) : Color(0xFF220690);
+      buttonText = isJoined ? "Disconnect" : "Connect";
+      buttonColor = isJoined ?  const Color(0xFFF199F2) : const Color(0xFF220690);
     });
   }
 
@@ -219,11 +234,9 @@ class _EventState extends State<Event> {
                               if (userNames.contains(users["username"])) {
                                 print("----1---------");
                                 _countMeOut(widget.eventName);
-
                               } else {
                                 print("-----2--------");
                                 _countMeIn(widget.eventName, widget.eventCategory);
-
                               }
                               setState(() {
                                 buttonText = (userNames.contains(myUserName)) ? "Connect" :  "Disconnect";
@@ -245,7 +258,11 @@ class _EventState extends State<Event> {
                                 const SizedBox(height: 4, width: 12),
                                 Text(
                                   buttonText,
-                                  style: const TextStyle(fontSize: 15, fontFamily: "DINNextLtPro"),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: "DINNextLtPro",
+                                    color: buttonText == "Connect" ? Colors.white : Colors.black,
+                                  ),
                                 ),
                               ],
                             ),
