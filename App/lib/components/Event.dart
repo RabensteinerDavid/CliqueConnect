@@ -228,6 +228,7 @@ class _EventState extends State<Event> {
                           width: 100,
                           height: 40,
                           child: FloatingActionButton(
+                            heroTag: 'connectButtonHero',
                             onPressed: () {
                               print("----name---------");
                               print(users["username"]);
