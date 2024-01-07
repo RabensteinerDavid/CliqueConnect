@@ -222,7 +222,7 @@ class _EventState extends State<Event> {
                           child: FloatingActionButton(
                             onPressed: () {
                               if (userNames.contains(users["username"])) {
-                                _countMeOut();
+                                _countMeOut(widget.eventName);
                               } else {
                                 _countMeIn(widget.eventName, widget.eventCategory);
                               }
@@ -389,7 +389,7 @@ class _EventState extends State<Event> {
       // Überprüfen, ob der Benutzername bereits auf der Liste steht
       if (userNames.contains(userData["username"])) {
         // Der Benutzer ist bereits auf der Liste
-        _countMeOut(); // Rufe hier deine Funktion auf
+        _countMeOut(activityName); // Rufe hier deine Funktion auf
         return;
       }
 
@@ -406,14 +406,10 @@ class _EventState extends State<Event> {
 
       await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
         if (snapshot != null && snapshot.docs.isNotEmpty) {
-          print("here in if");
           var doc = snapshot.docs.first; // Assuming you're interested in the first document
           String groupId = doc['groupId']; // Replace with the actual field name
           String groupName = doc['groupName']; // Replace with the actual field name
-              print("Dates from user");
-          print(groupId);
-          print(groupName);
-          print(userData["username"]);
+
           try {
             // Perform operations with the extracted values
             // For example, you might want to call a function with these values
@@ -440,7 +436,7 @@ class _EventState extends State<Event> {
     }
   }
 
-  void _countMeOut() async {
+  void _countMeOut(String activityName) async {
     try {
       CollectionReference activitiesCollection =
           FirebaseFirestore.instance.collection('activities');
@@ -460,6 +456,25 @@ class _EventState extends State<Event> {
         // Schreiben Sie das aktualisierte Array zurück in die Datenbank
         await activitiesCollection.doc(widget.eventCategory).update({
           widget.eventName: eventList,
+        });
+
+        await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
+          if (snapshot != null && snapshot.docs.isNotEmpty) {
+            var doc = snapshot.docs.first; // Assuming you're interested in the first document
+            String groupId = doc['groupId']; // Replace with the actual field name
+            String groupName = doc['groupName']; // Replace with the actual field name
+
+            try {
+              // Perform operations with the extracted values
+              // For example, you might want to call a function with these values
+              await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
+              print('User added to the group successfully');
+            } catch (e) {
+              print('Error adding user to the group: $e');
+            }
+          } else {
+            print('Snapshot is null or does not contain any documents');
+          }
         });
 
         // Hier kannst du weitere Aktionen durchführen, z.B. eine Erfolgsmeldung anzeigen

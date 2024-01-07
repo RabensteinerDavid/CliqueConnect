@@ -32,6 +32,8 @@ class _EventHomeState extends State<EventHome> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {});
     userName = getUserName();
     eventDataAll = getEventData();
     connectedEvents = getConnectedEventsNames();
@@ -227,12 +229,15 @@ class _EventHomeState extends State<EventHome> {
   void _updateFilteredEvents() async {
     final events = await eventDataAll;
 
-    setState(() {
-      filteredEvents = events.where((marker) {
-        return filtersCategory.isEmpty || filtersCategory.contains(marker['eventCategory']);
-      }).toList();
-    });
+    if (mounted) {
+      setState(() {
+        filteredEvents = events.where((marker) {
+          return filtersCategory.isEmpty || filtersCategory.contains(marker['eventCategory']);
+        }).toList();
+      });
+    }
   }
+
 
 
   @override
@@ -375,14 +380,14 @@ class _EventHomeState extends State<EventHome> {
                               label: Text(category),
                               selected: filtersCategory.contains(category),
                               onSelected: (bool selected) {
-                              setState(() {
-                                if (mounted && selected) {
-                                  filtersCategory.add(category);
-                                } else {
-                                  filtersCategory.remove(category);
-                                }
-                                _updateFilteredEvents(); // Update filtered markers when filters change
-                              });
+                                setState(() {
+                                  if (mounted && selected) {
+                                    filtersCategory.add(category);
+                                  } else {
+                                    filtersCategory.remove(category);
+                                  }
+                                  _updateFilteredEvents(); // Update filtered markers when filters change
+                                });
                               },
                             ),
                             const SizedBox(width: 4.0),
@@ -398,64 +403,64 @@ class _EventHomeState extends State<EventHome> {
           Expanded(
               child: filteredEvents.isNotEmpty
                   ? StackedCardCarousel(
-              initialOffset: 20,
-              spaceBetweenItems: eventBoxSize * 1.1,
-              type: StackedCardCarouselType.fadeOutStack,
-              items: filteredEvents.map((item) {
-                String eventName = item['eventName'];
-                if (eventName.length > textLength) {
-                  eventName = '${eventName.substring(0, textLength)}...';
-                }
+                initialOffset: 20,
+                spaceBetweenItems: eventBoxSize * 1.1,
+                type: StackedCardCarouselType.fadeOutStack,
+                items: filteredEvents.map((item) {
+                  String eventName = item['eventName'];
+                  if (eventName.length > textLength) {
+                    eventName = '${eventName.substring(0, textLength)}...';
+                  }
 
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Event(
-                          eventName: item['eventName'],
-                          eventCategory: item['eventCategory'],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Stack(
-                    alignment: Alignment.bottomLeft,
-                    children: [
-                      Image.network(
-                        item['imgURL'],
-                        height: eventBoxSize,
-                        fit: BoxFit.cover,
-                      ),
-                      _buildGradientShadow(),
-                      Positioned(
-                        top: eventBoxSize * 0.03,
-                        right: eventBoxSize * 0.03,
-                        child: Image.asset(
-                          'assets/Event/${item['eventCategory']}.png',
-                          height: 75,
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                            left: 16.0, bottom: 16.0),
-                        child: Text(
-                          eventName,
-                          style: const TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Event(
+                            eventName: item['eventName'],
+                            eventCategory: item['eventCategory'],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            )
-          : const Center(
-          child: Text("No Events"),
-          ))
+                      );
+                    },
+                    child: Stack(
+                      alignment: Alignment.bottomLeft,
+                      children: [
+                        Image.network(
+                          item['imgURL'],
+                          height: eventBoxSize,
+                          fit: BoxFit.cover,
+                        ),
+                        _buildGradientShadow(),
+                        Positioned(
+                          top: eventBoxSize * 0.03,
+                          right: eventBoxSize * 0.03,
+                          child: Image.asset(
+                            'assets/Event/${item['eventCategory']}.png',
+                            height: 75,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(
+                              left: 16.0, bottom: 16.0),
+                          child: Text(
+                            eventName,
+                            style: const TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              )
+                  : const Center(
+                child: Text("No Events"),
+              ))
         ],
       ),
     );
