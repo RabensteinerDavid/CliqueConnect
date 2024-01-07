@@ -269,7 +269,7 @@ class _EventHomeState extends State<EventHome> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 0),
+                          margin: const EdgeInsets.only(left: 10.0, top: 20.0, bottom: 0),
                           child: const Text(
                             "Connected",
                             style: TextStyle(
