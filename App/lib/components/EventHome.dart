@@ -63,13 +63,19 @@ class _EventHomeState extends State<EventHome> {
                 width: 25,
                 height: 25,
               ),
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ProfileView(),
                   ),
                 );
+                setState(() {
+                  userName = getUserName();
+                  eventDataAll = getEventData();
+                  connectedEvents = getConnectedEventsNames();
+                  _updateFilteredEvents();
+                });
               },
               color: Colors.white,
             ),
@@ -81,13 +87,19 @@ class _EventHomeState extends State<EventHome> {
             width: 30,
             height: 30,
           ),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const AddEventForm(),
               ),
             );
+            setState(() {
+              userName = getUserName();
+              eventDataAll = getEventData();
+              connectedEvents = getConnectedEventsNames();
+              _updateFilteredEvents();
+            });
           },
         ),
         leadingWidth: 65,
@@ -238,103 +250,112 @@ class _EventHomeState extends State<EventHome> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
       body: Column(
         children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 0),
-              child: const Text(
-                "Connected",
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: connectedEvents,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return CarouselSlider.builder(
-                    itemCount: snapshot.data!.length,
-                    options: CarouselOptions(
-                      scrollPhysics: const BouncingScrollPhysics(),
-                      height: 150.0,
-                      enableInfiniteScroll: false,
-                      viewportFraction: 0.5,
-                      pageSnapping: false,
-                      padEnds: false,
-                    ),
-                    itemBuilder: (context, index, realIndex) {
-                      String eventName = snapshot.data![index]['eventName'];
-                      if (eventName.length > textLength) {
-                        eventName =
-                        '${eventName.substring(0, textLength)}...';
-                      }
+                    snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 0),
+                          child: const Text(
+                            "Connected",
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      CarouselSlider.builder(
+                        itemCount: snapshot.data!.length,
+                        options: CarouselOptions(
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          height: 150.0,
+                          enableInfiniteScroll: false,
+                          viewportFraction: 0.5,
+                          pageSnapping: false,
+                          padEnds: false,
+                        ),
+                        itemBuilder: (context, index, realIndex) {
+                          String eventName = snapshot.data![index]['eventName'];
+                          if (eventName.length > textLength) {
+                            eventName =
+                            '${eventName.substring(0, textLength)}...';
+                          }
 
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                            right: 8), // Adjust spacing as needed
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Event(
-                                  eventName: snapshot.data![index]
-                                  ['eventName'],
-                                  eventCategory: snapshot.data![index]
-                                  ['eventCategory'],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Stack(
-                            children: [
-                              Image.network(
-                                snapshot.data![index]['imgURL'],
-                                height: 150.0,
-                                fit: BoxFit.fitHeight,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 50,
-                                  color: MyApp.blueMain,
-                                  child: Center(
-                                    child: Text(
-                                      eventName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8), // Adjust spacing as needed
+                            child: GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Event(
+                                      eventName: snapshot.data![index]
+                                      ['eventName'],
+                                      eventCategory: snapshot.data![index]
+                                      ['eventCategory'],
+                                    ),
+                                  ),
+                                );
+                                setState(() {
+                                  userName = getUserName();
+                                  eventDataAll = getEventData();
+                                  connectedEvents = getConnectedEventsNames();
+                                  _updateFilteredEvents();
+                                });
+                              },
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    snapshot.data![index]['imgURL'],
+                                    height: 150.0,
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 50,
+                                      color: MyApp.blueMain,
+                                      child: Center(
+                                        child: Text(
+                                          eventName,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   );
                 } else if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center();
                 }
               },
             ),
@@ -413,8 +434,8 @@ class _EventHomeState extends State<EventHome> {
                   }
 
                   return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Event(
@@ -423,6 +444,12 @@ class _EventHomeState extends State<EventHome> {
                           ),
                         ),
                       );
+                      setState(() {
+                        userName = getUserName();
+                        eventDataAll = getEventData();
+                        connectedEvents = getConnectedEventsNames();
+                        _updateFilteredEvents();
+                      });
                     },
                     child: Stack(
                       alignment: Alignment.bottomLeft,
