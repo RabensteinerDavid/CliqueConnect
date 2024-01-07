@@ -1339,9 +1339,16 @@ class _EventState extends State<AddEventForm> {
 
       String newActivity = activityNameController.text;
       _user = FirebaseAuth.instance.currentUser;
+
+      final firestore = FirebaseFirestore.instance;
+      User? user = FirebaseAuth.instance.currentUser;
+
+      var userData = await firestore.collection('users').doc(user?.uid).get();
+      var myUserName = await userData["username"];
+
       if (newActivity != null && _user != null) {
         await HelperFunctions.getUserNameSharedPreference().then((val) {
-          DatabaseService(uid: _user!.uid).createGroup(val!, newActivity, selectedCategory!);
+          DatabaseService(uid: _user!.uid).createGroup(myUserName!, newActivity, selectedCategory!);
         });
         Navigator.of(context).pop();
       } else {
