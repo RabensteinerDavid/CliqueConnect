@@ -12,6 +12,7 @@ import '../shema/MapMarker.dart';
 import 'ProfileView.dart';
 import 'Event.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 // Replace with your Mapbox access token
@@ -132,6 +133,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   Future<List<MapMarker>> getMarkersAsFuture() async {
     final firestore = FirebaseFirestore.instance;
+    User? user = FirebaseAuth.instance.currentUser;
     final userID = user?.uid;
 
     if (userID != null) {
