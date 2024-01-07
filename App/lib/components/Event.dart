@@ -37,21 +37,16 @@ class _EventState extends State<Event> {
   String description = "";
   String location = "";
 
-  Map<String, dynamic> users =
-      {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
-  final List<dynamic> userNames =
-      []; // Liste für Benutzernamen --> zum Anzeigen
+  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
+  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
+
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
-
   String icon = "assets/cliqueConnect.png";
   String buttonText = "Connect";
   Color buttonColor = const Color(0xFF220690);
 
-
   final firestore = FirebaseFirestore.instance;
-
-
 
   @override
   void initState() {
@@ -62,7 +57,6 @@ class _EventState extends State<Event> {
   Future<void> _initializeData() async {
     // Warte darauf, dass getEvent abgeschlossen ist
     await getEvent(widget.eventName, widget.eventCategory);
-
     _checkUserInList();
   }
 
@@ -71,8 +65,7 @@ class _EventState extends State<Event> {
     myUserName = userData["username"];
     print("checkUserInList: userNames: $userNames + myUserName: $myUserName");
     setState(() {
-
-      buttonText = (userNames.contains(myUserName)) ? "Disconnect" : "Connect";
+      buttonText = (userNames.contains(myUserName)) ? "Connect" : "Disconnect";
       buttonColor = (userNames.contains(myUserName)) ?  Color(0xFFF199F2) : Color(0xFF220690);
     });
   }
@@ -146,7 +139,7 @@ class _EventState extends State<Event> {
               ),
 
               Padding(
-                padding: EdgeInsets.only(left: 25.0, top: 60.0, right: 40.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 60.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -159,7 +152,7 @@ class _EventState extends State<Event> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 25.0, top: 20.0, right: 40.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 20.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -172,7 +165,7 @@ class _EventState extends State<Event> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -185,7 +178,7 @@ class _EventState extends State<Event> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 25.0, top: 20.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 20.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -201,12 +194,12 @@ class _EventState extends State<Event> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 8, width: 12),
+                  const SizedBox(height: 8, width: 12),
                   Padding(
-                    padding: EdgeInsets.only(left: 25.0, top: 40 , right: 25.0),
+                    padding: const EdgeInsets.only(left: 25.0, top: 40 , right: 25.0),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Participants:',
                           style: TextStyle(
                             fontSize: 20.0,
@@ -215,20 +208,26 @@ class _EventState extends State<Event> {
                             color: Color(0xFF2E148C),
                           ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         SizedBox(
                           width: 100,
                           height: 40,
                           child: FloatingActionButton(
                             onPressed: () {
+                              print("----name---------");
+                              print(users["username"]);
                               if (userNames.contains(users["username"])) {
+                                print("----1---------");
                                 _countMeOut(widget.eventName);
+
                               } else {
+                                print("-----2--------");
                                 _countMeIn(widget.eventName, widget.eventCategory);
+
                               }
                               setState(() {
                                 buttonText = (userNames.contains(myUserName)) ? "Connect" :  "Disconnect";
-                                buttonColor = (userNames.contains(myUserName)) ? Color(0xFF220690) : Color(0xFFF199F2);
+                                buttonColor = (userNames.contains(myUserName)) ? const Color(0xFF220690) : const Color(0xFFF199F2);
                               });
                             },
 
@@ -270,9 +269,9 @@ class _EventState extends State<Event> {
                     future: getImageUrlForUser(username),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return LinearProgressIndicator(color: Color(0xFF2E148C),  minHeight: 0.2,);
+                        return const LinearProgressIndicator(color: Color(0xFF2E148C),  minHeight: 0.2,);
                       } else if (snapshot.hasError) {
-                        return Text('Error loading image');
+                        return const Text('Error loading image');
                       } else {
                         String imageUrl = snapshot.data ?? ''; // Use a default value if null
                         return SizedBox(
@@ -304,8 +303,6 @@ class _EventState extends State<Event> {
                   );
                 },
               )
-
-
             ],
           ),
         ),
@@ -317,7 +314,7 @@ class _EventState extends State<Event> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(30.0, 40.0, 0.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(30.0, 40.0, 0.0, 0.0),
                     child: SizedBox(
                       width: 30.0,
                       height: 30.0,
@@ -329,16 +326,11 @@ class _EventState extends State<Event> {
                         elevation: 0,
                         child: Image.asset(
                           'icons/arrow_white.png', // Set the correct path to your image
-
                         ),
                       ),
                     ),
                   ),
                 ),
-
-
-                //connect button bottom right-corner
-
               ],
             ),
           ],
@@ -354,7 +346,7 @@ class _EventState extends State<Event> {
       final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
 
       if (snapshot.docs.isNotEmpty) {
-        final data = snapshot.docs.first.data() as Map<String, dynamic>;
+        final data = snapshot.docs.first.data();
         final imageName = data["image_data"];
 
         if (imageName != null) {
@@ -370,10 +362,6 @@ class _EventState extends State<Event> {
       return ''; // Default image or handle accordingly
     }
   }
-
-
-
-
 
   void _countMeIn(String activityName, String activityCategory) async {
     print("userNames: $userNames");
@@ -414,7 +402,13 @@ class _EventState extends State<Event> {
             // Perform operations with the extracted values
             // For example, you might want to call a function with these values
             await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
-            print('User added to the group successfully');
+            if(await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"])){
+              print('User is removed from the group successfully');
+            }
+            else{
+              print('User added to the group successfully');
+            }
+
           } catch (e) {
             print('Error adding user to the group: $e');
           }
@@ -437,9 +431,9 @@ class _EventState extends State<Event> {
   }
 
   void _countMeOut(String activityName) async {
+    print("-----countmeout------");
     try {
-      CollectionReference activitiesCollection =
-          FirebaseFirestore.instance.collection('activities');
+      CollectionReference activitiesCollection = FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
       myUserName = userData["username"];
@@ -506,10 +500,8 @@ class _EventState extends State<Event> {
 
         GeoPoint locationData = eventList[4];
         _convertCoordinatesToAddress(locationData);
-        this.imageURLBanner=eventList[5];
+        imageURLBanner=eventList[5];
         print("This is a imageBanner: "+imageURLBanner);
-
-
 
         users = eventList[7];
 
@@ -517,8 +509,6 @@ class _EventState extends State<Event> {
         users.forEach((userName, value) {
           if (value == true) {
             userNames.add(userName);
-
-
           }
 
         });
