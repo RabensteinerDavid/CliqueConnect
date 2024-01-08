@@ -263,95 +263,103 @@ class _EventHomeState extends State<EventHome> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 10.0, top: 20.0, bottom: 0),
-                          child: const Text(
-                            "Connected",
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                  if(snapshot.data!.isNotEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 10.0, top: 20.0, bottom: 0),
+                            child: const Text(
+                              "Connected",
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      CarouselSlider.builder(
-                        itemCount: snapshot.data!.length,
-                        options: CarouselOptions(
-                          scrollPhysics: const BouncingScrollPhysics(),
-                          height: 150.0,
-                          enableInfiniteScroll: false,
-                          viewportFraction: 0.5,
-                          pageSnapping: false,
-                          padEnds: false,
-                        ),
-                        itemBuilder: (context, index, realIndex) {
-                          String eventName = snapshot.data![index]['eventName'];
-                          if (eventName.length > textLength) {
-                            eventName =
-                            '${eventName.substring(0, textLength)}...';
-                          }
+                        CarouselSlider.builder(
+                          itemCount: snapshot.data!.length,
+                          options: CarouselOptions(
+                            scrollPhysics: const BouncingScrollPhysics(),
+                            height: 150.0,
+                            enableInfiniteScroll: false,
+                            viewportFraction: 0.5,
+                            pageSnapping: false,
+                            padEnds: false,
+                          ),
+                          itemBuilder: (context, index, realIndex) {
+                            String eventName = snapshot
+                                .data![index]['eventName'];
+                            if (eventName.length > textLength) {
+                              eventName =
+                              '${eventName.substring(0, textLength)}...';
+                            }
 
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                right: 8), // Adjust spacing as needed
-                            child: GestureDetector(
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Event(
-                                      eventName: snapshot.data![index]
-                                      ['eventName'],
-                                      eventCategory: snapshot.data![index]
-                                      ['eventCategory'],
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 8), // Adjust spacing as needed
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          Event(
+                                            eventName: snapshot.data![index]
+                                            ['eventName'],
+                                            eventCategory: snapshot.data![index]
+                                            ['eventCategory'],
+                                          ),
                                     ),
-                                  ),
-                                );
-                                setState(() {
-                                  userName = getUserName();
-                                  eventDataAll = getEventData();
-                                  connectedEvents = getConnectedEventsNames();
-                                  _updateFilteredEvents();
-                                });
-                              },
-                              child: Stack(
-                                children: [
-                                  Image.network(
-                                    snapshot.data![index]['imgURL'],
-                                    height: 150.0,
-                                    fit: BoxFit.fitHeight,
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 50,
-                                      color: MyApp.blueMain,
-                                      child: Center(
-                                        child: Text(
-                                          eventName,
-                                          style: const TextStyle(
-                                            color: Colors.white,
+                                  );
+                                  setState(() {
+                                    userName = getUserName();
+                                    eventDataAll = getEventData();
+                                    connectedEvents = getConnectedEventsNames();
+                                    _updateFilteredEvents();
+                                  });
+                                },
+                                child: Stack(
+                                  children: [
+                                    Image.network(
+                                      snapshot.data![index]['imgURL'],
+                                      height: 150.0,
+                                      fit: BoxFit.fitHeight,
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                        height: 50,
+                                        color: MyApp.blueMain,
+                                        child: Center(
+                                          child: Text(
+                                            eventName,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  );
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  }
+                  else{
+                    return Container();
+                  }
                 } else if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
                 } else {
