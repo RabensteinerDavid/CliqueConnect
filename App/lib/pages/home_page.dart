@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePageChat> {
               // Navigate to the search page when the search icon is pressed
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const EventHome()), // Replace EventHome with your actual widget
+                MaterialPageRoute(builder: (context) => const AddEventForm()), // Replace EventHome with your actual widget
               );
             },
           ),
