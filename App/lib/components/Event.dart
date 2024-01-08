@@ -52,7 +52,7 @@ class _EventState extends State<Event> {
 
   Future<void> _initializeData() async {
     // Warte darauf, dass getEvent abgeschlossen ist
-    await getEvent(widget.eventName, widget.eventCategory);
+    imageURLBanner = await getEvent(widget.eventName, widget.eventCategory);
     _checkUserInList();
   }
 
@@ -104,7 +104,7 @@ class _EventState extends State<Event> {
 
                   Image.network(
                     //TODO: Change the default image
-          imageURLBanner.isNotEmpty ? imageURLBanner : 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2F3fk45j6p0cad2PzAURCTOaIGgmE2%2Fimage_cropper_C244C1D3-467C-46CB-90F1-3CBB8C862AE1-75989-00028C6D7F089556.jpg?alt=media&token=ea67af55-b058-4c1a-87fc-67de0f0ae640',
+          imageURLBanner.isNotEmpty ? imageURLBanner : 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2%20_big.png?alt=media&token=4371317c-3183-4c8e-abae-3ff07f4e31ba',
                     loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
                         return child; // Das Bild ist geladen
@@ -500,7 +500,7 @@ class _EventState extends State<Event> {
     }
   }
 
-  Future<void> getEvent(String eventName, String eventCategory) async {
+  Future<String> getEvent(String eventName, String eventCategory) async {
     final snapshot = await firestore.collection("activities").doc(eventCategory).get();
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
@@ -535,6 +535,7 @@ class _EventState extends State<Event> {
     } else {
       print("Document does not exist");
     }
+    return imageURLBanner;
   }
 
   Future<void> _convertCoordinatesToAddress(GeoPoint locationData) async {

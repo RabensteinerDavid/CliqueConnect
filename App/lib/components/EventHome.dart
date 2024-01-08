@@ -360,7 +360,38 @@ class _EventHomeState extends State<EventHome> {
                   else{
                     return Container();
                   }
-                } else if (snapshot.hasError) {
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10.0, top: 20.0, bottom: 0),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(
+                              left: 0.0, top: 0.0, bottom: 0),
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Connected",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 57.0),
+                              Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              SizedBox(height: 57.0)
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                }
+                else if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
                 } else {
                   return const Center();
