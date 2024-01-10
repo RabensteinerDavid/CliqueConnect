@@ -8,7 +8,6 @@ import 'AuthGate.dart';
 import '../main.dart';
 
 final filters = <String>{};
-User? user = FirebaseAuth.instance.currentUser;
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -19,6 +18,7 @@ class ProfileView extends StatefulWidget {
 
 class YourCurrentScreenState extends State<ProfileView> {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  User? user = FirebaseAuth.instance.currentUser;
 
   final firestore = FirebaseFirestore.instance;
   static String imageURL = '';
@@ -27,18 +27,23 @@ class YourCurrentScreenState extends State<ProfileView> {
   late Future<String> universityFuture;
   late Future<String> aboutMeFuture;
   late Future<String> interestsFuture;
-  late Future<bool> imageUrlFuture;
+  late bool imageUrlFuture;
 
 
   @override
   void initState() {
     super.initState();
-    imageUrlFuture = getImgUrl();
+    loadPic();
     userNameFuture = getUserName();
     courseFuture = getCourse();
     universityFuture = getUniversity();
     aboutMeFuture = getAboutMeText();
     interestsFuture = getInterests();
+  }
+
+  void loadPic() async {
+    imageUrlFuture = await getImgUrl();
+    setState(() {});
   }
 
   void _deleteAccount(context) async {
@@ -66,14 +71,16 @@ class YourCurrentScreenState extends State<ProfileView> {
 
   void _signOut(context) async {
     await deleteYourLogin();
+
     try {
-      await FirebaseAuth.instance.signOut();
+      await FirebaseAuth.instance.signOut().then((value) => print("Ausloggen erfolgreich"));
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) =>
         const AuthGate()), // Replace with your authentication gate screen
       );
     } catch (e) {
-      print('Error signing out: $e');
+      print('Error signing out Outlogggging: $e');
     }
   }
 
@@ -106,7 +113,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                 ),
                 child: FutureBuilder(
                   // Use a List or Tuple to combine multiple futures
-                  future: Future.wait([courseFuture, universityFuture, aboutMeFuture, interestsFuture, imageUrlFuture, userNameFuture]),
+                  future: Future.wait([courseFuture, universityFuture, aboutMeFuture, interestsFuture, userNameFuture]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
@@ -115,8 +122,8 @@ class YourCurrentScreenState extends State<ProfileView> {
                         var university = snapshot.data![1];
                         var aboutMe = snapshot.data![2];
                         var interests = snapshot.data![3] as String; // Change this line
-                        var imageUrl = snapshot.data![4];
-                        var username = snapshot.data![5];
+
+                        var username = snapshot.data![4];
 
                         return Padding (
                           padding: const EdgeInsets.only(left: 20), // Adjust the left padding as needed
@@ -259,6 +266,19 @@ class YourCurrentScreenState extends State<ProfileView> {
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                : null,
+                          ),
+                        );
+                      }
+                    },
                   )
                       : Image.asset(
                     'assets/cliqueConnect.png',
@@ -268,6 +288,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                   ),
                 ),
               ),
+
             ),
           ),
           AppBar(
@@ -354,6 +375,9 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final imageName = await data["image_data"];
 
+        print("imageName");
+        print(imageName);
+
         if (imageName != null) {
           imageURL = imageName;
           print("Image Name: $imageName");
@@ -369,6 +393,9 @@ class YourCurrentScreenState extends State<ProfileView> {
 
         try {
           final imageUrl = await storageRef.getDownloadURL();
+
+          print("getDownloadURL");
+          print(storageRef.getDownloadURL());
 
           if (imageUrl != null) {
             imageURL = imageUrl;
