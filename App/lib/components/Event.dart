@@ -343,7 +343,9 @@ class _EventState extends State<Event> {
                         },
                         elevation: 0,
                         child: Image.asset(
-                          'icons/arrow_white.png', // Set the correct path to your image
+                          'icons/arrow_white.png',
+                          width: 30,
+                          height: 30,// Set the correct path to your image
                         ),
                       ),
                     ),
