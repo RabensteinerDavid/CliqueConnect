@@ -29,6 +29,8 @@ class _EventHomeState extends State<EventHome> {
   late Future<List<Map<String, dynamic>>> connectedEvents;
   late List<Map<String, dynamic>> filteredEvents = [];
 
+  final PageController _pageController = PageController();
+
   @override
   void initState() {
     super.initState();
@@ -216,6 +218,10 @@ class _EventHomeState extends State<EventHome> {
     );
   }
 
+  void scrollToFirstCard() {
+    _pageController.jumpToPage(0);
+  }
+
   Future<String?> getCatergoryActivities() async {
     try {
       final activitiesCollectionRef = FirebaseFirestore.instance.collection("categoriesActivities");
@@ -240,13 +246,13 @@ class _EventHomeState extends State<EventHome> {
 
   void _updateFilteredEvents() async {
     final events = await eventDataAll;
-
     if (mounted) {
       setState(() {
         filteredEvents = events.where((marker) {
           return filtersCategory.isEmpty || filtersCategory.contains(marker['eventCategory']);
         }).toList();
       });
+      scrollToFirstCard();
     }
   }
 
@@ -464,14 +470,15 @@ class _EventHomeState extends State<EventHome> {
               child: filteredEvents.isNotEmpty
                   ? StackedCardCarousel(
                 initialOffset: 20,
+                pageController: _pageController,
                 spaceBetweenItems: eventBoxSize * 1.1,
                 type: StackedCardCarouselType.fadeOutStack,
                 items: filteredEvents.map((item) {
+
                   String eventName = item['eventName'];
                   if (eventName.length > textLength) {
                     eventName = '${eventName.substring(0, textLength)}...';
                   }
-
                   return GestureDetector(
                     onTap: () async {
                       await Navigator.push(
