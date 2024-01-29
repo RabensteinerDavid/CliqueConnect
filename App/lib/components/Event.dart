@@ -178,7 +178,7 @@ class _EventState extends State<Event> {
                 children: [
                   Padding(
                     padding:
-                    const EdgeInsets.only(left: 25.0, top: 45.0, right: 40.0),
+                    const EdgeInsets.only(left: 25.0, top: 70.0, right: 40.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -191,8 +191,8 @@ class _EventState extends State<Event> {
                     ),
                   ),
                   Positioned(
-                    top: 45,
-                    right: 55,
+                    top: 70,
+                    right: 25,
                     child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () {
@@ -214,7 +214,7 @@ class _EventState extends State<Event> {
                         visible: userNames.contains(myUserName),
                         child: Image.asset(
                           'icons/chat_single_grey.png',
-                          height: 35,
+                          height: 30,
                         ),
                       ),
                     ),
@@ -405,7 +405,7 @@ class _EventState extends State<Event> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(30.0, 100.0, 0.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(30.0, 48.0, 0.0, 0.0),
                     child: SizedBox(
                       width: 30.0,
                       height: 30.0,

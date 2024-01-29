@@ -201,7 +201,7 @@ class _ChatPageState extends State<ChatPage> {
             ],
           ),
           Positioned(
-            bottom: 40, // Adjust this value to move it higher or lower
+            bottom: 10, // Adjust this value to move it higher or lower
             left: 30,
             right: 30,
             child: Container(

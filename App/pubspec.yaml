@@ -68,6 +68,13 @@ flutter_native_splash:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: 0.11.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/cliqueConnect4.png"
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -124,6 +131,7 @@ flutter:
     - assets/Marker_culinary_noStory.png
     - assets/Marker_offTopic_noStory.png
     - assets/Marker_archive_noStory.png
+    - assets/cliqueConnect4.png
     - icons/home_grey.png
     - icons/home_white.png
     - icons/chat_all_grey.png

@@ -32,7 +32,7 @@ class GroupTile extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
         child: ListTile(
           leading: FutureBuilder<String>(
             future: getGroupCategory(groupId),
@@ -40,13 +40,13 @@ class GroupTile extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 // If the Future is still running, you can return a placeholder or loading image
                 return const CircleAvatar(
-                  radius: 35.0,
+                  radius: 30.0,
                   backgroundColor: MyApp.blueMain,
                   child: CircularProgressIndicator(),
                 );
               } else {
                 return CircleAvatar(
-                  radius: 35.0,
+                  radius: 30.0,
                   backgroundColor: MyApp.blueMain,
                   child: Image.asset(
                     getCategoryPic(snapshot.data ?? ""),
@@ -58,7 +58,7 @@ class GroupTile extends StatelessWidget {
               }
             },
           ),
-          title: Text(groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(groupName, style: const TextStyle(fontFamily: 'DINNextLtPro')),
           subtitle: Text("Join the conversation as $userName", style: const TextStyle(fontSize: 13.0)),
         ),
       ),

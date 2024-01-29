@@ -71,10 +71,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(),
-      body: Column(
-        children: [
-          Expanded(
+        appBar: buildAppBar(),
+    body: Padding(
+    padding: const EdgeInsets.only(top: 30.0), // Füge hier den gewünschten Abstand hinzu
+    child: Column(
+    children: [
+    Expanded(
             child: Calendar(
               startOnMonday: true,
               weekDays: const ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'],
@@ -105,13 +107,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
               dayOfWeekStyle: const TextStyle(
                 color: MyApp.blueMain,
                 fontWeight: FontWeight.w800,
-                fontSize: 11,
+                fontSize: 15,
               ),
+
               showEvents: showEvents,
             ),
           ),
         ],
       ),
+    ),
     );
   }
 

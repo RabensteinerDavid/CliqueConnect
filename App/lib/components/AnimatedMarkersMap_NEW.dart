@@ -385,7 +385,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             ),
           ),
           Positioned(
-            top: 0,
+            top: 10,
             left: 10,
             right: 10,
             child: Opacity(

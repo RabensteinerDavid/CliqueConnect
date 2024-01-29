@@ -271,7 +271,7 @@ class _EventHomeState extends State<EventHome> {
                           alignment: Alignment.topLeft,
                           child: Container(
                             margin: const EdgeInsets.only(
-                                left: 10.0, top: 20.0, bottom: 0),
+                                left: 0.0, top: 20.0, bottom: 0),
                             child: const Text(
                               "Connected",
                               style: TextStyle(
@@ -402,7 +402,7 @@ class _EventHomeState extends State<EventHome> {
           Align(
             alignment: Alignment.topLeft,
             child: Container(
-              margin: const EdgeInsets.only(left: 30.0, top: 20.0, bottom: 0),
+              margin: const EdgeInsets.only(left: 20.0, top: 20.0, bottom: 0),
               child: const Text(
                 "Explore",
                 style: TextStyle(
@@ -414,7 +414,7 @@ class _EventHomeState extends State<EventHome> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Align(
               alignment: Alignment.topLeft,
               child: SingleChildScrollView(
