@@ -219,7 +219,9 @@ class _EventHomeState extends State<EventHome> {
   }
 
   void scrollToFirstCard() {
-    _pageController.jumpToPage(0);
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
   }
 
   Future<String?> getCatergoryActivities() async {
