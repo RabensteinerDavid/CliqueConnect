@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'dart:io' show Platform;
 
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
@@ -397,39 +399,82 @@ class _EventState extends State<Event> {
             ],
           ),
         ),
-        floatingActionButton: Row(
-          children: [
-            Stack(
-              children: [
-                // Back button upper left-corner
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(30.0, 48.0, 0.0, 0.0),
-                    child: SizedBox(
-                      width: 30.0,
-                      height: 30.0,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          // Logic for navigation to the start page
-                          Navigator.pop(context);
-                        },
-                        elevation: 0,
-                        child: Image.asset(
-                          'icons/arrow_white.png',
-                          width: 30,
-                          height: 30, // Set the correct path to your image
-                        ),
+        floatingActionButton: _buildFloatingActionButton(context),
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context) {
+    if (Platform.isIOS) {
+      // iOS-specific UI
+      return Row(
+        children: [
+          Stack(
+            children: [
+              // Back button upper left-corner
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(32.0, 125.0, 0.0, 0.0),
+                  child: SizedBox(
+                    width: 30.0,
+                    height: 30.0,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        // Logic for navigation to the start page
+                        Navigator.pop(context);
+                      },
+                      elevation: 0,
+                      child: Image.asset(
+                        'icons/arrow_white.png',
+                        width: 30,
+                        height: 30, // Set the correct path to your image
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+              ),
+            ],
+          ),
+        ],
+      );
+    } else if (Platform.isAndroid) {
+      // Android-specific UI
+      return Row(
+        children: [
+          Stack(
+            children: [
+              // Back button upper left-corner
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(30.0, 48.0, 0.0, 0.0),
+                  child: SizedBox(
+                    width: 30.0,
+                    height: 30.0,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        // Logic for navigation to the start page
+                        Navigator.pop(context);
+                      },
+                      elevation: 0,
+                      child: Image.asset(
+                        'icons/arrow_white.png',
+                        width: 30,
+                        height: 30, // Set the correct path to your image
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      // Fallback UI for other platforms
+      return Container();
+    }
   }
 
   Future<String> getImageUrlForUser(String username) async {
