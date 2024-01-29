@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../pages/chat_page.dart';
 import '../services/database_service.dart';
 
 //TODo: Edit the Event Page as admin button instead of connect button
@@ -17,12 +18,12 @@ class Event extends StatefulWidget {
   final String eventName;
 
   @override
-  _EventState createState() =>
-      _EventState();
+  _EventState createState() => _EventState();
 }
 
 class _EventState extends State<Event> {
-  String imageURLBanner= "" ;
+  String imageURLBanner = "";
+
   double bannerHeight = 254.0;
   double bannerWidth = 400.0;
 
@@ -33,8 +34,10 @@ class _EventState extends State<Event> {
   String description = "";
   String location = "";
 
-  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
-  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
+  Map<String, dynamic> users =
+  {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
+  final List<dynamic> userNames =
+  []; // Liste für Benutzernamen --> zum Anzeigen
 
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
@@ -42,12 +45,26 @@ class _EventState extends State<Event> {
   String buttonText = "Connect";
   Color buttonColor = const Color(0xFF220690);
 
+  String groupId = "";
+
   final firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
+    findGroupId();
+  }
+
+  Future<void> findGroupId() async {
+    var groupData = await firestore.collection('groups').get();
+
+    groupData.docs.forEach((doc) {
+      if (doc['groupName'] == widget.eventName) {
+        groupId = doc['groupId'];
+        print("Group ID: $groupId");
+      }
+    });
   }
 
   Future<void> _initializeData() async {
@@ -62,15 +79,19 @@ class _EventState extends State<Event> {
     print("checkUserInList: userNames: $userNames + myUserName: $myUserName");
     bool isJoined = false;
 
-    await DatabaseService(uid: user!.uid).searchByName(widget.eventName).then((snapshot) async {
+    await DatabaseService(uid: user!.uid)
+        .searchByName(widget.eventName)
+        .then((snapshot) async {
       if (snapshot != null && snapshot.docs.isNotEmpty) {
-        var doc = snapshot.docs.first; // Assuming you're interested in the first document
+        var doc = snapshot
+            .docs.first; // Assuming you're interested in the first document
         String groupId = doc['groupId']; // Replace with the actual field name
-        String groupName = doc['groupName']; // Replace with the actual field name
+        String groupName =
+        doc['groupName']; // Replace with the actual field name
 
         try {
-          isJoined = await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"]);
-
+          isJoined = await DatabaseService(uid: user!.uid)
+              .isUserJoined(groupId, groupName, userData["username"]);
         } catch (e) {
           print('Error adding user to the group: $e');
         }
@@ -81,10 +102,10 @@ class _EventState extends State<Event> {
 
     setState(() {
       buttonText = isJoined ? "Disconnect" : "Connect";
-      buttonColor = isJoined ?  const Color(0xFFF199F2) : const Color(0xFF220690);
+      buttonColor =
+      isJoined ? const Color(0xFFF199F2) : const Color(0xFF220690);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -102,17 +123,21 @@ class _EventState extends State<Event> {
               Stack(
                 alignment: Alignment.center,
                 clipBehavior: Clip.none,
-                children: [
 
+                children: [
                   Image.network(
                     //TODO: Change the default image
-          imageURLBanner.isNotEmpty ? imageURLBanner : 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2%20_big.png?alt=media&token=4371317c-3183-4c8e-abae-3ff07f4e31ba',
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    imageURLBanner.isNotEmpty
+                        ? imageURLBanner
+                        : 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2%20_big.png?alt=media&token=4371317c-3183-4c8e-abae-3ff07f4e31ba',
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
                         return child; // Das Bild ist geladen
                       } else if (loadingProgress.expectedTotalBytes == null) {
                         return const Center(
-                          child: CircularProgressIndicator(), // Das Bild wird noch geladen
+                          child:
+                          CircularProgressIndicator(), // Das Bild wird noch geladen
                         );
                       } else {
                         // Das Bild konnte nicht geladen werden, zeige einen Platzhalter
@@ -125,7 +150,8 @@ class _EventState extends State<Event> {
                         );
                       }
                     },
-                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    errorBuilder: (BuildContext context, Object error,
+                        StackTrace? stackTrace) {
                       // Ein Fehler ist aufgetreten, zeige ebenfalls einen Platzhalter
                       return Center(
                         child: Container(
@@ -140,52 +166,68 @@ class _EventState extends State<Event> {
                   Positioned(
                     top: bannerHeight,
                     left: 20,
-                    child: GestureDetector(
-                      onTap: () {
-                        //TODO navigate to the stories site, if stories are available
-                        // Handle button click action here
-                        print("Button Clicked!");
-                      },
-                      child: Image.asset(
-                        'assets/Event/${widget.eventCategory}.png',
-                        height: 75,
+                    child: Image.asset(
+                      'assets/Event/${widget.eventCategory}.png',
+                      height: 75,
+                    ),
+                  ),
+                ],
+              ),
+
+              Stack(
+                children: [
+                  Padding(
+                    padding:
+                    const EdgeInsets.only(left: 25.0, top: 45.0, right: 40.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 35.0,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ),
-
                   Positioned(
-                    top: bannerHeight+105,
+                    top: 45,
                     right: 55,
                     child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () {
-                        //TODO navigate to the stories site, if stories are available
+                        //TODO: Button on click action (onTap) funktioniert nicht
                         // Handle button click action here
-                        print("Button Clicked!");
+                        print("Chat: Button Clicked!");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatPage(
+                              groupId: groupId,
+                              userName: myUserName,
+                              groupName: widget.eventName,
+                            ),
+                          ),
+                        );
                       },
-                      child: Image.asset(
-                        'icons/chat_single_grey.png',
-                        height: 35,
+                      child: Visibility(
+                        visible: userNames.contains(myUserName),
+                        child: Image.asset(
+                          'icons/chat_single_grey.png',
+                          height: 35,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
 
+
+
+
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 60.0, right: 40.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 35.0,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 20.0, right: 40.0),
+                padding:
+                const EdgeInsets.only(left: 25.0, top: 20.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -198,7 +240,8 @@ class _EventState extends State<Event> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
+                padding:
+                const EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -229,7 +272,8 @@ class _EventState extends State<Event> {
                 children: [
                   const SizedBox(height: 8, width: 12),
                   Padding(
-                    padding: const EdgeInsets.only(left: 25.0, top: 40 , right: 25.0),
+                    padding:
+                    const EdgeInsets.only(left: 25.0, top: 40, right: 25.0),
                     child: Row(
                       children: [
                         const Text(
@@ -255,14 +299,18 @@ class _EventState extends State<Event> {
                                 _countMeOut(widget.eventName);
                               } else {
                                 print("-----2--------");
-                                _countMeIn(widget.eventName, widget.eventCategory);
+                                _countMeIn(
+                                    widget.eventName, widget.eventCategory);
                               }
                               setState(() {
-                                buttonText = (userNames.contains(myUserName)) ? "Connect" :  "Disconnect";
-                                buttonColor = (userNames.contains(myUserName)) ? const Color(0xFF220690) : const Color(0xFFF199F2);
+                                buttonText = (userNames.contains(myUserName))
+                                    ? "Connect"
+                                    : "Disconnect";
+                                buttonColor = (userNames.contains(myUserName))
+                                    ? const Color(0xFF220690)
+                                    : const Color(0xFFF199F2);
                               });
                             },
-
                             backgroundColor: buttonColor,
                             elevation: 0,
                             shape: const RoundedRectangleBorder(
@@ -280,7 +328,9 @@ class _EventState extends State<Event> {
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontFamily: "DINNextLtPro",
-                                    color: buttonText == "Connect" ? Colors.white : Colors.black,
+                                    color: buttonText == "Connect"
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                               ],
@@ -305,11 +355,15 @@ class _EventState extends State<Event> {
                     future: getImageUrlForUser(username),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const LinearProgressIndicator(color: Color(0xFF2E148C),  minHeight: 0.2,);
+                        return const LinearProgressIndicator(
+                          color: Color(0xFF2E148C),
+                          minHeight: 0.2,
+                        );
                       } else if (snapshot.hasError) {
                         return const Text('Error loading image');
                       } else {
-                        String imageUrl = snapshot.data ?? ''; // Use a default value if null
+                        String imageUrl =
+                            snapshot.data ?? ''; // Use a default value if null
                         return SizedBox(
                           height: 75, // Adjust the height as needed
                           child: Column(
@@ -330,7 +384,8 @@ class _EventState extends State<Event> {
                                 ),
                               ),
                               if (index < userNames.length - 1)
-                                const Divider(color: Colors.black12, thickness: 0.5),
+                                const Divider(
+                                    color: Colors.black12, thickness: 0.5),
                             ],
                           ),
                         );
@@ -363,7 +418,7 @@ class _EventState extends State<Event> {
                         child: Image.asset(
                           'icons/arrow_white.png',
                           width: 30,
-                          height: 30,// Set the correct path to your image
+                          height: 30, // Set the correct path to your image
                         ),
                       ),
                     ),
@@ -377,11 +432,12 @@ class _EventState extends State<Event> {
     );
   }
 
-
-
   Future<String> getImageUrlForUser(String username) async {
     try {
-      final snapshot = await firestore.collection("users").where('username', isEqualTo: username).get();
+      final snapshot = await firestore
+          .collection("users")
+          .where('username', isEqualTo: username)
+          .get();
 
       if (snapshot.docs.isNotEmpty) {
         final data = snapshot.docs.first.data();
@@ -407,7 +463,7 @@ class _EventState extends State<Event> {
 
     try {
       CollectionReference activitiesCollection =
-          FirebaseFirestore.instance.collection('activities');
+      FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
       print("Username: " + userData["username"]);
@@ -430,23 +486,27 @@ class _EventState extends State<Event> {
         userNames.insert(0, userData["username"]);
       });
 
-      await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
+      await DatabaseService(uid: user!.uid)
+          .searchByName(activityName)
+          .then((snapshot) async {
         if (snapshot != null && snapshot.docs.isNotEmpty) {
-          var doc = snapshot.docs.first; // Assuming you're interested in the first document
+          var doc = snapshot
+              .docs.first; // Assuming you're interested in the first document
           String groupId = doc['groupId']; // Replace with the actual field name
-          String groupName = doc['groupName']; // Replace with the actual field name
+          String groupName =
+          doc['groupName']; // Replace with the actual field name
 
           try {
             // Perform operations with the extracted values
             // For example, you might want to call a function with these values
-            await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
-            if(await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"])){
+            await DatabaseService(uid: user!.uid)
+                .togglingGroupJoin(groupId, groupName, userData["username"]);
+            if (await DatabaseService(uid: user!.uid)
+                .isUserJoined(groupId, groupName, userData["username"])) {
               print('User is removed from the group successfully');
-            }
-            else{
+            } else {
               print('User added to the group successfully');
             }
-
           } catch (e) {
             print('Error adding user to the group: $e');
           }
@@ -471,7 +531,8 @@ class _EventState extends State<Event> {
   void _countMeOut(String activityName) async {
     print("-----countmeout------");
     try {
-      CollectionReference activitiesCollection = FirebaseFirestore.instance.collection('activities');
+      CollectionReference activitiesCollection =
+      FirebaseFirestore.instance.collection('activities');
 
       var userData = await firestore.collection('users').doc(user?.uid).get();
       myUserName = userData["username"];
@@ -490,16 +551,22 @@ class _EventState extends State<Event> {
           widget.eventName: eventList,
         });
 
-        await DatabaseService(uid: user!.uid).searchByName(activityName).then((snapshot) async {
+        await DatabaseService(uid: user!.uid)
+            .searchByName(activityName)
+            .then((snapshot) async {
           if (snapshot != null && snapshot.docs.isNotEmpty) {
-            var doc = snapshot.docs.first; // Assuming you're interested in the first document
-            String groupId = doc['groupId']; // Replace with the actual field name
-            String groupName = doc['groupName']; // Replace with the actual field name
+            var doc = snapshot
+                .docs.first; // Assuming you're interested in the first document
+            String groupId =
+            doc['groupId']; // Replace with the actual field name
+            String groupName =
+            doc['groupName']; // Replace with the actual field name
 
             try {
               // Perform operations with the extracted values
               // For example, you might want to call a function with these values
-              await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
+              await DatabaseService(uid: user!.uid)
+                  .togglingGroupJoin(groupId, groupName, userData["username"]);
               print('User added to the group successfully');
             } catch (e) {
               print('Error adding user to the group: $e');
@@ -521,7 +588,8 @@ class _EventState extends State<Event> {
   }
 
   Future<String> getEvent(String eventName, String eventCategory) async {
-    final snapshot = await firestore.collection("activities").doc(eventCategory).get();
+    final snapshot =
+    await firestore.collection("activities").doc(eventCategory).get();
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
 
@@ -538,8 +606,8 @@ class _EventState extends State<Event> {
 
         GeoPoint locationData = eventList[4];
         _convertCoordinatesToAddress(locationData);
-        imageURLBanner=eventList[5];
-        print("This is a imageBanner: "+imageURLBanner);
+        imageURLBanner = eventList[5];
+        print("This is a imageBanner: " + imageURLBanner);
 
         users = eventList[7];
 
@@ -548,7 +616,6 @@ class _EventState extends State<Event> {
           if (value == true) {
             userNames.add(userName);
           }
-
         });
         print("userNames: $userNames + myUserName: $myUserName");
       }
