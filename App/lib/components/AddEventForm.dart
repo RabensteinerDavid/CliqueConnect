@@ -167,16 +167,18 @@ class _EventState extends State<AddEventForm> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 40,
-                  left: 20,
-                  child: GestureDetector(
+                AppBar(
+                  elevation: 0.0,
+                  backgroundColor: Color(0x2E148C),
+
+                  leading: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
-                      },
+                    },
                     child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Image.asset('icons/arrow_white_noBG_white.png', // Set the correct path to your image
+                      padding: const EdgeInsets.all(005.0),
+                      child: Image.asset(
+                        'icons/arrow_white_noBG_white.png', // Set the correct path to your image
                         width: 30,
                         height: 30,
                       ),
@@ -765,6 +767,9 @@ class _EventState extends State<AddEventForm> {
                       showSecondDate = !showSecondDate;
                     });
                   },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(MyApp.blueMain),
+                  ),
                   child: Text(showSecondDate ? 'No additional Date' : 'Additional Date'),
                 ),
                 const SizedBox(height: 12.0),
@@ -947,15 +952,18 @@ class _EventState extends State<AddEventForm> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12.0),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            showAdditionalFields = !showAdditionalFields;
-                          });
-                        },
-                        child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
+                    const SizedBox(height: 12.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          showAdditionalFields = !showAdditionalFields;
+                        });
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(MyApp.blueMain),
                       ),
+                      child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
+                    ),
                       const SizedBox(height: 40.0),
                       ElevatedButton(
                         onPressed: () => savePictureToFirestore(context),
@@ -968,7 +976,7 @@ class _EventState extends State<AddEventForm> {
                           elevation: 3.0,
                         ),
                         child: const Text(
-                          'Add Creativ Activity',
+                          'Add Activity',
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,

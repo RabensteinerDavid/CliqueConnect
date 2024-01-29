@@ -163,7 +163,21 @@ class _SearchPageState extends State<SearchPage> {
         elevation: 0.0,
         backgroundColor: Color(0xFF2E148C),
         title: Text('Search', style: TextStyle(fontSize: 27.0, fontWeight: FontWeight.bold, color: Colors.white)),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'icons/arrow_white_noBG_white.png', // Set the correct path to your image
+              width: 30,
+              height: 30,
+            ),
+          ),
+        ),
       ),
+
       body: Container(
         child: Column(
           children: [
@@ -175,7 +189,7 @@ class _SearchPageState extends State<SearchPage> {
                   Expanded(
                     child: TextField(
                       controller: searchEditingController,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       decoration: const InputDecoration(
                         hintText: "Search groups...",
                         hintStyle: TextStyle(color: Colors.black, fontSize: 16),
