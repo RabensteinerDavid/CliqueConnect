@@ -212,7 +212,10 @@ class _EventState extends State<AddEventForm> {
                     decoration: InputDecoration(
                     labelText: 'Activity name',
                     border: const OutlineInputBorder(),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:  BorderSide(color: MyApp.blueMain),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                     labelStyle: TextStyle(
                       color: _nameFocus.hasFocus ? MyApp.blueMain : _nameLabelColor,
                     ),
@@ -242,6 +245,9 @@ class _EventState extends State<AddEventForm> {
                   decoration: InputDecoration(
                     labelText: 'Description',
                     border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:  BorderSide(color: MyApp.blueMain),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                     labelStyle: TextStyle(
                       color: _descriptionFocuse.hasFocus ? MyApp.blueMain : _descriptionlColor,
@@ -270,8 +276,11 @@ class _EventState extends State<AddEventForm> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Enter an address',
+                    labelText: 'Enter an addresssss',
                     border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:  BorderSide(color: MyApp.blueMain),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                     labelStyle: TextStyle(
                       color: _addressFocus.hasFocus ? MyApp.blueMain : _addressLabelColor,
@@ -332,6 +341,9 @@ class _EventState extends State<AddEventForm> {
                       labelText: 'Start Date',
                       contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:  BorderSide(color: MyApp.blueMain),
+                      ),
                       labelStyle: TextStyle(
                         color: _startDateFocus.hasFocus ? MyApp.blueMain : _startDateLabelColor,
                       ),
@@ -416,6 +428,9 @@ class _EventState extends State<AddEventForm> {
                       labelText: 'Start Time',
                       contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _startTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:  BorderSide(color: MyApp.blueMain),
+                      ),
                       labelStyle: TextStyle(
                         color: _startTimeFocus.hasFocus ? MyApp.blueMain : _startTimeLabelColor,
                       ),
@@ -492,6 +507,9 @@ class _EventState extends State<AddEventForm> {
                           labelText: 'Second Date',
                           contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _secondStartDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:  BorderSide(color: MyApp.blueMain),
+                          ),
                           labelStyle: TextStyle(
                             color: _secondStartDateFocus.hasFocus ? MyApp.blueMain : _secondDateLabelColor,
                           ),
@@ -576,6 +594,9 @@ class _EventState extends State<AddEventForm> {
                         decoration: InputDecoration(
                           labelText: 'Second Time',
                           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _secondEndTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:  BorderSide(color: MyApp.blueMain),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                           labelStyle: TextStyle(
                             color: _secondEndTimeFocus.hasFocus ? MyApp.blueMain : _secondTimeLabelColor,
@@ -652,6 +673,9 @@ class _EventState extends State<AddEventForm> {
                                 labelText: 'Third Date',
                                 contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _thirdStartDateFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:  BorderSide(color: MyApp.blueMain),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _thirdStartDateFocus.hasFocus ? MyApp.blueMain : _thirdDateLabelColor,
                                 ),
@@ -735,6 +759,9 @@ class _EventState extends State<AddEventForm> {
                               decoration: InputDecoration(
                                 labelText: 'Third Time',
                                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _thirdEndTimeFocus.hasFocus ? MyApp.blueMain : Colors.black54)),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:  BorderSide(color: MyApp.blueMain),
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                                 labelStyle: TextStyle(
                                   color: _thirdEndTimeFocus.hasFocus ? MyApp.blueMain : _thirdTimeLabelColor,
@@ -770,7 +797,9 @@ class _EventState extends State<AddEventForm> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(MyApp.blueMain),
                   ),
-                  child: Text(showSecondDate ? 'No additional Date' : 'Additional Date'),
+                  child: Text(showSecondDate ? 'No additional Date' : 'Additional Date',
+                    style: TextStyle(color: Colors.white,),
+                  ),
                 ),
                 const SizedBox(height: 12.0),
                 DropdownButtonFormField<String>(
@@ -809,6 +838,9 @@ class _EventState extends State<AddEventForm> {
                     labelText: 'Category',
                     hintText: 'Select your Category',
                     border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:  BorderSide(color: MyApp.blueMain),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
                     labelStyle: TextStyle(
                       color: _categoryFocus.hasFocus ? MyApp.blueMain : _categoryLabelColor,
@@ -861,6 +893,9 @@ class _EventState extends State<AddEventForm> {
                               labelText: 'Weekly',
                               hintText: 'Select your Interval',
                               border: const OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:  BorderSide(color: MyApp.blueMain),
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12.0, horizontal: 10.0),
                               labelStyle: TextStyle(
@@ -905,6 +940,9 @@ class _EventState extends State<AddEventForm> {
                               labelText: 'Till which Months',
                               hintText: 'Select till month',
                               border: const OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:  BorderSide(color: MyApp.blueMain),
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12.0, horizontal: 10.0),
                               labelStyle: TextStyle(
@@ -944,6 +982,9 @@ class _EventState extends State<AddEventForm> {
                                 color: _intervallFocus.hasFocus ? MyApp.blueMain : _intervalLabelColor,
                               ),
                               border: const OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:  BorderSide(color: MyApp.blueMain),
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12.0, horizontal: 10.0),
                                 ),
@@ -962,8 +1003,9 @@ class _EventState extends State<AddEventForm> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(MyApp.blueMain),
                       ),
-                      child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat'),
-                    ),
+                      child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat' ,style: TextStyle(color: Colors.white,),
+                        ),
+                      ),
                       const SizedBox(height: 40.0),
                       ElevatedButton(
                         onPressed: () => savePictureToFirestore(context),
