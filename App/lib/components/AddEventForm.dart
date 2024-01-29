@@ -1150,7 +1150,7 @@ class _EventState extends State<AddEventForm> {
   }
 
   Future imgFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 0);
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
     setState(() {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
