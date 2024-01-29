@@ -165,14 +165,8 @@ class _HomePageState extends State<HomePageChat> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.fromLTRB(48.0, 46.0, 18.0, 8.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Messages',
-                style: TextStyle(fontSize: 18.0, color: MyApp.blueMain,  fontFamily: "DINNextLtPro"),
-              ),
-            ),
+            padding: EdgeInsets.fromLTRB(48.0, 15.0, 18.0, 8.0),
+
           ),
           Expanded(
             child: groupsList(),
