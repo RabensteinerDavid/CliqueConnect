@@ -72,7 +72,6 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            SizedBox(width: MediaQuery.of(context).size.width * 0.1),
             FutureBuilder<String>(
               future: getGroupCategory(widget.groupId),
               builder: (context, snapshot) {
