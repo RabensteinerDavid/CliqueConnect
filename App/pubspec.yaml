@@ -142,6 +142,7 @@ flutter:
     - icons/plus_pink.png
     - icons/plus_white.png
     - icons/profile_rose.png
+    - icons/chat_single_grey.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

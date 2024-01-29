@@ -224,6 +224,7 @@ class _AuthGateState extends State<AuthGate> {
       child: TextFormField(
         style: TextStyle(color: textInputColor),
         controller: passwordController,
+        obscureText: true,
        /* obscureText: true, // Obscure the password input*/
         decoration: InputDecoration(
           labelText: 'Password',

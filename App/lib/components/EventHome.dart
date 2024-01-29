@@ -500,8 +500,8 @@ class _EventHomeState extends State<EventHome> {
                         ),
                         _buildGradientShadow(),
                         Positioned(
-                          top: eventBoxSize * 0.03,
-                          right: eventBoxSize * 0.03,
+                          top: 16,
+                          left: 16,
                           child: Image.asset(
                             'assets/Event/${item['eventCategory']}.png',
                             height: 75,

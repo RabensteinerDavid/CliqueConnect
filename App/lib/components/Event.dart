@@ -85,9 +85,11 @@ class _EventState extends State<Event> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily:
         'DINCondensed', // Hier die gewünschte Standard-Schriftart angeben
@@ -136,8 +138,8 @@ class _EventState extends State<Event> {
                   ),
 
                   Positioned(
-                    top: bannerHeight+15,
-                    right: 40,
+                    top: bannerHeight,
+                    left: 20,
                     child: GestureDetector(
                       onTap: () {
                         //TODO navigate to the stories site, if stories are available
@@ -147,6 +149,22 @@ class _EventState extends State<Event> {
                       child: Image.asset(
                         'assets/Event/${widget.eventCategory}.png',
                         height: 75,
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    top: bannerHeight+105,
+                    right: 55,
+                    child: GestureDetector(
+                      onTap: () {
+                        //TODO navigate to the stories site, if stories are available
+                        // Handle button click action here
+                        print("Button Clicked!");
+                      },
+                      child: Image.asset(
+                        'icons/chat_single_grey.png',
+                        height: 35,
                       ),
                     ),
                   ),
@@ -332,7 +350,7 @@ class _EventState extends State<Event> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(30.0, 40.0, 0.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(30.0, 100.0, 0.0, 0.0),
                     child: SizedBox(
                       width: 30.0,
                       height: 30.0,
