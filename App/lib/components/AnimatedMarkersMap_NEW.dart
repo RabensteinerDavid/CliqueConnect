@@ -54,13 +54,42 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   late Future<List<MapMarker>> _markersFuture;
 
+  List<String> connectedEventNames = [];
+
   @override
   void initState() {
     super.initState();
+    load();
     _checkAndRequestLocationPermission();
     _updateMarkers();
     _markersFuture = getMarkersAsFuture();
     _markers = [];
+  }
+
+  void load() async {
+    await getConnectedEventsName();
+  }
+
+  Future<List<String>> getConnectedEventsName() async {
+    final firestore = FirebaseFirestore.instance;
+    User? user = FirebaseAuth.instance.currentUser;
+
+    List<String> connectedEvents = [];
+    var userID = user?.uid;
+
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        var userGroup = data["groups"];
+
+        for (var group in userGroup) {
+          connectedEventNames.add(group.split("_")[1]);
+        }
+      }
+    }
+    return connectedEvents;
   }
 
   Future<bool> _handleLocationPermission() async {
@@ -262,11 +291,23 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
+    if(filtersCategory.isEmpty){
+      filtersCategory.clear();
+      filtersCategory.add("All");
+    }
     if(filtersCategory.contains("All")){
       filtersCategory.clear();
       filtersCategory.add("All");
       filteredMapMarkers = _markers.toList();
-    }else{
+    }
+    else if(filtersCategory.contains("Connected")){
+      filtersCategory.clear();
+      filtersCategory.add("Connected");
+      filteredMapMarkers = _markers.where((marker) {
+        return filtersCategory.isEmpty || connectedEventNames.contains(marker.title);
+      }).toList();
+    }
+    else{
       filteredMapMarkers = _markers.where((marker) {
         return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
       }).toList();
@@ -419,7 +460,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                               onSelected: (bool selected) {
                                 setState(() {
                                   if (mounted && selected) {
-                                    if(filtersCategory.contains("All")){
+                                    if(filtersCategory.contains("All") || filtersCategory.contains("Connected")){
                                       filtersCategory.clear();
                                       filtersCategory.add(category);
                                     }else{
@@ -525,6 +566,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             .map((dynamic item) => item.toString())
             .toList();
         activities.insert(0, 'All');
+        activities.insert(1, 'Connected');
         return activities.join(',');
       } else {
         print("Document does not exist");
