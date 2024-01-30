@@ -1238,6 +1238,7 @@ class _EventState extends State<AddEventForm> {
       String nameActivity = activityNameController.text;
       User? user = FirebaseAuth.instance.currentUser;
 
+      //work here
       if (nameActivity.isNotEmpty) {
         if (_photo != null) {
           final path = 'events/${user?.uid}/${basename("${nameActivity}_${basename(_photo!.path)}")}';
@@ -1357,6 +1358,16 @@ class _EventState extends State<AddEventForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select start date for the activity.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      if (selectedCategory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a category for the activity.'),
             duration: Duration(seconds: 2),
           ),
         );
