@@ -262,9 +262,15 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    filteredMapMarkers = _markers.where((marker) {
-      return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
-    }).toList();
+    if(filtersCategory.contains("All")){
+      filtersCategory.clear();
+      filtersCategory.add("All");
+      filteredMapMarkers = _markers.toList();
+    }else{
+      filteredMapMarkers = _markers.where((marker) {
+        return filtersCategory.isEmpty || filtersCategory.contains(marker.category);
+      }).toList();
+    }
     return Scaffold(
       appBar: buildAppBar(),
       body: Stack(
@@ -273,13 +279,11 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             stream: Geolocator.getPositionStream(locationSettings: locationSettings),
             builder: (context, positionSnapshot) {
               if (positionSnapshot.hasData) {
-                print("first");
                 final userPosition = positionSnapshot.data;
                 return FutureBuilder<List<MapMarker>>(
                   future: _markersFuture,
                   builder: (context, markersSnapshot) {
                     if (markersSnapshot.connectionState == ConnectionState.done) {
-                      print("second");
                       return _markers.isNotEmpty
                           ? FlutterMap(
                         mapController: mapController,
@@ -415,7 +419,12 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                               onSelected: (bool selected) {
                                 setState(() {
                                   if (mounted && selected) {
-                                    filtersCategory.add(category);
+                                    if(filtersCategory.contains("All")){
+                                      filtersCategory.clear();
+                                      filtersCategory.add(category);
+                                    }else{
+                                      filtersCategory.add(category);
+                                    }
                                     isCardVisible = false;
                                   } else {
                                     filtersCategory.remove(category);
@@ -515,6 +524,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             .where((activity) => activity != 'All' && activity != 'Archive')
             .map((dynamic item) => item.toString())
             .toList();
+        activities.insert(0, 'All');
         return activities.join(',');
       } else {
         print("Document does not exist");
