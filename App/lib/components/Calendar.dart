@@ -210,7 +210,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 onRangeSelected: (value) {
                   print('Range selected ${value.from} - ${value.to}');
                 },
-                datePickerType: DatePickerType.date,
+                // datePickerType: DatePickerType.date,
                 dayOfWeekStyle: const TextStyle(
                   color: MyApp.blueMain,
                   fontWeight: FontWeight.w800,
