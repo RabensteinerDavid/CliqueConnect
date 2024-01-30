@@ -210,7 +210,7 @@ class _EventState extends State<AddEventForm> {
                     });
                   },
                     decoration: InputDecoration(
-                    labelText: 'Activity name',
+                    labelText: 'Activity Name',
                     border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide:  BorderSide(color: MyApp.blueMain),
@@ -276,7 +276,7 @@ class _EventState extends State<AddEventForm> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Enter an addresssss',
+                    labelText: 'Address e.g. Softwarepark 11 4232 Hagenberg',
                     border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide:  BorderSide(color: MyApp.blueMain),
@@ -354,7 +354,7 @@ class _EventState extends State<AddEventForm> {
                         Text(
                           startDate != null
                               ? "${startDate!.toLocal()}".split(' ')[0]
-                              : 'Select start date',
+                              : 'Select Start Date',
                           style: TextStyle(
                             color: _startDateText ? MyApp.black : _startDateLabelColor,
                           ),
@@ -441,7 +441,7 @@ class _EventState extends State<AddEventForm> {
                         Text(
                           startDate != null
                               ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select start time',
+                              : 'Select Start Time',
                           style: TextStyle(
                             color:_startTimeText ? MyApp.black: _startTimeLabelColor,
                           ),
@@ -520,7 +520,7 @@ class _EventState extends State<AddEventForm> {
                             Text(
                               secondStartDate != null
                                   ? "${secondStartDate!.toLocal()}".split(' ')[0]
-                                  : 'Select Second start date',
+                                  : 'Select Second Start Date',
                               style: TextStyle(
                                 color: _secondStartDateText ? MyApp.black : _secondDateLabelColor,
                               ),
@@ -608,7 +608,7 @@ class _EventState extends State<AddEventForm> {
                             Text(
                               secondStartDate != null
                                   ? '${"${secondStartDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${secondStartDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                                  : 'Second start time',
+                                  : 'Second Start Time',
                               style: TextStyle(
                                 color: _secondStartDateText ? MyApp.black : _secondTimeLabelColor,
                               ),
@@ -686,7 +686,7 @@ class _EventState extends State<AddEventForm> {
                                   Text(
                                     thirdStartDate != null
                                         ? "${thirdStartDate!.toLocal()}".split(' ')[0]
-                                        : 'Select Third start date',
+                                        : 'Select Third Start Date',
                                     style: TextStyle(
                                       color: _thirdStartDateText ? MyApp.black : _thirdDateLabelColor,
                                     ),
@@ -773,7 +773,7 @@ class _EventState extends State<AddEventForm> {
                                   Text(
                                     thirdStartDate != null
                                         ? '${"${thirdStartDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${thirdStartDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                                        : 'Third start time',
+                                        : 'Third Start Time',
                                     style: TextStyle(
                                       color: _thirdStartDateText ? MyApp.black : _thirdTimeLabelColor,
                                     ),
@@ -938,7 +938,7 @@ class _EventState extends State<AddEventForm> {
                             },
                             decoration: InputDecoration(
                               labelText: 'Till which Months',
-                              hintText: 'Select till month',
+                              hintText: 'Select till Month',
                               border: const OutlineInputBorder(),
                               focusedBorder: OutlineInputBorder(
                                 borderSide:  BorderSide(color: MyApp.blueMain),
