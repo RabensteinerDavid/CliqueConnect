@@ -235,6 +235,7 @@ class _EventHomeState extends State<EventHome> {
             .where((activity) => activity != 'All' && activity != 'Archive')
             .map((dynamic item) => item.toString())
             .toList();
+        activities.insert(0, 'All');
         return activities.join(',');
       } else {
         print("Document does not exist");
@@ -245,9 +246,9 @@ class _EventHomeState extends State<EventHome> {
       return "";
     }
   }
-
+  var events;
   void _updateFilteredEvents() async {
-    final events = await eventDataAll;
+    events = await eventDataAll;
     if (mounted) {
       setState(() {
         filteredEvents = events.where((marker) {
@@ -260,6 +261,18 @@ class _EventHomeState extends State<EventHome> {
 
   @override
   Widget build(BuildContext context) {
+    if(filtersCategory.isEmpty){
+      filtersCategory.clear();
+      filtersCategory.add("All");
+    }
+    if(filtersCategory.contains("All")){
+      filtersCategory.clear();
+      filtersCategory.add("All");
+      if(events != null){
+        filteredEvents = events.toList();
+      }
+
+    }
     return Scaffold(
       appBar: buildAppBar(),
       body: Column(
@@ -450,7 +463,12 @@ class _EventHomeState extends State<EventHome> {
                               onSelected: (bool selected) {
                                 setState(() {
                                   if (mounted && selected) {
-                                    filtersCategory.add(category);
+                                    if (filtersCategory.contains("All")) {
+                                      filtersCategory.clear();
+                                      filtersCategory.add(category);
+                                    } else {
+                                      filtersCategory.add(category);
+                                    }
                                   } else {
                                     filtersCategory.remove(category);
                                   }
