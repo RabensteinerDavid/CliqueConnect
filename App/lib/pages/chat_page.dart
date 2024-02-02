@@ -110,11 +110,15 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
             const SizedBox(width: 10),
-            Text(
-              widget.groupName,
-              style: const TextStyle(
-                color: MyApp.blueMain,
-                fontFamily: "DINNextLtPro",
+            Expanded(
+              child: Text(
+                widget.groupName,
+                style: const TextStyle(
+                  color: MyApp.blueMain,
+                  fontFamily: "DINNextLtPro",
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
