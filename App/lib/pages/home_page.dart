@@ -26,8 +26,6 @@ class _HomePageState extends State<HomePageChat> {
   late StreamController<Map<String, dynamic>> _groupsController = StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get _groups => _groupsController.stream;
 
-  late String _groupName;
-
   @override
   void initState() {
     super.initState();
@@ -44,18 +42,16 @@ class _HomePageState extends State<HomePageChat> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          // Add the search icon button
           IconButton(
             icon: Image.asset(
               "icons/plus_pink.png",
-              width: 50.0, // Adjust the width as needed
-              height: 50.0, // Adjust the height as needed
+              width: 50.0,
+              height: 50.0,
             ),
             onPressed: () {
-              // Navigate to the search page when the search icon is pressed
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddEventForm()), // Replace EventHome with your actual widget
+                MaterialPageRoute(builder: (context) => const AddEventForm()),
               );
             },
           ),
@@ -65,16 +61,13 @@ class _HomePageState extends State<HomePageChat> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "DINNextLtPro",
-              fontSize: 16.0, // Adjust the font size as needed
+              fontSize: 16.0,
             ),
           ),
         ],
       ),
     );
   }
-
-
-
 
   Widget groupsList() {
     return StreamBuilder<Map<String, dynamic>>(
@@ -87,7 +80,7 @@ class _HomePageState extends State<HomePageChat> {
               itemCount: snapshot.data?['groups'].length,
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                int reqIndex = snapshot.data?['groups'].length - index - 1; // Use groupsData instead of snapshot.data['groups']
+                int reqIndex = snapshot.data?['groups'].length - index - 1;
                 return GroupTile(userName: snapshot.data?['username'],
                     groupId: _destructureId(snapshot.data?['groups'][reqIndex]),
                     groupName: _destructureName(snapshot.data?['groups'][reqIndex]));
@@ -105,9 +98,6 @@ class _HomePageState extends State<HomePageChat> {
     );
   }
 
-
-
-
   _getUserAuthAndJoinedGroups() async {
     _user = FirebaseAuth.instance.currentUser;
 
@@ -119,22 +109,16 @@ class _HomePageState extends State<HomePageChat> {
       });
 
       if (_user!.uid != null) {
-        // Remove the listen() method, StreamBuilder will handle it
         Stream<DocumentSnapshot> groupsStream = DatabaseService(uid: _user!.uid).getUserGroups();
         groupsStream.listen((DocumentSnapshot<Object?> snapshot) {
           if (snapshot.exists) {
-            // Document exists, you can access its data
             Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
             _groupsController.add(data);
           } else {
-            // Document doesn't exist
             print('Document does not exist');
           }
-        }
-
-    );
+        });
       }
-
       await HelperFunctions.getUserEmailSharedPreference().then((value) {
         setState(() {
           _email = value!;
@@ -142,11 +126,6 @@ class _HomePageState extends State<HomePageChat> {
       });
     }
   }
-
-
-
-
-
 
   String _destructureId(String res) {
     print(res.substring(0, res.indexOf('_')));
@@ -166,21 +145,19 @@ class _HomePageState extends State<HomePageChat> {
         children: [
           const Padding(
             padding: EdgeInsets.fromLTRB(48.0, 15.0, 18.0, 8.0),
-
           ),
           Expanded(
             child: groupsList(),
           ),
         ],
       ),
-      /*floatingActionButton: buildFloatingActionButton(),*/
     );
   }
 
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
       preferredSize: Size(
-        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.width,
         MediaQuery.of(context).size.height * 0.08,
       ),
       child: AppBar(
@@ -189,19 +166,18 @@ class _HomePageState extends State<HomePageChat> {
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: <Widget>[
-          IconButton(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            icon: const Icon(Icons.search, color: Colors.white, size: 25.0),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => SearchPage()),
-              );
-            },
-          )
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        //     icon: const Icon(Icons.search, color: Colors.white, size: 25.0),
+        //     onPressed: () {
+        //       Navigator.of(context).push(
+        //         MaterialPageRoute(builder: (context) => SearchPage()),
+        //       );
+        //     },
+        //   )
+        // ],
       ),
     );
   }
-
 }

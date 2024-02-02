@@ -1,44 +1,63 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_clique_connect/main.dart';
 import 'package:test_clique_connect/pages/chat_page.dart';
-import 'package:test_clique_connect/services/database_service.dart';
 
-class GroupTile extends StatelessWidget {
+class GroupTile extends StatefulWidget {
   final String userName;
   final String groupId;
   final String groupName;
 
   GroupTile({
-    super.key,
+    Key? key,
     required this.userName,
     required this.groupId,
     required this.groupName,
-  });
+  }) : super(key: key);
+
+  @override
+  _GroupTileState createState() => _GroupTileState();
+}
+
+class _GroupTileState extends State<GroupTile> {
+  late Future<String> lastMessage;
+  late Future<String> recentMessager;
+
+  @override
+  void initState() {
+    super.initState();
+    recentMessager = recentMessageSender(widget.groupId);
+    lastMessage = loadLastMessage(widget.groupId);
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
-              groupId: groupId,
-              userName: userName,
-              groupName: groupName,
+              groupId: widget.groupId,
+              userName: widget.userName,
+              groupName: widget.groupName,
             ),
           ),
         );
+
+        if (result != null && result) {
+          setState(() {
+            lastMessage = loadLastMessage(widget.groupId);
+          });
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
         child: ListTile(
           leading: FutureBuilder<String>(
-            future: getGroupCategory(groupId),
+            future: getGroupCategory(widget.groupId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                // If the Future is still running, you can return a placeholder or loading image
                 return const CircleAvatar(
                   radius: 30.0,
                   backgroundColor: MyApp.blueMain,
@@ -58,8 +77,21 @@ class GroupTile extends StatelessWidget {
               }
             },
           ),
-          title: Text(groupName, style: const TextStyle(fontFamily: 'DINNextLtPro')),
-          subtitle: Text("Join the conversation as $userName", style: const TextStyle(fontSize: 13.0)),
+          title: Text(widget.groupName, style: const TextStyle(fontFamily: 'DINNextLtPro')),
+          subtitle: FutureBuilder(
+            future: Future.wait([lastMessage,recentMessager]),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
+              return Text(
+                data?[0]?.toString() != null && data![0].isNotEmpty
+                    ? "${data[1]}: ${data[0]}"
+                    : "Join the conversation as ${widget.userName}",
+                style: const TextStyle(fontSize: 13.0),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              );
+            },
+          ),
         ),
       ),
     );
@@ -96,6 +128,34 @@ class GroupTile extends StatelessWidget {
 
       if (groupDoc.exists) {
         return groupDoc['category'];
+      } else {
+        return "";
+      }
+    } catch (e) {
+      return "";
+    }
+  }
+
+  Future<String> loadLastMessage(String groupId) async {
+    try {
+      DocumentSnapshot groupDoc = await groupCollection.doc(groupId).get();
+
+      if (groupDoc.exists) {
+        return groupDoc['recentMessage'];
+      } else {
+        return "";
+      }
+    } catch (e) {
+      return "";
+    }
+  }
+
+  Future<String> recentMessageSender(String groupId) async {
+    try {
+      DocumentSnapshot groupDoc = await groupCollection.doc(groupId).get();
+
+      if (groupDoc.exists) {
+        return groupDoc['recentMessageSender'];
       } else {
         return "";
       }

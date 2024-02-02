@@ -50,7 +50,6 @@ class _ChatPageState extends State<ChatPage> {
 
     _initializeChats();
     if (!_isChatsLoaded) {
-      // Add a post-frame callback to scroll to the bottom after the widgets are built
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(const Duration(milliseconds: 1000), () {
           if (_scrollController.hasClients) {
@@ -58,7 +57,6 @@ class _ChatPageState extends State<ChatPage> {
               _scrollController.position.maxScrollExtent,
               duration: const Duration(milliseconds: 1),
               curve: Curves.easeOut,
-
             );
           }
         });
@@ -84,7 +82,6 @@ class _ChatPageState extends State<ChatPage> {
                 } else {
                   return GestureDetector(
                     onTap: () {
-                      print("here");
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -129,7 +126,7 @@ class _ChatPageState extends State<ChatPage> {
         automaticallyImplyLeading: false,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           },
           child: Container(
             padding: const EdgeInsets.all(8.0),
@@ -321,7 +318,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     messageEditingController.dispose();
     super.dispose();
   }
