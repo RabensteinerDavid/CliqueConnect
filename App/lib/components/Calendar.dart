@@ -6,9 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:rrule/rrule.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../main.dart';
-import '../shema/MapMarker.dart';
+import 'dart:async';
+import 'Event.dart';
+
 
 class EventData {
   final String title;
@@ -39,15 +40,14 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   bool showEvents = true;
-  late String nameActivityCalender;
 
+  List<String> connectedEventNames = [];
   List<NeatCleanCalendarEvent> _eventList = [];
   final List<String> filtersCategory = [];
 
   late List<EventData> eventDataList = [];
   late List<EventData> filteredEventData =[];
-
-  List<String> connectedEventNames = [];
+  late String nameActivityCalender;
 
   @override
   void initState() {
@@ -102,6 +102,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
+  String findCategoryByTitle(String titleToFind) {
+    for (EventData event in eventDataList) {
+      if (event.title == titleToFind) {
+        return event.category;
+      }
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Category not found for event with title: $titleToFind'),
+      ),
+    );
+    return 'Category not found';
+  }
+
   @override
   Widget build(BuildContext context) {
     if(filtersCategory.isEmpty){
@@ -129,6 +143,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Container(
+                margin: const EdgeInsets.only(
+                    left: 20.0, top: 20.0, bottom: 0),
+                child: const Text(
+                  "Calendar",
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Align(
@@ -141,13 +170,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
-
                       if (!snapshot.hasData) {
                         return Container();
                       }
-
                       List<String> categories = snapshot.data!.split(',');
-
                       return Row(
                         children: categories.map((String category) {
                           return Row(
@@ -182,41 +208,56 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 14.0),
+            SizedBox(height: MediaQuery.of(context).size.width * 0.05),
             Expanded(
-              child: Calendar(
-                startOnMonday: true,
-                weekDays: const ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'],
-                eventsList: _eventList,
-                isExpandable: true,
-                defaultDayColor: MyApp.black,
-                selectedTodayColor: MyApp.blueMain,
-                eventDoneColor: MyApp.blueMain,
-                selectedColor: MyApp.blueMain,
-                todayColor: MyApp.pinkMain,
-                eventColor: null,
-                locale: 'de_DE',
-                isExpanded: true,
-                expandableDateFormat: 'EEEE, dd. MMMM yyyy',
-                onEventSelected: (value) {
-                  print('Event selected ${value.summary}');
-                },
-                onEventLongPressed: (value) {
-                  print('Event long pressed ${value.summary}');
-                },
-                onMonthChanged: (value) {
-                  print('Month changed $value');
-                },
-                onRangeSelected: (value) {
-                  print('Range selected ${value.from} - ${value.to}');
-                },
-                // datePickerType: DatePickerType.date,
-                dayOfWeekStyle: const TextStyle(
-                  color: MyApp.blueMain,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 15,
-                ),
-                showEvents: showEvents,
+              child: Align(
+                alignment: Alignment.center,
+                child:
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: Calendar(
+                      startOnMonday: true,
+                      weekDays: const ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'],
+                      eventsList: _eventList,
+                      isExpandable: true,
+                      defaultDayColor: MyApp.black,
+                      selectedTodayColor: MyApp.blueMain,
+                      eventDoneColor: MyApp.blueMain,
+                      selectedColor: MyApp.blueMain,
+                      todayColor: MyApp.pinkMain,
+                      eventColor: null,
+                      locale: 'de_DE',
+                      isExpanded: true,
+                      expandableDateFormat: 'EEEE, dd. MMMM yyyy',
+                      onEventSelected: (value) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Event(
+                              eventName: value.summary,
+                              eventCategory: findCategoryByTitle(value.summary),
+                            ),
+                          ),
+                        );
+                      },
+                      onEventLongPressed: (value) {
+                        print('Event long pressed ${value.summary}');
+                      },
+                      onMonthChanged: (value) {
+                        print('Month changed $value');
+                      },
+                      onRangeSelected: (value) {
+                        print('Range selected ${value.from} - ${value.to}');
+                      },
+                      // datePickerType: DatePickerType.date,
+                      dayOfWeekStyle: const TextStyle(
+                        color: MyApp.blueMain,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                      showEvents: showEvents,
+                    ),
+                  ),
               ),
             ),
           ],
@@ -224,7 +265,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
-
 
   void _updateFilteredMarkers() {
     setState(() {
@@ -277,9 +317,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     if (userID != null) {
       final activitiesCollectionRef = firestore.collection("activities");
-
       final querySnapshot = await activitiesCollectionRef.get();
-
       for (final activityDoc in querySnapshot.docs) {
         final Map<String, dynamic> data = activityDoc.data();
         for (final key in data.keys) {
@@ -288,9 +326,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
             final nameActivity = await alldata[0];
             nameActivityCalender = nameActivity;
 
-            final startTimestamp = await alldata[2]; // Assuming this is a Timestamp object
-            final start = startTimestamp.seconds * 1000 +
-                (startTimestamp.nanoseconds / 1e6).round();
+            final startTimestamp = await alldata[2];
+            final start = startTimestamp.seconds * 1000 + (startTimestamp.nanoseconds / 1e6).round();
+            final startDateTime = DateTime.fromMillisecondsSinceEpoch(start);
+            final endDateTime = startDateTime.add(Duration(hours: 1));
 
             final description = await alldata[1];
             final location = await alldata[4];
@@ -306,7 +345,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               eventDataList.add(EventData(
                 title: nameActivity,
                 startTime: DateTime.fromMillisecondsSinceEpoch(start),
-                endTime: DateTime.fromMillisecondsSinceEpoch(start),
+                endTime: endDateTime,
                 description: description,
                 location: latlong.LatLng(
                     location.latitude, location.longitude),
@@ -323,7 +362,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
-  // Funktion zum Umwandeln von Datenbankdaten in das Event-Format
   List<NeatCleanCalendarEvent> convertToCalendarEvents(List<EventData> events) {
     List<NeatCleanCalendarEvent> calendarEvents = [];
 
@@ -336,8 +374,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         color: MyApp.blueMain,
 
         //color: event.color,
-        //isMultiDay: event.isMultiDay,
-        //isAllDay: event.isAllDay,
+        //isMultiDay: true,
+        isAllDay: false,
         //icon: event.icon,
       ));
     }
