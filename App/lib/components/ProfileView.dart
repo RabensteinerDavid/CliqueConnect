@@ -355,13 +355,13 @@ class YourCurrentScreenState extends State<ProfileView> {
                   color: Colors.white,
                 ),
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: Icon(Icons.edit),
-                      title: Text('Edit Account'),
-                    ),
-                  ),
+                  // const PopupMenuItem<String>(
+                  //   value: 'edit',
+                  //   child: ListTile(
+                  //     leading: Icon(Icons.edit),
+                  //     title: Text('Edit Account'),
+                  //   ),
+                  // ),
                   const PopupMenuItem<String>(
                     value: 'logout',
                     child: ListTile(
@@ -376,13 +376,13 @@ class YourCurrentScreenState extends State<ProfileView> {
                       title: Text('Delete Account'),
                     ),
                   ),
-                  const PopupMenuItem<String>(
-                    value: 'impressum',
-                    child: ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('Impressum'),
-                    ),
-                  ),
+                  // const PopupMenuItem<String>(
+                  //   value: 'impressum',
+                  //   child: ListTile(
+                  //     leading: Icon(Icons.info),
+                  //     title: Text('Impressum'),
+                  //   ),
+                  // ),
                 ],
               ),
               // Add more action buttons as needed
