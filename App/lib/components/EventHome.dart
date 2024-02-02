@@ -384,7 +384,7 @@ class _EventHomeState extends State<EventHome> {
                 } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return Padding(
                       padding: const EdgeInsets.only(
-                          left: 10.0, top: 20.0, bottom: 0),
+                          left: 0.0, top: 20.0, bottom: 0),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Container(
