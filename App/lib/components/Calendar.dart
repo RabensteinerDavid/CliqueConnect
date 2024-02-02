@@ -208,7 +208,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
             ),
-            SizedBox(height: MediaQuery.of(context).size.width * 0.05),
+            SizedBox(height: MediaQuery.of(context).size.width * 0.025),
             Expanded(
               child: Align(
                 alignment: Alignment.center,
