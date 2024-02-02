@@ -9,13 +9,10 @@ import 'package:latlong2/latlong.dart' as latlong;
 import 'package:rrule/rrule.dart';
 import '../main.dart';
 import '../shema/MapMarker.dart';
-import 'ProfileView.dart';
 import 'Event.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
-// Replace with your Mapbox access token
 const MAPBOX_ACCESS_TOKEN = 'sk.eyJ1IjoiYm9uaXRoYW4iLCJhIjoiY2xvaGFydjR1MGV5bDJqbnZ6cWg0dXh4cyJ9.m3uRWclpqOdSgYfUegOlTg';
 const MAPBOX_STYLE = 'mapbox://styles/bonithan/cloh3lx0f000d01qoh3okhz10';
 const MARKER_COLOR = Color(0xFF3DC5A7);
@@ -27,14 +24,12 @@ const LocationSettings locationSettings = LocationSettings(
   distanceFilter: 10,
 );
 
-final List<String> filtersCategory = [];
 List<MapMarker> _markers = [];
-
-var categorySave = "";
-
 List<int> indexToShow = [];
 
-late List<MapMarker> filteredMapMarkers; //hier stehen nur die einträge drinnen die gefiltert worden sind
+final List<String> filtersCategory = [];
+var categorySave = "";
+late List<MapMarker> filteredMapMarkers;
 
 class AnimatedMarkersMap_NEW extends StatefulWidget {
   const AnimatedMarkersMap_NEW({Key? key}) : super(key: key);
@@ -44,15 +39,14 @@ class AnimatedMarkersMap_NEW extends StatefulWidget {
 }
 
 class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProviderStateMixin {
+
   MapController mapController = MapController();
 
   final PageController _pageController = PageController(initialPage: 0, keepPage: true);
+  late Future<List<MapMarker>> _markersFuture;
 
   bool isCardVisible = false;
-
   int selectedCardIndex = 0;
-
-  late Future<List<MapMarker>> _markersFuture;
 
   List<String> connectedEventNames = [];
 
@@ -93,16 +87,17 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
   }
 
   Future<bool> _handleLocationPermission() async {
+
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Location services are disabled. Please enable the services')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location services are disabled. Please enable the services')));
       return false;
     }
-    print("CheckPermission()");
+
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -114,8 +109,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     }
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
+          content: Text('Location permissions are permanently denied, we cannot request permissions.')));
       return false;
     }
     return true;
@@ -145,12 +139,10 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
   Future<String> _convertAddressToCoordinates(GeoPoint location) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          location.latitude, location.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(location.latitude, location.longitude);
 
       if (placemarks.isNotEmpty) {
         Placemark first = placemarks.first;
-
         return'${first.street}, ${first.locality}, ${first.administrativeArea}';
       } else {
         return 'No address found for the given coordinates';
@@ -174,7 +166,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
       Map<String, MapMarker> uniqueMarkers = {};
 
       for (final activityDoc in querySnapshot.docs) {
-        final activityName = activityDoc.id;
+
         final Map<String, dynamic> data = activityDoc.data();
 
         for (final key in data.keys) {
@@ -218,11 +210,8 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             if (location != null && location is GeoPoint) {
               var address = await _convertAddressToCoordinates(location);
 
-              // Use the title as a unique identifier
               String title = nameActivity.toString();
-              final category = alldata.length > 6
-                  ? await alldata[6].toString()
-                  : '';
+              final category = alldata.length > 6 ? await alldata[6].toString() : '';
 
               // Check if the title is already in the map
               if (!uniqueMarkers.containsKey(title)) {
@@ -230,8 +219,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                   image: imagePic,
                   title: title,
                   address: address,
-                  location: latlong.LatLng(
-                      location.latitude, location.longitude),
+                  location: latlong.LatLng(location.latitude, location.longitude),
                   start: start,
                   end: now,
                   description: description,
@@ -244,7 +232,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
         }
       }
 
-      // Convert the map values to a list
       _markers = uniqueMarkers.values.toList();
       return _markers;
     } else {
@@ -288,7 +275,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     }).toList();
   }
 
-
+var currentLocation;
   @override
   Widget build(BuildContext context) {
     if(filtersCategory.isEmpty){
@@ -321,6 +308,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             builder: (context, positionSnapshot) {
               if (positionSnapshot.hasData) {
                 final userPosition = positionSnapshot.data;
+                currentLocation = userPosition;
                 return FutureBuilder<List<MapMarker>>(
                   future: _markersFuture,
                   builder: (context, markersSnapshot) {
@@ -329,6 +317,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                           ? FlutterMap(
                         mapController: mapController,
                         options: MapOptions(
+                          interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
                           onTap: (tapPosition, point) {
                             if (tapPosition != Marker) {
                               setState(() {
@@ -364,7 +353,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                             options: MarkerClusterLayerOptions(
                               onClusterTap: (MarkerClusterNode node) {
                               },
-                              maxClusterRadius: 25,
+                              maxClusterRadius: 95,
                               size: const Size(30, 30),
                               fitBoundsOptions: const FitBoundsOptions(
                                 padding: EdgeInsets.all(50),
@@ -388,8 +377,7 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                             ),
                           ),
                         ],
-                      )
-                          : const CircularProgressIndicator();
+                      ) : const CircularProgressIndicator();
                     }
                     return Container();
                   },
@@ -411,7 +399,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                 controller: _pageController,
                 itemCount: filteredMapMarkers.length,
                 itemBuilder: (context, index) {
-                  final originalIndex = _markers.indexOf(filteredMapMarkers[index]);
                   final item = filteredMapMarkers[index];
                   return _MapItemDetails(
                     mapMarker: item,
@@ -430,6 +417,18 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
             ),
           ),
           Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                resetMapToCurrentLocation(currentLocation);
+              },
+              backgroundColor: MyApp.lightRose,
+              child: Icon(Icons.navigation),
+              shape: CircleBorder(),
+            ),
+          ),
+          Positioned(
             top: 10,
             left: 10,
             right: 10,
@@ -443,13 +442,10 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     }
-
                     if (!snapshot.hasData) {
                       return Container();
                     }
-
                     List<String> categories = snapshot.data!.split(',');
-
                     return Row(
                       children: categories.map((String category) {
                         return Row(
@@ -490,10 +486,42 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     );
   }
 
+  void resetMapToCurrentLocation(userPosition) async {
+    final destLocation = userPosition;
+    final destZoom = 18.0;
+
+    final latTween = Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+
+    final controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    final Animation<double> animation =
+    CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    controller.addListener(() {
+      mapController.move(
+        latlong.LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+        zoomTween.evaluate(animation),
+      );
+    });
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
+  }
+
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
       preferredSize: Size(
-        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.width,
         MediaQuery.of(context).size.height * 0.08,
       ),
       child: AppBar(
@@ -519,7 +547,6 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
     });
   }
 
-
   void _animateCameraToMarker(MapMarker marker) {
     final destLocation = marker.location;
     final destZoom = 18.0;
@@ -532,11 +559,10 @@ class _LocationPageState extends State<AnimatedMarkersMap_NEW> with TickerProvid
 
     final controller = AnimationController(
       duration: const Duration(milliseconds: 500),
-      vsync: this, // Use the TickerProvider from the current state
+      vsync: this,
     );
 
-    final Animation<double> animation =
-    CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
     controller.addListener(() {
       mapController.move(
@@ -601,7 +627,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
   double _dragStartX = 0.0;
   double _currentX = 0.0;
   double _offset = 0.0;
-  final double _threshold = 50.0;
+  final double _threshold = 20.0; // 50
 
   String? _getMonthNames(Set<int>? monthNumbers) {
     final monthNames = [
@@ -619,7 +645,6 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
 
     return selectedMonthNames?.join('');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -667,13 +692,9 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
       },
       child: Stack(
         children: [
-          // Positioned widget for the Card
           Positioned(
             child: GestureDetector(
               onTap: () {
-                // Handle the tap on the entire Card
-                debugPrint('Card tapped');
-                // Navigate to the EventPage or perform other actions as needed
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -746,7 +767,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                         ),
                         Expanded(
                           child: Text(
-                            "${widget.mapMarker.rule?.byWeekDays != null ? 'When: Every ${widget.mapMarker.rule?.interval} ${widget.mapMarker.rule?.frequency} at ${widget.mapMarker.rule?.byWeekDays.toString().replaceAll("{", "(").replaceAll("}", ")")}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' till ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
+                            "${widget.mapMarker.rule?.byWeekDays != null ? 'When: ${widget.mapMarker.rule?.byWeekDays.toString().replaceAll("{", "").replaceAll("}", "")}' : "When: $formattedStartDate"}${widget.mapMarker.rule?.byMonths != null ? ' till ${_getMonthNames(widget.mapMarker.rule!.byMonths)}' : ''}",
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 12,
@@ -759,9 +780,6 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                             alignment: Alignment.bottomRight,
                             child: GestureDetector(
                               onTap: () {
-                                // Handle the tap on the "Read More" text
-                                debugPrint('Read More tapped');
-                                // Navigate to the EventPage
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -772,8 +790,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                                   ),
                                 );
                               },
-                              child: const Text(
-                                'Read More...',
+                              child: const Text('Read More...',
                                 style: TextStyle(
                                   color: MyApp.blueMain,
                                   overflow: TextOverflow.clip,
@@ -788,13 +805,10 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
                 ),
               ),
             )
-
           ),
-
-          // Positioned widget for the image in the foreground
           Positioned(
-            top: 18, // Adjust the top position as needed
-            left: 18, // Adjust the left position as needed
+            top: 18,
+            left: 18,
             child: Image.asset(
               widget.mapMarker.image,
               width: 60,
@@ -868,12 +882,6 @@ class _MyLocationMarkerState extends State<_MyLocationMarker> {
     super.dispose();
     _timer.cancel();
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: AnimatedMarkersMap_NEW(),
-  ));
 }
 
 class YourCustomMarkerWidget extends StatelessWidget {
