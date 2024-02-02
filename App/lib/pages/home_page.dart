@@ -128,7 +128,6 @@ class _HomePageState extends State<HomePageChat> {
   }
 
   String _destructureId(String res) {
-    print(res.substring(0, res.indexOf('_')));
     return res.substring(0, res.indexOf('_'));
   }
 
