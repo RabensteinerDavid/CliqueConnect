@@ -387,7 +387,6 @@ class _EventHomeState extends State<EventHome> {
                                     );
                                   },
                                 ),
-                                SizedBox(height: 10.0)
                               ]
                           ),
                         ),
@@ -416,11 +415,11 @@ class _EventHomeState extends State<EventHome> {
                           initiallyExpanded: isExpanded,
                           shape: Border(),
                             children: [
-                              SizedBox(height: 62.0),
+                              SizedBox(height: 59.5),
                               Center(
                                 child: CircularProgressIndicator(),
                               ),
-                              SizedBox(height: 67.0)
+                              SizedBox(height: 59.5)
                             ],
                         ),
                     );
@@ -436,7 +435,7 @@ class _EventHomeState extends State<EventHome> {
           Align(
             alignment: Alignment.topLeft,
             child: Container(
-              margin: const EdgeInsets.only(left: 20.0, top: 0, bottom: 0),
+              margin: const EdgeInsets.only(left: 20.0, top: 10, bottom: 0),
               child: const Text(
                 "Explore",
                 style: TextStyle(

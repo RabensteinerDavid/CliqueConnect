@@ -357,7 +357,7 @@ class _EventState extends State<Event> {
                       } else if (snapshot.hasError) {
                         return const Text('Error loading image');
                       } else {
-                        String imageUrl = snapshot.data ?? '';
+                        String imageUrl = snapshot.data.toString().isEmpty ? 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2.png?alt=media&token=b1f13cb5-60ef-417e-b266-e516b9c94ce1' : snapshot.data.toString();
                         return SizedBox(
                           height: 75,
                           child: Column(
