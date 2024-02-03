@@ -131,14 +131,14 @@ class _ChatPageState extends State<ChatPage> {
           child: Container(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(
-              'icons/arrow_white_noBG.png', // Set the correct path to your image
+              'icons/arrow_white_noBG.png',
               width: 30,
               height: 30,
             ),
           ),
         ),
         iconTheme: const IconThemeData(
-          color: Colors.black, // Ändern Sie die Farbe hier
+          color: Colors.black,
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2.0),
@@ -155,7 +155,7 @@ class _ChatPageState extends State<ChatPage> {
           Column(
             children: <Widget>[
               Expanded(
-                flex: 1, // 70% height
+                flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 120.0),
                   child: StreamBuilder<QuerySnapshot>(
@@ -201,11 +201,11 @@ class _ChatPageState extends State<ChatPage> {
             ],
           ),
           Positioned(
-            bottom: 10, // Adjust this value to move it higher or lower
+            bottom: 10,
             left: 30,
             right: 30,
             child: Container(
-              width: MediaQuery.of(context).size.width, // Adjust the width as needed
+              width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -215,7 +215,7 @@ class _ChatPageState extends State<ChatPage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: const Offset(0, -2), // Negative offset to move it up
+                    offset: const Offset(0, -2),
                   ),
                 ],
               ),
@@ -245,9 +245,9 @@ class _ChatPageState extends State<ChatPage> {
                       height: 30.0,
                       width: 30.0,
                       child: Image.asset(
-                        "icons/send_blue.png", // Replace with your image asset path
-                        width: 30, // Adjust width as needed
-                        height: 30, // Adjust height as needed
+                        "icons/send_blue.png",
+                        width: 30,
+                        height: 30,
                         fit: BoxFit.cover,
                       ),
                     ),
