@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:test_clique_connect/components/CreateProfile.dart';
 import '../helper/helper_functions.dart';
-import 'Home.dart';
+import '../save/Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'NavigationBar.dart';

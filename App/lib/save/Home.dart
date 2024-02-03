@@ -7,18 +7,16 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
-import 'package:test_clique_connect/save/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
 import '../pages/home_page.dart';
-import 'AuthGate.dart';
-import 'Calendar.dart';
-import 'CreateProfile.dart';
+import '../components/AuthGate.dart';
+import '../components/Calendar.dart';
+import '../components/CreateProfile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -28,15 +26,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _usernameController = TextEditingController();
   File? _photo;
+  User? user = FirebaseAuth.instance.currentUser;
+
+  final TextEditingController _usernameController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final FirebaseAuth auth = FirebaseAuth.instance;
-  User? user = FirebaseAuth.instance.currentUser;
   final firestore = FirebaseFirestore.instance;
 
-  firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -46,8 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<bool> deleteYourLogin() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Remove the counter key-value pair from persistent storage.
     return await prefs.remove('isLoggedIn');
   }
 
@@ -61,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
           aspectRatioPresets:
           [
             CropAspectRatioPreset.square,
-            //CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.original,
+            //CropAspectRatioPreset.ratio3x2,
             //CropAspectRatioPreset.ratio4x3,
             //CropAspectRatioPreset.ratio16x9
           ],
@@ -222,11 +218,9 @@ class _HomeScreenState extends State<HomeScreen> {
         var uploadTask = ref.putFile(_photo!);
         final snapshot = await uploadTask!.whenComplete(() {});
         final urlDownload = await snapshot.ref.getDownloadURL();
-        //final imageUrl = await firebaseReference.getDownloadURL();
         await saveUserDataToFirestore(username, urlDownload);
       } else {
         print('No Photo to upload');
-
         await saveUserDataToFirestore(username, '');
       }
 
