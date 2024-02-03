@@ -285,7 +285,6 @@ class _EventHomeState extends State<EventHome> {
       if(events != null){
         filteredEvents = events.toList();
       }
-
     }
     return Scaffold(
       appBar: buildAppBar(),
@@ -296,8 +295,7 @@ class _EventHomeState extends State<EventHome> {
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: connectedEvents,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData && snapshot.data!.isNotEmpty) {
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData && snapshot.data!.isNotEmpty) {
                   if(snapshot.data!.isNotEmpty) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,18 +303,16 @@ class _EventHomeState extends State<EventHome> {
                         ListTileTheme(
                           iconColor: MyApp.blueMain,
                           contentPadding: EdgeInsets.all(0),
-                          child: ExpansionTile(title: Text(
-                            "Connected",
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
+                          child: ExpansionTile(
+                              title: Text("Connected",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,),),
                               iconColor: MyApp.blueMain,
                               onExpansionChanged: (value) {
                                 saveExpansionState(value);
-                              },
+                                },
                               initiallyExpanded: isExpanded,
                               shape: Border(),
                               children:[
@@ -391,10 +387,10 @@ class _EventHomeState extends State<EventHome> {
                                     );
                                   },
                                 ),
-                              ]),
+                                SizedBox(height: 20.0)
+                              ]
+                          ),
                         ),
-
-
                       ],
                     );
                   }
@@ -424,10 +420,10 @@ class _EventHomeState extends State<EventHome> {
                               Center(
                                 child: CircularProgressIndicator(),
                               ),
-                              SizedBox(height: 57.0)
+                              SizedBox(height: 77.0)
                             ],
-                          ),
-                        );
+                        ),
+                    );
                 }
                 else if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
@@ -440,7 +436,7 @@ class _EventHomeState extends State<EventHome> {
           Align(
             alignment: Alignment.topLeft,
             child: Container(
-              margin: const EdgeInsets.only(left: 20.0, top: 20.0, bottom: 0),
+              margin: const EdgeInsets.only(left: 20.0, top: 0.0, bottom: 0),
               child: const Text(
                 "Explore",
                 style: TextStyle(
