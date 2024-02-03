@@ -291,7 +291,7 @@ class _EventHomeState extends State<EventHome> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
+            padding: const EdgeInsets.only(top: 0.0, left: 20.0, right: 20.0),
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: connectedEvents,
               builder: (context, snapshot) {
@@ -320,9 +320,9 @@ class _EventHomeState extends State<EventHome> {
                                   itemCount: snapshot.data!.length,
                                   options: CarouselOptions(
                                     scrollPhysics: const BouncingScrollPhysics(),
-                                    height: 150.0,
+                                    height: 155.0,
                                     enableInfiniteScroll: false,
-                                    viewportFraction: 0.5,
+                                    viewportFraction: 0.51,
                                     pageSnapping: false,
                                     padEnds: false,
                                   ),
@@ -387,7 +387,7 @@ class _EventHomeState extends State<EventHome> {
                                     );
                                   },
                                 ),
-                                SizedBox(height: 20.0)
+                                SizedBox(height: 10.0)
                               ]
                           ),
                         ),
@@ -416,11 +416,11 @@ class _EventHomeState extends State<EventHome> {
                           initiallyExpanded: isExpanded,
                           shape: Border(),
                             children: [
-                              SizedBox(height: 57.0),
+                              SizedBox(height: 62.0),
                               Center(
                                 child: CircularProgressIndicator(),
                               ),
-                              SizedBox(height: 77.0)
+                              SizedBox(height: 67.0)
                             ],
                         ),
                     );
@@ -436,7 +436,7 @@ class _EventHomeState extends State<EventHome> {
           Align(
             alignment: Alignment.topLeft,
             child: Container(
-              margin: const EdgeInsets.only(left: 20.0, top: 0.0, bottom: 0),
+              margin: const EdgeInsets.only(left: 20.0, top: 0, bottom: 0),
               child: const Text(
                 "Explore",
                 style: TextStyle(
@@ -448,7 +448,7 @@ class _EventHomeState extends State<EventHome> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0),
             child: Align(
               alignment: Alignment.topLeft,
               child: SingleChildScrollView(
@@ -499,7 +499,7 @@ class _EventHomeState extends State<EventHome> {
           Expanded(
               child: filteredEvents.isNotEmpty
                   ? StackedCardCarousel(
-                initialOffset: 20,
+                initialOffset: 5,
                 pageController: _pageController,
                 spaceBetweenItems: eventBoxSize * 1.1,
                 type: StackedCardCarouselType.fadeOutStack,
