@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/ProfileView.dart';
@@ -31,14 +32,36 @@ class _EventHomeState extends State<EventHome> {
   late Future<List<Map<String, dynamic>>> connectedEvents;
   late List<Map<String, dynamic>> filteredEvents = [];
 
+  late bool isExpanded;
+  late SharedPreferences prefs;
+
   @override
   void initState() {
     super.initState();
+    isExpanded = false;
+    initPrefs();
     setState(() {});
     userName = getUserName();
     eventDataAll = getEventData();
     connectedEvents = getConnectedEventsNames();
     _updateFilteredEvents();
+  }
+
+  Future<void> initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // Load the saved state
+      isExpanded = prefs.getBool('isExpanded') ?? false;
+    });
+  }
+
+  Future<void> saveExpansionState(bool value) async {
+    setState(() {
+      isExpanded = value;
+    });
+
+    // Save the state
+    await prefs.setBool('isExpanded', value);
   }
 
   PreferredSizeWidget buildAppBar() {
@@ -280,91 +303,97 @@ class _EventHomeState extends State<EventHome> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                                left: 0.0, top: 20.0, bottom: 0),
-                            child: const Text(
-                              "Connected",
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                        ListTileTheme(
+                          iconColor: MyApp.blueMain,
+                          contentPadding: EdgeInsets.all(0),
+                          child: ExpansionTile(title: Text(
+                            "Connected",
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
-                        ),
-                        CarouselSlider.builder(
-                          itemCount: snapshot.data!.length,
-                          options: CarouselOptions(
-                            scrollPhysics: const BouncingScrollPhysics(),
-                            height: 150.0,
-                            enableInfiniteScroll: false,
-                            viewportFraction: 0.5,
-                            pageSnapping: false,
-                            padEnds: false,
-                          ),
-                          itemBuilder: (context, index, realIndex) {
-                            String eventName = snapshot
-                                .data![index]['eventName'];
-                            if (eventName.length > textLength) {
-                              eventName =
-                              '${eventName.substring(0, textLength)}...';
-                            }
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          Event(
-                                            eventName: snapshot.data![index]
-                                            ['eventName'],
-                                            eventCategory: snapshot.data![index]
-                                            ['eventCategory'],
-                                          ),
-                                    ),
-                                  );
-                                  setState(() {
-                                    userName = getUserName();
-                                    eventDataAll = getEventData();
-                                    connectedEvents = getConnectedEventsNames();
-                                    _updateFilteredEvents();
-                                  });
-                                },
-                                child: Stack(
-                                  children: [
-                                    Image.network(
-                                      snapshot.data![index]['imgURL'],
-                                      height: 150.0,
-                                      fit: BoxFit.fitHeight,
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: Container(
-                                        height: 50,
-                                        color: MyApp.blueMain,
-                                        child: Center(
-                                          child: Text(
-                                            eventName,
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                              onExpansionChanged: (value) {
+                                saveExpansionState(value);
+                              },
+                              initiallyExpanded: isExpanded,
+                              shape: Border(),
+                              children:[
+                                CarouselSlider.builder(
+                                  itemCount: snapshot.data!.length,
+                                  options: CarouselOptions(
+                                    scrollPhysics: const BouncingScrollPhysics(),
+                                    height: 150.0,
+                                    enableInfiniteScroll: false,
+                                    viewportFraction: 0.5,
+                                    pageSnapping: false,
+                                    padEnds: false,
+                                  ),
+                                  itemBuilder: (context, index, realIndex) {
+                                    String eventName = snapshot
+                                        .data![index]['eventName'];
+                                    if (eventName.length > textLength) {
+                                      eventName =
+                                      '${eventName.substring(0, textLength)}...';
+                                    }
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Event(
+                                                    eventName: snapshot.data![index]
+                                                    ['eventName'],
+                                                    eventCategory: snapshot.data![index]
+                                                    ['eventCategory'],
+                                                  ),
                                             ),
-                                          ),
+                                          );
+                                          setState(() {
+                                            userName = getUserName();
+                                            eventDataAll = getEventData();
+                                            connectedEvents = getConnectedEventsNames();
+                                            _updateFilteredEvents();
+                                          });
+                                        },
+                                        child: Stack(
+                                          children: [
+                                            Image.network(
+                                              snapshot.data![index]['imgURL'],
+                                              height: 150.0,
+                                              fit: BoxFit.fitHeight,
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                height: 50,
+                                                color: MyApp.blueMain,
+                                                child: Center(
+                                                  child: Text(
+                                                    eventName,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          },
+                              ]),
                         ),
+
+
                       ],
                     );
                   }
