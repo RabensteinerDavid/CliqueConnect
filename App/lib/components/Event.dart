@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:rrule/rrule.dart';
 import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:intl/intl.dart';
-
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
 
@@ -23,36 +21,33 @@ class Event extends StatefulWidget {
 
 class _EventState extends State<Event> {
 
+  var rrule;
+  late DateTime dateTime;
+  final firestore = FirebaseFirestore.instance;
+
+  List<dynamic> eventList = [];
+  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
+  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
+
   double bannerHeight = 254.0;
   double bannerWidth = 400.0;
 
-  List<dynamic> eventList = [];
-
-  var rrule;
-  late DateTime dateTime;
   String imageURLBanner = "";
   String title = "";
   String date = "";
   String description = "";
   String location = "";
-
   String secondTime = "";
   String thirdTime = "";
 
   bool sameDate = false;
-
-  Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
-  final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
 
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
   String icon = "assets/cliqueConnect.png";
   String buttonText = "Connect";
   Color buttonColor = const Color(0xFF220690);
-
   String groupId = "";
-
-  final firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -399,7 +394,6 @@ class _EventState extends State<Event> {
         children: [
           Stack(
             children: [
-              // Back button upper left-corner
               Align(
                 alignment: Alignment.topLeft,
                 child: Padding(
@@ -428,7 +422,6 @@ class _EventState extends State<Event> {
         children: [
           Stack(
             children: [
-              // Back button upper left-corner
               Align(
                 alignment: Alignment.topLeft,
                 child: Padding(
@@ -452,7 +445,6 @@ class _EventState extends State<Event> {
         ],
       );
     } else {
-      // Fallback UI for other platforms
       return Container();
     }
   }
