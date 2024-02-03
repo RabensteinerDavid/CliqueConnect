@@ -27,11 +27,10 @@ class _EventState extends State<AddEventForm> {
   DateTime? startDate;
   DateTime? secondStartDate;
   DateTime? thirdStartDate;
+  String? selectedCategory;
 
   var categories;
-  String? selectedCategory;
   final TextEditingController _addressController = TextEditingController();
-
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _descriptionFocuse = FocusNode();
   final FocusNode _addressFocus = FocusNode();
@@ -68,6 +67,7 @@ class _EventState extends State<AddEventForm> {
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
 
   RecurrenceRule? recurrenceRule;
   String? selectedFrequency;
@@ -75,9 +75,8 @@ class _EventState extends State<AddEventForm> {
   int? selectedInterval;
 
   File? _photo;
-  final ImagePicker _picker = ImagePicker();
-  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
   User? _user;
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -100,7 +99,6 @@ class _EventState extends State<AddEventForm> {
     _weeklyFocus.dispose();
     _endMonthFocus.dispose();
     _intervallFocus.dispose();
-
     super.dispose();
   }
 
@@ -170,7 +168,6 @@ class _EventState extends State<AddEventForm> {
                 AppBar(
                   elevation: 0.0,
                   backgroundColor: Color(0x2E148C),
-
                   leading: GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
@@ -305,8 +302,7 @@ class _EventState extends State<AddEventForm> {
                               if (newDate != null && newDate != startDate) {
                                 setState(() {
                                   startDate = newDate;
-
-                                _startDateText = true;
+                                  _startDateText = true;
                                 });
                               }
                             },
@@ -572,7 +568,6 @@ class _EventState extends State<AddEventForm> {
                             );
                           });
                         }
-
                         FocusScope.of(context).requestFocus(_secondEndTimeFocus);
                         setState(() {
                           _nameLabelColor = MyApp.greyDark;
@@ -1011,7 +1006,6 @@ class _EventState extends State<AddEventForm> {
                         onPressed: () => savePictureToFirestore(context),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white, backgroundColor: MyApp.blueMain,
-
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
                           ),
@@ -1058,10 +1052,10 @@ class _EventState extends State<AddEventForm> {
                         ),
                         width: 150,
                         height: 150,
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: Colors.grey[800],
-                          ),
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.grey[800],
+                        ),
                       ),
                     ),
                   ),
@@ -1115,8 +1109,8 @@ class _EventState extends State<AddEventForm> {
             //CropAspectRatioPreset.square,
             //CropAspectRatioPreset.ratio3x2,
             //CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
             //CropAspectRatioPreset.ratio16x9
+            CropAspectRatioPreset.ratio4x3,
           ],
 
           uiSettings: [
@@ -1168,7 +1162,6 @@ class _EventState extends State<AddEventForm> {
     }
     final fileName = basename(_photo!.path);
     final destination = 'files/$fileName';
-
     try {
       final ref = storage.ref(destination);
       await ref.putFile(_photo!);
@@ -1181,14 +1174,12 @@ class _EventState extends State<AddEventForm> {
 
   Future<void> _convertAddressToCoordinates() async {
     try {
-      List<Location> locations = await locationFromAddress(
-          _addressController.text);
+      List<Location> locations = await locationFromAddress(_addressController.text);
 
       if (locations.isNotEmpty) {
         Location first = locations.first;
         setState(() {
-          _result =
-          'Latitude: ${first.latitude}, Longitude: ${first.longitude}';
+          _result = 'Latitude: ${first.latitude}, Longitude: ${first.longitude}';
         });
       } else {
         setState(() {
@@ -1207,7 +1198,6 @@ class _EventState extends State<AddEventForm> {
       final activitiesCollectionRef =
       FirebaseFirestore.instance.collection("categoriesActivities");
       final data = await activitiesCollectionRef.doc("category").get();
-
       if (data.exists) {
         setState(() {
           data.data()!.forEach((key, value) {
@@ -1229,7 +1219,6 @@ class _EventState extends State<AddEventForm> {
   String extractNumbers(String input) {
     List<String> parts = input.split(RegExp(r'[^0-9.-]'));
     String result = parts.where((part) => part.isNotEmpty).join(', ');
-
     return result;
   }
 
@@ -1238,7 +1227,6 @@ class _EventState extends State<AddEventForm> {
       String nameActivity = activityNameController.text;
       User? user = FirebaseAuth.instance.currentUser;
 
-      //work here
       if (nameActivity.isNotEmpty) {
         if (_photo != null) {
           final path = 'events/${user?.uid}/${basename("${nameActivity}_${basename(_photo!.path)}")}';
@@ -1293,7 +1281,6 @@ class _EventState extends State<AddEventForm> {
 
   Set<ByWeekDayEntry> _buildByWeekDays(List<DateTime> dates) {
     Set<ByWeekDayEntry> byWeekDays = {};
-
     for (DateTime date in dates) {
       for (int i = DateTime.monday; i <= DateTime.sunday; i++) {
         if (date.weekday == i) {
@@ -1302,13 +1289,11 @@ class _EventState extends State<AddEventForm> {
         }
       }
     }
-
     return byWeekDays;
   }
 
   Set<int> _buildByMonths(String? selectedTillMonth) {
     Set<int> byMonths = {};
-
     Map<String, int> monthIndexMap = {
       'January': 1,
       'February': 2,
@@ -1327,12 +1312,10 @@ class _EventState extends State<AddEventForm> {
     if (selectedTillMonth != null && monthIndexMap.containsKey(selectedTillMonth)) {
       byMonths.add(monthIndexMap[selectedTillMonth]!);
     }
-
     return byMonths;
   }
 
   Future<void> addCreativActivity(String urlDownload, context) async {
-
     try {
       if (activityNameController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1522,4 +1505,3 @@ class _EventState extends State<AddEventForm> {
     }
   }
 }
-
