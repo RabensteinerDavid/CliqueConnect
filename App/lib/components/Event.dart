@@ -545,9 +545,9 @@ class _EventState extends State<Event> {
           try {
             await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
             if (await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"])) {
-              print('User is removed from the group successfully');
-            } else {
               print('User added to the group successfully');
+            } else {
+              print('User is removed from the group successfully ');
             }
           } catch (e) {
             print('Error adding user to the group: $e');
