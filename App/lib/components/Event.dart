@@ -6,6 +6,7 @@ import 'package:rrule/rrule.dart';
 import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
 
@@ -24,6 +25,9 @@ class _EventState extends State<Event> {
   var rrule;
   late DateTime dateTime;
   final firestore = FirebaseFirestore.instance;
+
+  late bool isExpanded;
+  late SharedPreferences prefs;
 
   List<dynamic> eventList = [];
   Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
@@ -52,8 +56,17 @@ class _EventState extends State<Event> {
   @override
   void initState() {
     super.initState();
+    isExpanded = false;
+    initPrefs();
     _initializeData();
     findGroupId();
+  }
+
+  Future<void> initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isExpanded = prefs.getBool('isExpanded') ?? false;
+    });
   }
 
   Future<void> _initializeData() async {
@@ -546,6 +559,7 @@ class _EventState extends State<Event> {
             await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
             if (await DatabaseService(uid: user!.uid).isUserJoined(groupId, groupName, userData["username"])) {
               print('User added to the group successfully');
+              saveExpansionState(true);
             } else {
               print('User is removed from the group successfully ');
             }
@@ -562,6 +576,13 @@ class _EventState extends State<Event> {
     } catch (e) {
       print("Fehler beim Hinzufügen zur Datenbank: $e");
     }
+  }
+
+  Future<void> saveExpansionState(bool value) async {
+    setState(() {
+      isExpanded = value;
+    });
+    await prefs.setBool('isExpanded', value);
   }
 
   void _countMeOut(String activityName) async {
@@ -593,6 +614,7 @@ class _EventState extends State<Event> {
 
             try {
               await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
+              saveExpansionState(true);
             } catch (e) {
               print('Error adding user to the group: $e');
             }

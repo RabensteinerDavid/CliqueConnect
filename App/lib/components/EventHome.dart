@@ -50,7 +50,6 @@ class _EventHomeState extends State<EventHome> {
   Future<void> initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
-      // Load the saved state
       isExpanded = prefs.getBool('isExpanded') ?? false;
     });
   }
@@ -59,8 +58,6 @@ class _EventHomeState extends State<EventHome> {
     setState(() {
       isExpanded = value;
     });
-
-    // Save the state
     await prefs.setBool('isExpanded', value);
   }
 
@@ -93,6 +90,7 @@ class _EventHomeState extends State<EventHome> {
                   ),
                 );
                 setState(() {
+                  initPrefs();
                   userName = getUserName();
                   eventDataAll = getEventData();
                   connectedEvents = getConnectedEventsNames();
@@ -117,6 +115,7 @@ class _EventHomeState extends State<EventHome> {
               ),
             );
             setState(() {
+              initPrefs();
               userName = getUserName();
               eventDataAll = getEventData();
               connectedEvents = getConnectedEventsNames();
@@ -355,6 +354,7 @@ class _EventHomeState extends State<EventHome> {
                                             ),
                                           );
                                           setState(() {
+                                            initPrefs();
                                             userName = getUserName();
                                             eventDataAll = getEventData();
                                             connectedEvents = getConnectedEventsNames();
@@ -402,25 +402,24 @@ class _EventHomeState extends State<EventHome> {
                     return Container();
                   }
                 } else if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          left: 0.0, top: 20.0, bottom: 0),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                              left: 0.0, top: 0.0, bottom: 0),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    return ListTileTheme(
+                        iconColor: MyApp.blueMain,
+                        contentPadding: EdgeInsets.all(0),
+                        child: ExpansionTile(title: Text(
+                          "Connected",
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                          iconColor: MyApp.blueMain,
+                          onExpansionChanged: (value) {
+                            saveExpansionState(value);
+                          },
+                          initiallyExpanded: isExpanded,
+                          shape: Border(),
                             children: [
-                              Text(
-                                "Connected",
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
                               SizedBox(height: 57.0),
                               Center(
                                 child: CircularProgressIndicator(),
@@ -428,9 +427,7 @@ class _EventHomeState extends State<EventHome> {
                               SizedBox(height: 57.0)
                             ],
                           ),
-                        ),
-                      ),
-                    );
+                        );
                 }
                 else if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
@@ -527,6 +524,7 @@ class _EventHomeState extends State<EventHome> {
                         ),
                       );
                       setState(() {
+                        initPrefs();
                         userName = getUserName();
                         eventDataAll = getEventData();
                         connectedEvents = getConnectedEventsNames();
