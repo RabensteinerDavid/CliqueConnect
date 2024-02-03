@@ -316,10 +316,12 @@ class _AuthGateState extends State<AuthGate> {
       );
       await saveYourLogin();
 
+      String? userName = await HelperFunctions.getUserName() as String?;
+
       await HelperFunctions.saveUserLoggedInSharedPreference(true);
       await HelperFunctions.saveUserEmailSharedPreference(email);
       await HelperFunctions.saveUserNameSharedPreference(
-          "David Rabensteiner"
+          userName!
       );
 
       if (await isProfileCreated() != true) {
