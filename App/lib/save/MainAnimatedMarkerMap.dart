@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../save/AnimatedMarkersMap.dart';
+import 'AnimatedMarkersMap.dart';
 
 class MainAnimatedMarkerMap extends StatelessWidget {
   @override
