@@ -7,7 +7,6 @@ import 'package:test_clique_connect/components/AddEventForm.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
-import '../pages/search_page.dart';
 import '../services/auth_service.dart';
 import '../services/database_service.dart';
 import '../widgets/group_tile.dart';

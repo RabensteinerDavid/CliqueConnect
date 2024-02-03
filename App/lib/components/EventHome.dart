@@ -167,7 +167,6 @@ class _EventHomeState extends State<EventHome> {
         }
       }
     }
-    print(connectedEvents);
     return connectedEvents;
   }
 
@@ -182,7 +181,6 @@ class _EventHomeState extends State<EventHome> {
         final data = snapshot.data() as Map<String, dynamic>;
         final name = data["username"];
 
-        print(name);
         if (name != null) {
           userName = name;
         }

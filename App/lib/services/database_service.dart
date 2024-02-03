@@ -127,7 +127,6 @@ class DatabaseService {
   // Update other methods with error handling...
 
   Stream<QuerySnapshot> getChats(String groupId) {
-    print(groupId);
     return FirebaseFirestore.instance
         .collection('groups')
         .doc(groupId)

@@ -1479,10 +1479,8 @@ class _EventState extends State<AddEventForm> {
         };
 
         if (addRRule != "No Regular Event") {
-          print("With rules");
           await creativCollection.doc(selectedCategory).update(activityData);
         } else {
-          print("without rules");
           await creativCollection.doc(selectedCategory).update(activityDataWithourRules);
         }
 

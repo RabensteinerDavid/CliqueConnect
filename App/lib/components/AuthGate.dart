@@ -323,7 +323,6 @@ class _AuthGateState extends State<AuthGate> {
       );
 
       if (await isProfileCreated() != true) {
-        print("here");
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CreateProfile()));
       }
       if (userCredential.user != null) {

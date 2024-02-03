@@ -421,7 +421,6 @@ class _EventState extends State<CreateProfile> {
         setState(() {
           data.data()!.forEach((key, value) {
             university = value;
-            print(university);
           });
         });
         return "Data retrieved successfully.";
@@ -449,12 +448,8 @@ class _EventState extends State<CreateProfile> {
           data.data()!.forEach((key, value) {
 
             if (key ==  universityType){
-              print("hhere");
-              print(key);
               course = value;
-              print(course);
             }
-
           });
         });
         return "Data retrieved successfully.";
@@ -513,16 +508,12 @@ class _EventState extends State<CreateProfile> {
         final urlDownload = await snapshot.ref.getDownloadURL();
         await saveUserDataToFirestore(context, username, urlDownload);
       } else {
-        print('No Photo to upload');
         await saveUserDataToFirestore(context,username, '');
       }
       setState(() {
         nameController.clear();
         _photo = null;
       });
-    }
-    else {
-      print('No Username to upload');
     }
   }
 }

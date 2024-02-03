@@ -67,7 +67,6 @@ class _EventState extends State<Event> {
     groupData.docs.forEach((doc) {
       if (doc['groupName'] == widget.eventName) {
         groupId = doc['groupId'];
-        print("Group ID: $groupId");
       }
     });
   }
@@ -594,7 +593,6 @@ class _EventState extends State<Event> {
 
             try {
               await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, userData["username"]);
-              print('User added to the group successfully');
             } catch (e) {
               print('Error adding user to the group: $e');
             }
@@ -620,7 +618,6 @@ class _EventState extends State<Event> {
 
     if (snapshot.exists) {
       eventList = snapshot.data()?[eventName] ?? [];
-      print(eventList);
 
       if (eventList.isNotEmpty) {
         title = eventList[0];
@@ -670,7 +667,6 @@ class _EventState extends State<Event> {
             userNames.add(userName);
           }
         });
-        print("userNames: $userNames + myUserName: $myUserName");
       }
     } else {
       print("Document does not exist");
