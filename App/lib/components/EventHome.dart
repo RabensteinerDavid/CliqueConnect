@@ -18,8 +18,10 @@ class EventHome extends StatefulWidget {
 }
 
 class _EventHomeState extends State<EventHome> {
-  final firestore = FirebaseFirestore.instance;
+
   User? user = FirebaseAuth.instance.currentUser;
+  final firestore = FirebaseFirestore.instance;
+  final PageController _pageController = PageController();
 
   static const eventBoxSize = 260.0;
   static const textLength = 30;
@@ -29,25 +31,20 @@ class _EventHomeState extends State<EventHome> {
   late Future<List<Map<String, dynamic>>> connectedEvents;
   late List<Map<String, dynamic>> filteredEvents = [];
 
-  final PageController _pageController = PageController();
-
   @override
   void initState() {
     super.initState();
-
     setState(() {});
     userName = getUserName();
     eventDataAll = getEventData();
     connectedEvents = getConnectedEventsNames();
-
     _updateFilteredEvents();
   }
-
 
   PreferredSizeWidget buildAppBar() {
     return PreferredSize(
       preferredSize: Size(
-        MediaQuery.of(context).size.width, // Set the width to the full width of the screen
+        MediaQuery.of(context).size.width,
         MediaQuery.of(context).size.height * 0.08,
       ),
       child: AppBar(
@@ -108,9 +105,6 @@ class _EventHomeState extends State<EventHome> {
       ),
     );
   }
-
-
-
 
   Future<List<Map<String, dynamic>>> getEventData() async {
     final activitiesCollectionRef =
@@ -320,10 +314,8 @@ class _EventHomeState extends State<EventHome> {
                               eventName =
                               '${eventName.substring(0, textLength)}...';
                             }
-
                             return Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 8), // Adjust spacing as needed
+                              padding: const EdgeInsets.only(right: 8),
                               child: GestureDetector(
                                 onTap: () async {
                                   await Navigator.push(
@@ -446,13 +438,10 @@ class _EventHomeState extends State<EventHome> {
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     }
-
                     if (!snapshot.hasData) {
                       return Container();
                     }
-
                     List<String> categories = snapshot.data!.split(',');
-
                     return Row(
                       children: categories.map((String category) {
                         return Row(
@@ -494,7 +483,6 @@ class _EventHomeState extends State<EventHome> {
                 spaceBetweenItems: eventBoxSize * 1.1,
                 type: StackedCardCarouselType.fadeOutStack,
                 items: filteredEvents.map((item) {
-
                   String eventName = item['eventName'];
                   if (eventName.length > textLength) {
                     eventName = '${eventName.substring(0, textLength)}...';
@@ -550,10 +538,10 @@ class _EventHomeState extends State<EventHome> {
                     ),
                   );
                 }).toList(),
-              )
-                  : const Center(
+              ) : const Center(
                 child: Text("No Events"),
-              ))
+              )
+          )
         ],
       ),
     );
