@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:test_clique_connect/main.dart'; // Import your main file to access MyApp.blueMain
+import 'package:test_clique_connect/main.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import '../pages/home_page.dart';
 import 'Calendar.dart';
 import 'EventHome.dart';
-import '../save/Home.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({Key? key}) : super(key: key);
 
   @override
-  _BottomNavigationBarExampleState createState() =>
-      _BottomNavigationBarExampleState();
+  _BottomNavigationBarExampleState createState() => _BottomNavigationBarExampleState();
 }
 
-class _BottomNavigationBarExampleState
-    extends State<BottomNavigationBarExample> {
+class _BottomNavigationBarExampleState extends State<BottomNavigationBarExample> {
   int _selectedIndex = 0;
 
   @override
@@ -64,66 +61,6 @@ class _BottomNavigationBarExampleState
       ),
     );
   }
-  /*
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _getBodyForIndex(_selectedIndex),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildGradientShadow(),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        height: 120, // Set your desired height
-        child: ResponsiveNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'icons/home_grey.png',
-                width: 25,
-                height: 25,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'icons/chat_all_grey.png',
-                width: 25,
-                height: 25,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'icons/calendar_grey.png',
-                width: 25,
-                height: 25,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'icons/map_color.png',
-                width: 25,
-                height: 25,
-              ),
-              label: '',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
-      ),
-    );
-  }
-  */
-
 
   Widget _buildNavItem(int index, String iconData, String iconDataHover) {
     return GestureDetector(
@@ -131,11 +68,10 @@ class _BottomNavigationBarExampleState
         setState(() {
           _selectedIndex = index;
         });
-        // Handle navigation or other actions based on the selected index
       },
       child: Container(
-        width: _selectedIndex == 0 || _selectedIndex == 3 ? MediaQuery.of(context).size.width*0.25 : 80, // Set your desired width for the container
-        height: _selectedIndex == 0 || _selectedIndex == 3 ? 100 : 80, // Set your desired width for the container
+        width: _selectedIndex == 0 || _selectedIndex == 3 ? MediaQuery.of(context).size.width*0.25 : 80,
+        height: _selectedIndex == 0 || _selectedIndex == 3 ? 100 : 80,
         decoration: BoxDecoration(
           color: _selectedIndex == index ? MyApp.blueMain : Colors.transparent,
           borderRadius: BorderRadius.circular(0),
@@ -150,7 +86,6 @@ class _BottomNavigationBarExampleState
       ),
     );
   }
-
 }
 
   Widget _getBodyForIndex(int index) {
@@ -181,13 +116,11 @@ class _BottomNavigationBarExampleState
             Colors.transparent,
             Colors.transparent,
             Colors.black12,
-// Adjust the color as needed
           ],
         ),
       ),
     );
   }
-
 
 class ResponsiveNavigationBar extends StatelessWidget {
   final List<BottomNavigationBarItem> items;
@@ -203,7 +136,6 @@ class ResponsiveNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Small screen, show only icons
     return BottomNavigationBar(
       backgroundColor: Colors.white,
       items: items.map((item) {
