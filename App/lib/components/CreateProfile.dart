@@ -499,6 +499,13 @@ class _EventState extends State<CreateProfile> {
   void savePictureToFirestore(context) async {
     String username = nameController.text;
 
+    if(filters.isEmpty){
+      ScaffoldMessenger.of(context as BuildContext).showSnackBar(SnackBar(
+        content: Text('Please select an interest'),
+      ));
+      return;
+    }
+
     if (username.isNotEmpty) {
       if (_photo != null) {
         final path = 'files/${user?.uid}/${basename(_photo!.path)}';
