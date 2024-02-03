@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AuthGate.dart';
-
 import '../main.dart';
 
 final filters = <String>{};
@@ -17,8 +16,8 @@ class ProfileView extends StatefulWidget {
 }
 
 class YourCurrentScreenState extends State<ProfileView> {
-  final FirebaseAuth auth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   final firestore = FirebaseFirestore.instance;
   static String imageURL = '';
@@ -53,18 +52,14 @@ class YourCurrentScreenState extends State<ProfileView> {
       await user?.delete();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => AuthGate()),
-        // Replace AuthGate with your authentication gate screen
       );
     } catch (e) {
       print('Error deleting account: $e');
-      // Handle the error, show a message, etc.
     }
   }
 
   Future<bool> deleteYourLogin() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Remove the counter key-value pair from persistent storage.
     return await prefs.remove('isLoggedIn');
   }
 
@@ -79,7 +74,7 @@ class YourCurrentScreenState extends State<ProfileView> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
             builder: (context) =>
-                const AuthGate()), // Replace with your authentication gate screen
+                const AuthGate()),
       );
     } catch (e) {
       print('Error signing out Outlogggging: $e');
@@ -98,8 +93,7 @@ class YourCurrentScreenState extends State<ProfileView> {
             color: MyApp.blueMain,
           ),
           Positioned(
-            top: MediaQuery.of(context).size.height *
-                0.2, // Adjust the top position as needed
+            top: MediaQuery.of(context).size.height * 0.2,
             left: 0,
             right: 0,
             child: Align(
@@ -115,7 +109,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                   ),
                 ),
                 child: FutureBuilder(
-                  // Use a List or Tuple to combine multiple futures
                   future: Future.wait([
                     courseFuture,
                     universityFuture,
@@ -126,18 +119,12 @@ class YourCurrentScreenState extends State<ProfileView> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData) {
-                        // Extract data from the snapshot
                         var course = snapshot.data![0];
                         var university = snapshot.data![1];
                         var aboutMe = snapshot.data![2];
-                        var interests =
-                            snapshot.data![3] as String; // Change this line
-
                         var username = snapshot.data![4];
-
                         return Padding(
                           padding: const EdgeInsets.only(left: 20),
-                          // Adjust the left padding as needed
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -161,7 +148,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                         height: 40,
                                       ),
                                       const SizedBox(width: 20),
-                                      // Adjust the spacing as needed
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -186,17 +172,14 @@ class YourCurrentScreenState extends State<ProfileView> {
                                     ],
                                   ),
                                   const SizedBox(height: 10),
-                                  // Adjust the vertical spacing between rows
                                   Container(
                                     padding: const EdgeInsets.only(right: 20.0),
-                                    // Ändern Sie den Abstand nach Bedarf
                                     child: const Divider(
                                       color: MyApp.greyMedium,
                                       thickness: 1,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  // Adjust the vertical spacing between rows
                                   Row(
                                     children: [
                                       Image.asset(
@@ -205,7 +188,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                         height: 40,
                                       ),
                                       const SizedBox(width: 20),
-                                      // Adjust the spacing as needed
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -244,7 +226,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                   ),
                                   Container(
                                     padding: const EdgeInsets.only(right: 20.0),
-                                    // Adjust the right padding as needed
                                     child: const SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: FilterChipExample(),
@@ -256,7 +237,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                           ),
                         );
                       } else {
-                        // Handle the case where data is not available
                         return const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -265,7 +245,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                         );
                       }
                     } else {
-                      // Show a loading indicator while waiting for the Futures to complete.
                       return const CircularProgressIndicator();
                     }
                   },
@@ -274,7 +253,7 @@ class YourCurrentScreenState extends State<ProfileView> {
             ),
           ),
           Positioned(
-            top: 80, // Adjust the top position as needed
+            top: 80,
             left: 0,
             right: 0,
             child: Align(
@@ -295,24 +274,11 @@ class YourCurrentScreenState extends State<ProfileView> {
                               return child;
                             } else {
                               return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ??
-                                              1)
-                                      : null,
-                                ),
+                                child: CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1) : null,),
                               );
                             }
                           },
-                        )
-                      : Image.asset(
-                          'assets/cliqueConnect.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
+                        ) : Image.asset('assets/cliqueConnect.png', width: 100, height: 100, fit: BoxFit.cover,),
                 ),
               ),
             ),
@@ -328,7 +294,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                 padding: const EdgeInsets.all(005.0),
                 child: Image.asset(
                   'icons/arrow_white_noBG_white.png',
-                  // Set the correct path to your image
                   width: 30,
                   height: 30,
                 ),
@@ -337,17 +302,12 @@ class YourCurrentScreenState extends State<ProfileView> {
             actions: [
               PopupMenuButton<String>(
                 onSelected: (value) {
-                  // Handle menu item selection here
                   if (value == 'edit') {
-                    // Handle "Edit Account" press
                   } else if (value == 'logout') {
-                    // Handle "Log-out" press
-                    _signOut(context); // Call your sign-out method
+                    _signOut(context);
                   } else if (value == 'delete') {
                     _deleteAccount(context);
-                    // Handle "Delete Account" press
                   } else if (value == 'impressum') {
-                    // Handle "Impressum" press
                   }
                 },
                 icon: const Icon(
@@ -355,13 +315,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                   color: Colors.white,
                 ),
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  // const PopupMenuItem<String>(
-                  //   value: 'edit',
-                  //   child: ListTile(
-                  //     leading: Icon(Icons.edit),
-                  //     title: Text('Edit Account'),
-                  //   ),
-                  // ),
                   const PopupMenuItem<String>(
                     value: 'logout',
                     child: ListTile(
@@ -376,16 +329,8 @@ class YourCurrentScreenState extends State<ProfileView> {
                       title: Text('Delete Account'),
                     ),
                   ),
-                  // const PopupMenuItem<String>(
-                  //   value: 'impressum',
-                  //   child: ListTile(
-                  //     leading: Icon(Icons.info),
-                  //     title: Text('Impressum'),
-                  //   ),
-                  // ),
                 ],
               ),
-              // Add more action buttons as needed
             ],
           )
         ],
@@ -396,9 +341,6 @@ class YourCurrentScreenState extends State<ProfileView> {
   Future<bool> getImgUrl() async {
     var userID = user?.uid;
 
-    print("userID");
-    print(userID);
-
     if (userID != null) {
       final snapshot = await firestore.collection("users").doc(userID).get();
 
@@ -406,12 +348,8 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final imageName = await data["image_data"];
 
-        print("imageName");
-        print(imageName);
-
         if (imageName != null) {
           imageURL = imageName;
-          print("Image Name: $imageName");
           return true;
         } else {
           print("Image Name not found in the document.");
@@ -424,9 +362,6 @@ class YourCurrentScreenState extends State<ProfileView> {
 
         try {
           final imageUrl = await storageRef.getDownloadURL();
-
-          print("getDownloadURL");
-          print(storageRef.getDownloadURL());
 
           if (imageUrl != null) {
             imageURL = imageUrl;
@@ -442,7 +377,6 @@ class YourCurrentScreenState extends State<ProfileView> {
         }
       }
     }
-
     return false;
   }
 
@@ -457,7 +391,6 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final name = data["username"];
 
-        print(name);
         if (name != null) {
           userName = name;
         }
@@ -477,7 +410,6 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final userCourse = data["course"];
 
-        print(userCourse);
         if (userCourse != null) {
           course = userCourse;
         }
@@ -497,7 +429,6 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final userUniversity = data["universityType"];
 
-        print(userUniversity);
         if (userUniversity != null) {
           university = userUniversity;
         }
@@ -517,7 +448,6 @@ class YourCurrentScreenState extends State<ProfileView> {
         final data = snapshot.data() as Map<String, dynamic>;
         final aboutMeText = data["about_me"];
 
-        print(aboutMeText);
         if (aboutMeText != null) {
           aboutMe = aboutMeText;
         }
@@ -545,7 +475,7 @@ class YourCurrentScreenState extends State<ProfileView> {
       }
       return interests;
     } else {
-      return "No Interests"; // Add a default return statement
+      return "No Interests";
     }
   }
 }
@@ -558,7 +488,7 @@ class FilterChipExample extends StatefulWidget {
 }
 
 class _FilterChipExampleState extends State<FilterChipExample> {
-  late User? user; // Make sure user is initialized
+  late User? user;
 
   @override
   void initState() {
@@ -577,7 +507,7 @@ class _FilterChipExampleState extends State<FilterChipExample> {
 
       return activities;
     } else {
-      return ["No Interests"]; // Add a default return statement
+      return ["No Interests"];
     }
   }
 
@@ -587,20 +517,13 @@ class _FilterChipExampleState extends State<FilterChipExample> {
       future: getInterests(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Return a loading indicator while waiting for data
           return const CircularProgressIndicator();
         }
-
         if (snapshot.hasError) {
-          // Return an error message if there's an error
           return Text('Error: ${snapshot.error}');
         }
-
-        // Extract categories from the snapshot data
         List<String> interests = snapshot.data ?? ["No Interests"];
-
         return Wrap(
-          // Use Wrap instead of Row to handle multiple rows
           children: interests.map((String interest) {
             return Padding(
               padding: const EdgeInsets.all(4.0),
