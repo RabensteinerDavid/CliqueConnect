@@ -175,7 +175,7 @@ class _EventState extends State<AddEventForm> {
                     child: Container(
                       padding: const EdgeInsets.all(005.0),
                       child: Image.asset(
-                        'icons/arrow_white_noBG_white.png', // Set the correct path to your image
+                        'icons/arrow_white_noBG_white.png',
                         width: 30,
                         height: 30,
                       ),
