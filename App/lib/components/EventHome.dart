@@ -314,6 +314,7 @@ class _EventHomeState extends State<EventHome> {
                               color: Colors.black,
                             ),
                           ),
+                              iconColor: MyApp.blueMain,
                               onExpansionChanged: (value) {
                                 saveExpansionState(value);
                               },
