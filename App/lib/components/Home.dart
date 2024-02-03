@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
-import 'package:test_clique_connect/components/AnimatedMarkersMap.dart';
+import 'package:test_clique_connect/save/AnimatedMarkersMap.dart';
 import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/Event.dart';
 import 'package:test_clique_connect/components/EventHome.dart';
