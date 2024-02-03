@@ -88,7 +88,6 @@ class SplashScreenState extends State<SplashScreen> {
           ),
         );
       } else {
-        // Navigating to the AuthGate screen with a custom transition
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const AuthGate(),
@@ -115,8 +114,7 @@ class SplashScreenState extends State<SplashScreen> {
           child: VideoPlayer(
             _controller,
           ),
-        )
-            : Container(),
+        ) : Container(),
       ),
     );
   }
