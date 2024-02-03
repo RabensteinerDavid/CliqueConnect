@@ -485,7 +485,7 @@ class _EventState extends State<CreateProfile> {
           selectedStudyCourse = null;
           universityType = null;
         });
-        profileIsCreated(true);
+        await profileIsCreated(true);
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BottomNavigationBarExample()));
 
       } catch (e) {
