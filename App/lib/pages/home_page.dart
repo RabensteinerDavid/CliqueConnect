@@ -164,17 +164,7 @@ class _HomePageState extends State<HomePageChat> {
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: Colors.white),
-        // actions: <Widget>[
-        //   IconButton(
-        //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        //     icon: const Icon(Icons.search, color: Colors.white, size: 25.0),
-        //     onPressed: () {
-        //       Navigator.of(context).push(
-        //         MaterialPageRoute(builder: (context) => SearchPage()),
-        //       );
-        //     },
-        //   )
-        // ],
+        automaticallyImplyLeading: false,
       ),
     );
   }
