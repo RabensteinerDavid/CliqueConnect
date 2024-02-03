@@ -1,22 +1,16 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_cropper/image_cropper.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_clique_connect/components/Home.dart';
 import 'package:test_clique_connect/main.dart';
-
 import 'NavigationBar.dart';
 
 final filters = <String>{};
-
 
 Future<bool> profileIsCreated(bool state) async{
   User? user = FirebaseAuth.instance.currentUser;
@@ -34,26 +28,25 @@ class CreateProfile extends StatefulWidget {
 }
 
 class _EventState extends State<CreateProfile> {
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController aboutController = TextEditingController();
-
-  File? _photo;
   final ImagePicker _picker = ImagePicker();
-
-  User? user = FirebaseAuth.instance.currentUser;
   final firestore = FirebaseFirestore.instance;
-
-  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
-
-  var university;
-  var course;
-  String? selectedStudyCourse;
-  String? universityType;
 
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _aboutFocus = FocusNode();
   final FocusNode _universityFocus = FocusNode();
   final FocusNode _courseFocus = FocusNode();
+
+  var university;
+  var course;
+
+  File? _photo;
+  User? user = FirebaseAuth.instance.currentUser;
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+  String? selectedStudyCourse;
+  String? universityType;
 
   Color _nameLabelColor = MyApp.greyDark;
   Color _aboutLabelColor = MyApp.greyDark;
@@ -81,7 +74,6 @@ class _EventState extends State<CreateProfile> {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
-
         setState(() {
           _nameLabelColor = MyApp.greyDark;
           _aboutLabelColor = MyApp.greyDark;
@@ -130,7 +122,7 @@ class _EventState extends State<CreateProfile> {
                                   _nameLabelColor = MyApp.blueMain;
                                   _aboutLabelColor = MyApp.greyDark;
                                   _universityLabelColor = MyApp.greyDark;
-                                  _courseLabelColor = MyApp.greyDark;// Reset color for about
+                                  _courseLabelColor = MyApp.greyDark;
                                 });
                               },
                               decoration: InputDecoration(
@@ -142,7 +134,6 @@ class _EventState extends State<CreateProfile> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 20.0),
                             DropdownButtonFormField<String>(
                               value: universityType,
@@ -152,21 +143,20 @@ class _EventState extends State<CreateProfile> {
                                   value: category,
                                   child: Text(category),
                                 );
-                              }).toList()
-                                  : [],
+                              }).toList() : [],
                               onChanged: (value) {
                                 setState(() {
                                   universityType = value;
                                   selectedStudyCourse = null;
-                                  getCourse(); // Fetch courses based on the selected university
+                                  getCourse();
                                 });
                               },
                               onTap: () {
                                 setState(() {
                                   _universityLabelColor = MyApp.blueMain;
-                                  _nameLabelColor = MyApp.greyDark; // Reset color for name
+                                  _nameLabelColor = MyApp.greyDark;
                                   _aboutLabelColor = MyApp.greyDark;
-                                  _courseLabelColor = MyApp.greyDark;// Reset color for about
+                                  _courseLabelColor = MyApp.greyDark;
                                 });
                               },
                               decoration: InputDecoration(
@@ -188,8 +178,7 @@ class _EventState extends State<CreateProfile> {
                                   value: category,
                                   child: Text(category),
                                 );
-                              }).toList()
-                                  : [],
+                              }).toList() : [],
                               onChanged: (value) {
                                 setState(() {
                                   selectedStudyCourse = value;
@@ -197,9 +186,9 @@ class _EventState extends State<CreateProfile> {
                               },
                               onTap: () {
                                 setState(() {
-                                  _courseLabelColor = MyApp.blueMain;// Reset color for about
+                                  _courseLabelColor = MyApp.blueMain;
                                   _universityLabelColor = MyApp.greyDark;
-                                  _nameLabelColor = MyApp.greyDark; // Reset color for name
+                                  _nameLabelColor = MyApp.greyDark;
                                   _aboutLabelColor = MyApp.greyDark;
                                 });
                               },
@@ -222,7 +211,7 @@ class _EventState extends State<CreateProfile> {
                                   _aboutLabelColor = MyApp.blueMain;
                                   _nameLabelColor = MyApp.greyDark;
                                   _universityLabelColor = MyApp.greyDark;
-                                  _aboutLabelColor = MyApp.greyDark; // Reset color for name
+                                  _aboutLabelColor = MyApp.greyDark;
                                 });
                               },
                               decoration: InputDecoration(
@@ -234,7 +223,6 @@ class _EventState extends State<CreateProfile> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 22.0),
                             const Align(
                               alignment: Alignment.centerLeft,
@@ -259,13 +247,12 @@ class _EventState extends State<CreateProfile> {
                             ElevatedButton(
                               onPressed: () => savePictureToFirestore(context),
                               style: ElevatedButton.styleFrom(
-                                primary: MyApp.blueMain, // Background color
-                                onPrimary: Colors.white, // Text color
-
+                                primary: MyApp.blueMain,
+                                onPrimary: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                elevation: 3.0, // Elevation (shadow)
+                                elevation: 3.0,
                               ),
                               child: const Text(
                                 'Create Account',
@@ -291,8 +278,7 @@ class _EventState extends State<CreateProfile> {
                     child: CircleAvatar(
                       radius: 80,
                       backgroundColor: const Color(0xff8179b4),
-                      child: _photo != null
-                          ? ClipRRect(
+                      child: _photo != null ? ClipRRect(
                         borderRadius: BorderRadius.circular(500),
                         child: Image.file(
                           _photo!,
@@ -300,8 +286,7 @@ class _EventState extends State<CreateProfile> {
                           height: 150,
                           fit: BoxFit.fitHeight,
                         ),
-                      )
-                          : Container(
+                      ) : Container(
                         decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(500)),
@@ -362,8 +347,8 @@ class _EventState extends State<CreateProfile> {
           aspectRatioPresets:
           [
             CropAspectRatioPreset.square,
-            //CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.original,
+            //CropAspectRatioPreset.ratio3x2,
             //CropAspectRatioPreset.ratio4x3,
             //CropAspectRatioPreset.ratio16x9
           ],
@@ -526,14 +511,11 @@ class _EventState extends State<CreateProfile> {
         var uploadTask = ref.putFile(_photo!);
         final snapshot = await uploadTask!.whenComplete(() {});
         final urlDownload = await snapshot.ref.getDownloadURL();
-        //final imageUrl = await firebaseReference.getDownloadURL();
         await saveUserDataToFirestore(context, username, urlDownload);
       } else {
         print('No Photo to upload');
         await saveUserDataToFirestore(context,username, '');
       }
-
-      // Optionally, you can reset the text input field and image after saving
       setState(() {
         nameController.clear();
         _photo = null;
@@ -584,21 +566,14 @@ class _FilterChipExampleState extends State<FilterChipExample> {
     return FutureBuilder<String?>(
       future: getCatergoryActivities(),
       builder: (context, snapshot) {
-
-
         if (snapshot.hasError) {
-          // Return an error message if there's an error
           return Text('Error: ${snapshot.error}');
         }
-
         if (!snapshot.hasData) {
-          // Return an empty container if there's no data
           return Container();
         }
-
         // Extract categories from the snapshot data
         List<String> categories = snapshot.data!.split(',');
-
         return Row(
           children: categories.map((String category) {
             return Row(
@@ -616,7 +591,7 @@ class _FilterChipExampleState extends State<FilterChipExample> {
                     });
                   },
                 ),
-                SizedBox(width: 4.0), // Add the desired spacing here
+                SizedBox(width: 4.0),
               ],
             );
           }).toList(),
@@ -625,5 +600,3 @@ class _FilterChipExampleState extends State<FilterChipExample> {
     );
   }
 }
-
-
