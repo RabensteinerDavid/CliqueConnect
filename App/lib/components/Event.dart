@@ -7,6 +7,7 @@ import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../main.dart';
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
 
@@ -34,7 +35,6 @@ class _EventState extends State<Event> {
   final List<dynamic> userNames = []; // Liste für Benutzernamen --> zum Anzeigen
 
   double bannerHeight = 254.0;
-  double bannerWidth = 400.0;
 
   String imageURLBanner = "";
   String title = "";
@@ -116,6 +116,9 @@ class _EventState extends State<Event> {
 
   @override
   Widget build(BuildContext context) {
+    double topPadding = MediaQuery.of(context).size.height >= 800
+        ? MediaQuery.of(context).size.height * 0.06
+        : MediaQuery.of(context).size.height * 0.1;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -145,8 +148,7 @@ class _EventState extends State<Event> {
                         // Das Bild konnte nicht geladen werden, zeige einen Platzhalter
                         return Center(
                           child: Container(
-                            width: bannerWidth,
-                            height: bannerHeight,
+                            width: MediaQuery.of(context).size.width,
                             color: Colors.grey,
                           ),
                         );
@@ -156,8 +158,7 @@ class _EventState extends State<Event> {
                       // Ein Fehler ist aufgetreten, zeige ebenfalls einen Platzhalter
                       return Center(
                         child: Container(
-                          width: bannerWidth,
-                          height: bannerHeight,
+                          width: MediaQuery.of(context).size.width,
                           color: Colors.grey,
                         ),
                       );
@@ -175,7 +176,7 @@ class _EventState extends State<Event> {
               Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: 25.0, top: MediaQuery.of(context).size.height * 0.07, right: 40.0),
+                    padding: EdgeInsets.only(left: 25.0, top: topPadding, right: 40.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -191,7 +192,7 @@ class _EventState extends State<Event> {
                     ),
                   ),
                   Positioned(
-                    top: 60,
+                    top: topPadding,
                     right: 25,
                     child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
@@ -242,7 +243,7 @@ class _EventState extends State<Event> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 0.0),
+                padding: const EdgeInsets.only(left: 25.0, top: 0.0, right: 25),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -258,7 +259,7 @@ class _EventState extends State<Event> {
               SizedBox(height: 16.0,),
               Padding(
                 padding:
-                const EdgeInsets.only(left: 25.0, top: 2.0, right: 40.0),
+                const EdgeInsets.only(left: 25.0, top: 2.0, right: 25.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -270,123 +271,126 @@ class _EventState extends State<Event> {
                   ),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8, width: 12),
-                  Padding(
-                    padding:
-                    const EdgeInsets.only(left: 25.0, top: 40, right: 25.0),
-                    child: Row(
+              Padding(
+                padding: const EdgeInsets.only(top: 10, left: 25,right: 25),
+                child: SizedBox(
+                  width: MediaQuery.sizeOf(context).height -50,
+                  height: 44,
+                  child: FloatingActionButton(
+                    heroTag: 'connectButtonHero',
+                    onPressed: () {
+                      if (userNames.contains(users["username"])) {
+                        _countMeOut(widget.eventName);
+                      } else {
+                        _countMeIn(widget.eventName, widget.eventCategory);
+                      }
+                      setState(() {
+                        buttonText = (userNames.contains(myUserName))
+                            ? "Connect"
+                            : "Disconnect";
+                        buttonColor = (userNames.contains(myUserName))
+                            ? const Color(0xFF220690)
+                            : const Color(0xFFF199F2);
+                      });
+                    },
+                    backgroundColor: buttonColor,
+                    elevation: 0,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.horizontal(
+                        left: Radius.circular(15),
+                        right: Radius.circular(15),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Participants:',
+                        const SizedBox(height: 4, width: 12),
+                        Text(
+                          buttonText,
                           style: TextStyle(
-                            fontSize: 20.0,
-                            fontFamily: 'DINNextLtPro',
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2E148C),
-                          ),
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: 100,
-                          height: 40,
-                          child: FloatingActionButton(
-                            heroTag: 'connectButtonHero',
-                            onPressed: () {
-                              if (userNames.contains(users["username"])) {
-                                _countMeOut(widget.eventName);
-                              } else {
-                                _countMeIn(widget.eventName, widget.eventCategory);
-                              }
-                              setState(() {
-                                buttonText = (userNames.contains(myUserName))
-                                    ? "Connect"
-                                    : "Disconnect";
-                                buttonColor = (userNames.contains(myUserName))
-                                    ? const Color(0xFF220690)
-                                    : const Color(0xFFF199F2);
-                              });
-                            },
-                            backgroundColor: buttonColor,
-                            elevation: 0,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(15),
-                                right: Radius.circular(15),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 4, width: 12),
-                                Text(
-                                  buttonText,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontFamily: "DINNextLtPro",
-                                    color: buttonText == "Connect"
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            fontSize: 15,
+                            fontFamily: "DINNextLtPro",
+                            color: buttonText == "Connect"
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: userNames.length,
-                itemBuilder: (context, index) {
-                  String username = userNames[index];
-                  return FutureBuilder<String>(
-                    future: getImageUrlForUser(username),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const LinearProgressIndicator(
-                          color: Color(0xFF2E148C),
-                          minHeight: 0.2,
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Text('Error loading image');
-                      } else {
-                        String imageUrl = snapshot.data.toString().isEmpty ? 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2.png?alt=media&token=b1f13cb5-60ef-417e-b266-e516b9c94ce1' : snapshot.data.toString();
-                        return SizedBox(
-                          height: 75,
-                          child: Column(
-                            children: [
-                              ListTile(
-                                title: Text(
-                                  username,
-                                  style: const TextStyle(
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, top: 0, right: 25.0),
+                child: ListTileTheme(
+                  iconColor: MyApp.blueMain,
+                  contentPadding: EdgeInsets.all(0),
+                  child: ExpansionTile(
+                    title: const Text(
+                      'Participants:',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontFamily: 'DINNextLtPro',
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2E148C),
+                      ),
+                    ),
+                    iconColor: MyApp.blueMain,
+                    initiallyExpanded: true,
+                    shape: Border(),
+                    children:[
+                      Container(
+                        margin: const EdgeInsets.only(top: 10.0),
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: userNames.length,
+                          itemBuilder: (context, index) {
+                            String username = userNames[index];
+                            return FutureBuilder<String>(
+                              future: getImageUrlForUser(username),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const LinearProgressIndicator(
                                     color: Color(0xFF2E148C),
-                                    fontFamily: "DINNextLtPro",
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(imageUrl),
-                                ),
-                              ),
-                              if (index < userNames.length - 1)
-                                const Divider(color: Colors.black12, thickness: 0.5),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                  );
-                },
-              )
+                                    minHeight: 0.2,
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return const Text('Error loading image');
+                                } else {
+                                  String imageUrl = snapshot.data.toString().isEmpty ? 'https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2.png?alt=media&token=b1f13cb5-60ef-417e-b266-e516b9c94ce1' : snapshot.data.toString();
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(
+                                          username,
+                                          style: const TextStyle(
+                                            color: Color(0xFF2E148C),
+                                            fontFamily: "DINNextLtPro",
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                        leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(imageUrl),
+                                        ),
+                                      ),
+                                      if (index < userNames.length - 1)
+                                        const Divider(color: Colors.black12, thickness: 0.5),
+                                    ],
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
