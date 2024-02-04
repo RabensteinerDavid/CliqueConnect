@@ -194,6 +194,21 @@ class YourCurrentScreenState extends State<ProfileView> {
     }
   }
 
+  Future<List<String>> getInterestsChip() async {
+    final firestore = FirebaseFirestore.instance;
+    var userID = user?.uid;
+    final data = await firestore.collection("users").doc(userID).get();
+
+    if (data.exists) {
+      final activityList = data.data()!['interests'] as List<dynamic>;
+      var activities = activityList.map((item) => item.toString()).toList();
+
+      return activities;
+    } else {
+      return ["No Interests"];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -337,12 +352,45 @@ class YourCurrentScreenState extends State<ProfileView> {
                                       ),
                                     ],
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.only(right: 20.0),
-                                    child: const SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: FilterChipExample(),
-                                    ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 20),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: FutureBuilder<List<String>>(
+                                          future: getInterestsChip(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return const CircularProgressIndicator();
+                                            }
+                                            if (snapshot.hasError) {
+                                              return Text('Error: ${snapshot.error}');
+                                            }
+                                            List<String> interests = snapshot.data ?? ["No Interests"];
+                                            return Row(
+                                              children: interests.map((String interest) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.all(4.0),
+                                                  child: FilterChip(
+                                                    label: Text(interest),
+                                                    selected: filters.contains(interest),
+                                                    onSelected: (bool selected) {
+                                                      setState(() {
+                                                        if (selected) {
+                                                          filters.add(interest);
+                                                        } else {
+                                                          filters.remove(interest);
+                                                        }
+                                                      });
+                                                    },
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            );
+                                          },
+                                        ),
+                                      ),),
                                   ),
                                 ],
                               ),
@@ -590,73 +638,5 @@ class YourCurrentScreenState extends State<ProfileView> {
     } else {
       return "No Interests";
     }
-  }
-}
-
-class FilterChipExample extends StatefulWidget {
-  const FilterChipExample({super.key});
-
-  @override
-  State<FilterChipExample> createState() => _FilterChipExampleState();
-}
-
-class _FilterChipExampleState extends State<FilterChipExample> {
-  late User? user;
-
-  @override
-  void initState() {
-    super.initState();
-    user = FirebaseAuth.instance.currentUser;
-  }
-
-  Future<List<String>> getInterests() async {
-    final firestore = FirebaseFirestore.instance;
-    var userID = user?.uid;
-    final data = await firestore.collection("users").doc(userID).get();
-
-    if (data.exists) {
-      final activityList = data.data()!['interests'] as List<dynamic>;
-      var activities = activityList.map((item) => item.toString()).toList();
-
-      return activities;
-    } else {
-      return ["No Interests"];
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<String>>(
-      future: getInterests(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        }
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-        List<String> interests = snapshot.data ?? ["No Interests"];
-        return Wrap(
-          children: interests.map((String interest) {
-            return Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: FilterChip(
-                label: Text(interest),
-                selected: filters.contains(interest),
-                onSelected: (bool selected) {
-                  setState(() {
-                    if (selected) {
-                      filters.add(interest);
-                    } else {
-                      filters.remove(interest);
-                    }
-                  });
-                },
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
   }
 }
