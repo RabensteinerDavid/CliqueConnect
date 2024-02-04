@@ -68,57 +68,71 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            FutureBuilder<String>(
-              future: getGroupCategory(widget.groupId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircleAvatar(
-                    radius: 25.0,
-                    backgroundColor: MyApp.blueMain,
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Event(
-                            eventName: widget.groupName,
-                            eventCategory: snapshot.data ?? "",
-                          ),
-                        ),
-                      );
-                    },
-                    child: CircleAvatar(
-                      radius: 20.0,
-                      backgroundColor: MyApp.blueMain,
-                      child: Image.asset(
-                        getCategoryPic(snapshot.data ?? ""),
-                        fit: BoxFit.cover,
-                        width: 56.0,
-                        height: 56.0,
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                widget.groupName,
-                style: const TextStyle(
-                  color: MyApp.blueMain,
-                  fontFamily: "DINNextLtPro",
+        title: GestureDetector(
+          onTap: () async {
+            String category = await getGroupCategory(widget.groupId);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Event(
+                  eventName: widget.groupName,
+                  eventCategory: category,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            );
+          },
+          child: Row(
+            children: [
+              FutureBuilder<String>(
+                future: getGroupCategory(widget.groupId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircleAvatar(
+                      radius: 25.0,
+                      backgroundColor: MyApp.blueMain,
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Event(
+                              eventName: widget.groupName,
+                              eventCategory: snapshot.data ?? "",
+                            ),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20.0,
+                        backgroundColor: MyApp.blueMain,
+                        child: Image.asset(
+                          getCategoryPic(snapshot.data ?? ""),
+                          fit: BoxFit.cover,
+                          width: 56.0,
+                          height: 56.0,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  widget.groupName,
+                  style: const TextStyle(
+                    color: MyApp.blueMain,
+                    fontFamily: "DINNextLtPro",
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
         centerTitle: false,
         backgroundColor: Colors.white,
