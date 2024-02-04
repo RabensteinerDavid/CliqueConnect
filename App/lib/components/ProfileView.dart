@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/database_service.dart';
 import 'AuthGate.dart';
 import '../main.dart';
 
@@ -44,12 +45,124 @@ class YourCurrentScreenState extends State<ProfileView> {
     setState(() {});
   }
 
+  Future<List> allEventNames() async {
+    final firestore = FirebaseFirestore.instance;
+    final userID = user?.uid;
+    List<dynamic> alldata =[];
+    List<dynamic> eventNames = [];
+
+    if (userID != null) {
+      final activitiesCollectionRef = firestore.collection("activities");
+      final querySnapshot = await activitiesCollectionRef.get();
+      for (final activityDoc in querySnapshot.docs) {
+        final Map<String, dynamic> data = activityDoc.data();
+        for (final key in data.keys) {
+          alldata = List.from(data[key] ?? []);
+          if (alldata.isNotEmpty) {
+            final nameActivity = await alldata[0];
+            eventNames.add(nameActivity);
+          }
+        }
+      }
+      return eventNames;
+    } else {
+      return eventNames;
+    }
+  }
+
+  Future<bool> isUserJoined(String groupId, String groupName, String userName) async {
+    final CollectionReference groupCollection = FirebaseFirestore.instance.collection('groups');
+    try {
+      DocumentSnapshot groupDoc =
+      await groupCollection.doc(groupId).get();
+
+      List<dynamic> members = groupDoc['members'];
+
+      return members.contains(user!.uid + '_' + userName);
+    } catch (e) {
+      print('Error checking if user is joined: $e');
+      // Handle the error accordingly
+      return false;
+    }
+  }
+
+  Future<List> disconnectActivities(String eventName, String eventCategory, String username) async {
+    List<dynamic> eventList = [];
+    List<dynamic> userNames = [];
+
+    CollectionReference activitiesCollection = FirebaseFirestore.instance.collection('activities');
+
+    try {
+      final snapshot = await firestore.collection("activities").doc(eventCategory).get();
+
+      if (snapshot.exists) {
+        eventList = snapshot.data()?[eventName] ?? [];
+
+        if (eventList.isNotEmpty && eventList.length >= 7) {
+          Map<String, dynamic> users = eventList[7];
+
+          users.forEach((userName, value) {
+            if (userName == username) {
+              // Toggle the value in the users map
+              users[userName] = !(value ?? false);
+            }
+            userNames.add(userName);
+          });
+
+          // Update the eventList with the modified users map
+          eventList[7] = users;
+
+          // Update the Firestore document with the modified eventList
+          await activitiesCollection.doc(eventCategory).update({
+            eventName: eventList,
+          });
+          print("dissconnected");
+        }
+      }
+    } catch (e) {
+      print('Error disconnecting activities: $e');
+      // Handle the error accordingly, e.g., show a message to the user or log it.
+    }
+    return eventList;
+  }
+
+  Future<void> disconnectAllEvents() async{
+
+    List<dynamic> eventNames = await allEventNames();
+
+    var userData = await firestore.collection('users').doc(user?.uid).get();
+    var myUserName = userData["username"];
+
+    for(int i = 0; i < eventNames.length; i++){
+      await DatabaseService(uid: user!.uid).searchByName(eventNames[i]).then((snapshot) async {
+        if (snapshot != null && snapshot.docs.isNotEmpty) {
+          var doc = snapshot.docs.first;
+          String groupId = doc['groupId'];
+          String groupName = doc['groupName'];
+          String category = doc['category'];
+
+          try {
+            bool isJoined = await isUserJoined(groupId, groupName, myUserName);
+            if(isJoined){
+              disconnectActivities(groupName,category, myUserName);
+              await DatabaseService(uid: user!.uid).togglingGroupJoin(groupId, groupName, myUserName);
+            }
+          } catch (e) {
+            print('Error adding user to the group: $e');
+          }
+        } else {
+          print('Snapshot is null or does not contain any documents');
+        }
+      });
+    }
+  }
+
   void _deleteAccount(context) async {
     try {
+      await disconnectAllEvents();
       await firestore.collection("users").doc(user?.uid).delete();
-
       // Delete the user account
-      await user?.delete();
+      await user?.delete().then;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => AuthGate()),
       );
@@ -307,7 +420,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                     _signOut(context);
                   } else if (value == 'delete') {
                     _deleteAccount(context);
-                  } else if (value == 'impressum') {
+                  } else if (value == 'Disconnect') {
                   }
                 },
                 icon: const Icon(
