@@ -134,43 +134,45 @@ class _EventState extends State<Event> {
                 alignment: Alignment.center,
                 clipBehavior: Clip.none,
                 children: [
-                  Image.network(
-                    imageURLBanner,
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child; // Das Bild ist geladen
-                      } else if (loadingProgress.expectedTotalBytes == null) {
-                        return const Center(
-                          child:
-                          CircularProgressIndicator(),
-                        );
-                      } else {
-                        // Das Bild konnte nicht geladen werden, zeige einen Platzhalter
-                        return Center(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.grey,
-                          ),
-                        );
-                      }
-                    },
-                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                      // Ein Fehler ist aufgetreten, zeige ebenfalls einen Platzhalter
-                      return Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
+            Image.network(
+            imageURLBanner,
+            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) {
+                return child; // The image is loaded
+              } else if (loadingProgress.expectedTotalBytes == null) {
+                // Show a loading indicator
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                // The image has not loaded yet, show a placeholder
+                return Center(
+                  child: Container(
+                    height: bannerHeight+40,
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey,
                   ),
-                  Positioned(
-                    top: bannerHeight,
-                    left: 20,
-                    child: Image.asset('assets/Event/${widget.eventCategory}.png',
-                      height: 75,
-                    ),
-                  ),
+                );
+              }
+            },
+            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              // An error occurred, show a placeholder
+              return Center(
+                child: Container(
+                  height: bannerHeight+40,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey,
+                ),
+              );
+            },
+          ),
+          Positioned(
+            top: bannerHeight,
+            left: 20,
+            child: Image.asset('assets/Event/${widget.eventCategory}.png',
+              height: 75,
+            ),
+          ),
                 ],
               ),
               Stack(
@@ -393,6 +395,7 @@ class _EventState extends State<Event> {
                   ),
                 ),
               ),
+              SizedBox(height: 50.0,),
             ],
           ),
         ),
