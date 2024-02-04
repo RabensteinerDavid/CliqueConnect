@@ -253,6 +253,8 @@ class _EventState extends State<Event> {
                       height: 1,
                       fontFamily: 'DINNextLtPro',
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ),
               ),
