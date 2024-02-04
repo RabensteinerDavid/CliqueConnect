@@ -105,15 +105,12 @@ class _BottomNavigationBarExampleState extends State<BottomNavigationBarExample>
 
   Widget _buildGradientShadow() {
     return Container(
-      height: kBottomNavigationBarHeight,
+      height: 16,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
             Colors.transparent,
             Colors.black12,
           ],

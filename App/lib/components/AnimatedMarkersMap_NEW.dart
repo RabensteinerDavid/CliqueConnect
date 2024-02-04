@@ -420,14 +420,15 @@ var currentLocation;
             bottom: 16.0,
             right: 16.0,
             child: FloatingActionButton(
-              onPressed: () {
-                resetMapToCurrentLocation(currentLocation);
-              },
-              backgroundColor: MyApp.lightRose,
-              child: Icon(Icons.navigation),
-              shape: CircleBorder(),
+                onPressed: () {
+                  resetMapToCurrentLocation(currentLocation);
+                },
+                elevation: 0,
+                backgroundColor: MyApp.lightRose,
+                child: Icon(Icons.navigation),
+                shape: CircleBorder(),
+              ),
             ),
-          ),
           Positioned(
             top: 10,
             left: 10,
