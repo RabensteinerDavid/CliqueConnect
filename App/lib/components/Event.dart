@@ -175,7 +175,7 @@ class _EventState extends State<Event> {
               Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 25.0, top: 60.0, right: 40.0),
+                    padding: EdgeInsets.only(left: 25.0, top: MediaQuery.of(context).size.height * 0.07, right: 40.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
