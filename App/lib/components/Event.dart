@@ -477,6 +477,7 @@ class _EventState extends State<Event> {
                     height: 30.0,
                     child: FloatingActionButton(
                       onPressed: () {
+                        Navigator.pop(context,true);
                         Navigator.push(context,
                           MaterialPageRoute(
                             builder: (context) => BottomNavigationBarExample()
