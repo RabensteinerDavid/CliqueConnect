@@ -265,59 +265,11 @@ class YourCurrentScreenState extends State<ProfileView> {
                                     fontWeight: FontWeight.bold,
                                     color: MyApp.blueMain),
                               ),
-                              const Row(
-                                children: [
-                                  Text(
-                                    'Interests:',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'DIN-Next-LT-Pro-Regular',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:0, right: 20),
-                                child: Center(
-                                  child: FutureBuilder<List<String>>(
-                                    future: getInterestsChip(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      }
-                                      if (snapshot.hasError) {
-                                        return Text('Error: ${snapshot.error}');
-                                      }
-                                      List<String> interests = snapshot.data ?? ["No Interests"];
-                                      return SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: interests.map((String interest) {
-                                            return
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 4),
-                                                child: Text(interest,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontFamily: 'DIN-Next-LT-Pro-Regular',
-                                                  ),
-                                                ),
-                                              );
-                                          }).toList(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 60),
                               Column(
                                 children: [
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.all(16),
+                                    padding: const EdgeInsets.only(left: 16, right: 16),
                                     child: Row(
                                       children: [
                                         Image.asset(
@@ -342,7 +294,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                                               Text(
                                                 '$university',
                                                 style: const TextStyle(
-                                                    fontSize: 12,
+                                                    fontSize: 14,
                                                     fontFamily:
                                                     'DIN-Next-LT-Pro-Regular'),
                                               ),
@@ -352,7 +304,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
                                   Container(
                                     padding: const EdgeInsets.only(right: 20.0),
                                     child: const Divider(
@@ -360,10 +311,9 @@ class YourCurrentScreenState extends State<ProfileView> {
                                       thickness: 1,
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.only(left: 16, right: 40, top: 16,bottom: 16),
+                                    padding: const EdgeInsets.only(left: 16, right: 40,bottom: 16),
                                     child: Row(
                                       children: [
                                         Image.asset(
@@ -389,7 +339,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                                                 '$aboutMe',
                                                 textAlign: TextAlign.justify,
                                                 style: const TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                   fontFamily: 'DIN-Next-LT-Pro-Regular',
                                                 ),
                                               ),
@@ -399,7 +349,76 @@ class YourCurrentScreenState extends State<ProfileView> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  Container(
+                                    padding: const EdgeInsets.only(right: 20.0),
+                                    child: const Divider(
+                                      color: MyApp.greyMedium,
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.only(left: 16, right: 16),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const SizedBox(width: 20),
+                                            Text(
+                                              'Interests',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                color: MyApp.blueMain,
+                                                fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 20.0),
+                                          child: Opacity(
+                                            opacity: 0.7,
+                                            child: FutureBuilder<List<String>>(
+                                              future: getInterestsChip(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                  return const CircularProgressIndicator();
+                                                }
+                                                if (snapshot.hasError) {
+                                                  return Text('Error: ${snapshot.error}');
+                                                }
+                                                List<String> interests = snapshot.data ?? ["No Interests"];
+                                                return Wrap(
+                                                  spacing: 4.0, // Adjust spacing between interests
+                                                  runSpacing: .0, // Adjust spacing between lines
+                                                  children: interests.map((String interest) {
+                                                    return FilterChip(
+                                                      label: Text(interest),
+                                                      selected: interests.contains(interest),
+                                                      onSelected: (bool selected) {
+                                                        setState(() {
+                                                        });
+                                                      },
+                                                    );
+
+                                                    // Text(
+                                                    //   interest,
+                                                    //   style: const TextStyle(
+                                                    //     fontSize: 14,
+                                                    //     fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                                    //   ),
+                                                    // );
+                                                  }).toList(),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
