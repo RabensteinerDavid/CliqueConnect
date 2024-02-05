@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:rrule/rrule.dart';
@@ -7,9 +8,13 @@ import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
+import 'package:test_clique_connect/components/EditEventForm.dart';
 import '../main.dart';
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
+import 'EventHome.dart';
+import 'NavigationBar.dart';
 
 class Event extends StatefulWidget {
   const Event({Key? key, required this.eventCategory, required this.eventName}) : super(key: key);
@@ -45,6 +50,7 @@ class _EventState extends State<Event> {
   String thirdTime = "";
 
   bool sameDate = false;
+  bool moreDatesToView = false;
 
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
@@ -52,14 +58,21 @@ class _EventState extends State<Event> {
   String buttonText = "Connect";
   Color buttonColor = const Color(0xFF220690);
   String groupId = "";
+  String admin = "";
+  bool showEdit = false;
+
+  DateTime dateTimeTwo = DateTime.now();
+  DateTime dateTimeThree = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     isExpanded = false;
+    showEdit = false;
     initPrefs();
     _initializeData();
     findGroupId();
+    getAdmin();
   }
 
   Future<void> initPrefs() async {
@@ -72,6 +85,16 @@ class _EventState extends State<Event> {
   Future<void> _initializeData() async {
     imageURLBanner = await getEvent(widget.eventName, widget.eventCategory);
     _checkUserInList();
+  }
+
+  Future<void> getAdmin() async {
+    var groupData = await firestore.collection('groups').get();
+
+    groupData.docs.forEach((doc) {
+      if (doc['groupName'] == widget.eventName) {
+        admin = doc['admin'];
+      }
+    });
   }
 
   Future<void> findGroupId() async {
@@ -114,8 +137,14 @@ class _EventState extends State<Event> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
+    if(admin.toString() == myUserName.toString()){
+      showEdit = true;
+    }else{
+      showEdit = false;
+    }
     double topPadding = MediaQuery.of(context).size.height >= 800
         ? MediaQuery.of(context).size.height * 0.06
         : MediaQuery.of(context).size.height * 0.1;
@@ -166,17 +195,44 @@ class _EventState extends State<Event> {
               );
             },
           ),
-          Positioned(
-            top: bannerHeight,
-            left: 20,
-            child: Image.asset('assets/Event/${widget.eventCategory}.png',
-              height: 75,
-            ),
-          ),
+                  Positioned(
+                    top: bannerHeight,
+                    left: 20,
+                    child: Image.asset('assets/Event/${widget.eventCategory}.png',
+                      height: 75,
+                    ),
+                  ),
                 ],
               ),
               Stack(
                 children: [
+                  if (showEdit)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditEventForm(activityName: title,sameDate: moreDatesToView, description: description,location: location,firstTime: dateTime,category: widget.eventCategory, rrule: rrule.toString(),secondTime: dateTimeTwo.toString().isNotEmpty ? dateTimeTwo.toString() : "",thirdTime: dateTimeThree.toString().isNotEmpty ? dateTimeThree.toString() : "" ,moreDatesToView: moreDatesToView, imageURL:imageURLBanner),
+                          ),
+                        );
+                      },
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10.0,top: 10), // Adjust the right padding as needed
+                          child: Text(
+                            "Edit",
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              letterSpacing: 0.5,
+                              height: 1.0,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
                   Padding(
                     padding: EdgeInsets.only(left: 25.0, top: topPadding, right: 40.0),
                     child: Align(
@@ -424,7 +480,10 @@ class _EventState extends State<Event> {
                     height: 30.0,
                     child: FloatingActionButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.push(context,
+                          MaterialPageRoute(
+                            builder: (context) => BottomNavigationBarExample()
+                        ),);
                       },
                       elevation: 0,
                       child: Image.asset('icons/arrow_white.png', width: 30, height: 30,
@@ -474,9 +533,17 @@ class _EventState extends State<Event> {
     String weekdaysString = rrule.byWeekDays.toString();
     List<String> weekdaysList = weekdaysString.split(', ');
 
+    if(secondTime == "" && thirdTime == ""){
+      return "${_formatTime(dateTime)}";
+    }
+    if(_formatTime(dateTime) != secondTime && secondTime != thirdTime && _formatTime(dateTime) != thirdTime){
+      return "${_formatTime(dateTime)}, ${secondTime} and ${thirdTime}";
+    }
     if(weekdaysList.length == 2){
       if (_formatTime(dateTime) == secondTime ){
         return "${_formatTime(dateTime)}";
+      } if(_formatTime(dateTime) != secondTime && secondTime != thirdTime && _formatTime(dateTime) != thirdTime){
+        return "${_formatTime(dateTime)}, ${secondTime} and ${thirdTime}";
       }else{
         return "${_formatTime(dateTime)} and ${secondTime}";
       }
@@ -639,13 +706,16 @@ class _EventState extends State<Event> {
     }
   }
 
+  bool isWithinTolerance(DateTime dateTime1, DateTime dateTime2, Duration tolerance) {
+    Duration difference = dateTime1.difference(dateTime2).abs();
+
+    return difference <= tolerance;
+  }
+
   Future<String> getEvent(String eventName, String eventCategory) async {
     final snapshot = await firestore.collection("activities").doc(eventCategory).get();
     var userData = await firestore.collection('users').doc(user?.uid).get();
     myUserName = userData["username"];
-
-    DateTime dateTimeTwo = DateTime.now();;
-    DateTime dateTimeThree = DateTime.now();;
 
     if (snapshot.exists) {
       eventList = snapshot.data()?[eventName] ?? [];
@@ -661,8 +731,9 @@ class _EventState extends State<Event> {
         moreDates = eventList[3];
         int i = 0;
 
-        moreDates.forEach((date, value) {
+        moreDates.forEach((dateFor, value) {
           if(value != "noMore"){
+            moreDatesToView = true;
             i++;
             value = value.toDate();
             if(i == 1){
@@ -674,10 +745,22 @@ class _EventState extends State<Event> {
               dateTimeThree = value;
             }
           }
+          else{
+            moreDatesToView = false;
+          }
         });
 
-        if(dateTimeTwo == dateTimeThree){
+        if(isWithinTolerance(dateTimeTwo,dateTimeThree,Duration(seconds: 99)) && moreDatesToView){
           sameDate = true;
+          date+= " ";
+          date += _formatDateTime(dateTimeTwo);
+        }
+
+        if(!isWithinTolerance(dateTimeTwo,dateTimeThree,Duration(seconds: 99)) && moreDatesToView){
+          date+= " ";
+          date += _formatDateTime(dateTimeTwo);
+          date+= " ";
+          date += _formatDateTime(dateTimeThree);
         }
 
         GeoPoint locationData = eventList[4];

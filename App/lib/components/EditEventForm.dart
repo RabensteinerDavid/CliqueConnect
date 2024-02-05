@@ -14,24 +14,52 @@ import '../main.dart';
 import 'package:path/path.dart';
 
 import '../services/database_service.dart';
+import 'Event.dart';
 import 'NavigationBar.dart';
 
-class AddEventForm extends StatefulWidget {
-  const AddEventForm({Key? key}) : super(key: key);
+class EditEventForm extends StatefulWidget {
+  final String activityName;
+  final String description;
+  final String imageURL;
+  final String location;
+  final DateTime firstTime;
+  final String secondTime;
+  final String thirdTime;
+  final String category;
+  final String rrule;
+  final bool moreDatesToView;
+  final bool sameDate;
+
+  // Use a constant RecurrenceRule as the default value
+  const EditEventForm({
+    Key? key,
+    required this.activityName,
+    required this.description,
+    required this.location,
+    required this.firstTime,
+    this.secondTime="",
+    this.thirdTime="",
+    required this.category,
+    this.rrule = "",
+    this.moreDatesToView = false,
+    this.sameDate = false,
+    this.imageURL = ""
+  }) : super(key: key);
 
   @override
   _EventState createState() => _EventState();
 }
 
-class _EventState extends State<AddEventForm> {
+
+class _EventState extends State<EditEventForm> {
 
   DateTime? startDate;
   DateTime? secondStartDate;
   DateTime? thirdStartDate;
+
   String? selectedCategory;
 
   var categories;
-  final TextEditingController _addressController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _descriptionFocuse = FocusNode();
   final FocusNode _addressFocus = FocusNode();
@@ -67,7 +95,8 @@ class _EventState extends State<AddEventForm> {
 
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _intervallController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
   RecurrenceRule? recurrenceRule;
@@ -78,11 +107,41 @@ class _EventState extends State<AddEventForm> {
   File? _photo;
   User? _user;
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+  var rrule;
 
   @override
   void initState() {
     super.initState();
     getCatergoryActivities();
+    rrule = parseRecurrenceRule(widget.rrule);
+    if(rrule != null){
+      showAdditionalFields = true;
+    }
+    showSecondDate = widget.moreDatesToView;
+    activityNameController.text = widget.activityName;
+    descriptionController.text = widget.description;
+    _addressController.text = widget.location;
+    _intervallController.text = rrule?.interval.toString() ?? '';
+    startDate = widget.firstTime;
+    secondStartDate = DateTime.parse(widget.secondTime);
+    thirdStartDate = DateTime.parse(widget.thirdTime);
+    selectedCategory = widget.category;
+    selectedFrequency = rrule != null ? capitalizeFirstLetter(rrule?.frequency.toString() ?? '' ) : selectedFrequency;
+    selectedTillMonth = rrule != null ? capitalizeFirstLetter(_getMonthNames(rrule?.byMonths)) : selectedTillMonth;
+
+    try {
+      // Validate that the input is not empty and contains only digits
+      if (_intervallController.text.isNotEmpty && _intervallController.text.replaceAll(RegExp(r'\D'), '').isNotEmpty) {
+        // Parse the content of _intervallController.text as an integer
+        selectedInterval = int.parse(_intervallController.text);
+      } else {
+        // Handle the case where the input is empty or not a valid integer
+        print('Invalid input for interval');
+      }
+    } catch (e) {
+      // Handle the case where the text cannot be parsed as an integer
+      print('Error parsing interval: $e');
+    }
   }
 
   @override
@@ -121,6 +180,53 @@ class _EventState extends State<AddEventForm> {
     'November',
     'December',
   ];
+
+  String capitalizeFirstLetter(String input) {
+    if (input.isEmpty) {
+      return input;
+    }
+    return input[0].toUpperCase() + input.substring(1).toLowerCase();
+  }
+
+  String _formatDate(DateTime dateTime) {
+    String formattedMonth = dateTime.month < 10 ? '0${dateTime.month}' : '${dateTime.month}';
+    String formattedDay = dateTime.day < 10 ? '0${dateTime.day}' : '${dateTime.day}';
+
+    return '${dateTime.year}-$formattedMonth-$formattedDay';
+  }
+
+  String _formatTime(DateTime dateTime) {
+    String formattedHour = dateTime.hour.toString().padLeft(2, '0');
+    String formattedMinute = dateTime.minute.toString().padLeft(2, '0');
+    return '$formattedHour:$formattedMinute';
+  }
+
+  String _getMonthNames(Set<int>? monthNumbers) {
+    final monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+
+    final List<String>? selectedMonthNames = monthNumbers?.map((monthNumber) {
+      if (monthNumber >= 1 && monthNumber <= 12) {
+        return monthNames[monthNumber - 1];
+      } else {
+        return 'Unknown';
+      }
+    }).toList();
+
+    return selectedMonthNames?.join('') ?? '';
+  }
+
+  RecurrenceRule? parseRecurrenceRule(String? rruleString) {
+    try {
+      if (rruleString != null) {
+        return RecurrenceRule.fromString(rruleString);
+      }
+    } catch (e) {
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +402,7 @@ class _EventState extends State<AddEventForm> {
                           height: 200.0,
                           child: CupertinoDatePicker(
                             mode: CupertinoDatePickerMode.date,
-                            initialDateTime: DateTime.now(),
+                            initialDateTime: widget.firstTime,
                             minimumDate: null,
                             maximumDate: DateTime(2101),
                             onDateTimeChanged: (DateTime newDate) {
@@ -351,9 +457,9 @@ class _EventState extends State<AddEventForm> {
                         Text(
                           startDate != null
                               ? "${startDate!.toLocal()}".split(' ')[0]
-                              : 'Select Start Date',
+                              : _formatDate(widget.firstTime),
                           style: TextStyle(
-                            color: _startDateText ? MyApp.black : _startDateLabelColor,
+                            color: _startDateText ? MyApp.black : MyApp.black,
                           ),
                         ),
                         const Icon(Icons.calendar_today),
@@ -372,7 +478,7 @@ class _EventState extends State<AddEventForm> {
                           height: 200.0,
                           child: CupertinoDatePicker(
                             mode: CupertinoDatePickerMode.time,
-                            initialDateTime: DateTime.now(),
+                            initialDateTime: widget.firstTime,
                             use24hFormat: true,
                             onDateTimeChanged: (DateTime newTime) {
                               if (newTime != null && newTime != startDate) {
@@ -438,9 +544,9 @@ class _EventState extends State<AddEventForm> {
                         Text(
                           startDate != null
                               ? '${"${startDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${startDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                              : 'Select Start Time',
+                              : _formatTime(widget.firstTime),
                           style: TextStyle(
-                            color:_startTimeText ? MyApp.black: _startTimeLabelColor,
+                            color:_startTimeText ? MyApp.black: MyApp.black,
                           ),
                         ),
                         const Icon(Icons.access_time),
@@ -468,7 +574,7 @@ class _EventState extends State<AddEventForm> {
                               height: 200.0,
                               child: CupertinoDatePicker(
                                 mode: CupertinoDatePickerMode.date,
-                                initialDateTime: DateTime.now(),
+                                initialDateTime: widget.firstTime,
                                 minimumDate: null,
                                 maximumDate: DateTime(2101),
                                 onDateTimeChanged: (DateTime newDate) {
@@ -523,9 +629,9 @@ class _EventState extends State<AddEventForm> {
                             Text(
                               secondStartDate != null
                                   ? "${secondStartDate!.toLocal()}".split(' ')[0]
-                                  : 'Select Second Start Date',
+                                  : widget.sameDate ? '${_formatDate(DateTime.parse(widget.secondTime))}':'Select Second Date',
                               style: TextStyle(
-                                color: _secondStartDateText ? MyApp.black : _secondDateLabelColor,
+                                color: _secondStartDateText ? MyApp.black : widget.sameDate ? MyApp.black : _secondDateLabelColor,
                               ),
                             ),
                             const Icon(Icons.calendar_today),
@@ -544,7 +650,7 @@ class _EventState extends State<AddEventForm> {
                               height: 200.0,
                               child: CupertinoDatePicker(
                                 mode: CupertinoDatePickerMode.time,
-                                initialDateTime: DateTime.now(),
+                                initialDateTime: widget.firstTime,
                                 use24hFormat: true,
                                 onDateTimeChanged: (DateTime newDateTime) {
                                   if (newDateTime != null && newDateTime != secondStartDate) {
@@ -610,9 +716,9 @@ class _EventState extends State<AddEventForm> {
                             Text(
                               secondStartDate != null
                                   ? '${"${secondStartDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${secondStartDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                                  : 'Second Start Time',
+                                  : widget.sameDate ? '${_formatTime(DateTime.parse(widget.secondTime))}':'Select Second Time',
                               style: TextStyle(
-                                color: _secondStartDateText ? MyApp.black : _secondTimeLabelColor,
+                                color: _secondStartDateText ? MyApp.black : widget.sameDate ? MyApp.black : _secondTimeLabelColor,
                               ),
                             ),
                             const Icon(Icons.access_time),
@@ -633,7 +739,7 @@ class _EventState extends State<AddEventForm> {
                                     height: 200.0,
                                     child: CupertinoDatePicker(
                                       mode: CupertinoDatePickerMode.date,
-                                      initialDateTime: DateTime.now(),
+                                      initialDateTime: widget.firstTime,
                                       minimumDate: null,
                                       maximumDate: DateTime(2101),
                                       onDateTimeChanged: (DateTime newDate) {
@@ -688,9 +794,11 @@ class _EventState extends State<AddEventForm> {
                                   Text(
                                     thirdStartDate != null
                                         ? "${thirdStartDate!.toLocal()}".split(' ')[0]
-                                        : 'Select Third Start Date',
+                                        : (widget.sameDate && !isWithinTolerance(DateTime.parse(widget.secondTime), DateTime.parse(widget.thirdTime), Duration(seconds: 99)))
+                                        ? '${_formatDate(DateTime.parse(widget.thirdTime))}'
+                                        :"Select Third Start Date" ,
                                     style: TextStyle(
-                                      color: _thirdStartDateText ? MyApp.black : _thirdDateLabelColor,
+                                      color: _thirdStartDateText ? MyApp.black : widget.sameDate ? MyApp.black : _thirdDateLabelColor,
                                     ),
                                   ),
                                   const Icon(Icons.calendar_today),
@@ -709,7 +817,7 @@ class _EventState extends State<AddEventForm> {
                                     height: 200.0,
                                     child: CupertinoDatePicker(
                                       mode: CupertinoDatePickerMode.time,
-                                      initialDateTime: DateTime.now(),
+                                      initialDateTime: widget.firstTime,
                                       use24hFormat: true,
                                       onDateTimeChanged: (DateTime newDateTime) {
                                         if (newDateTime != null && newDateTime != thirdStartDate) {
@@ -775,11 +883,14 @@ class _EventState extends State<AddEventForm> {
                                   Text(
                                     thirdStartDate != null
                                         ? '${"${thirdStartDate!.toLocal()}".split(' ')[1].split(":")[0]}:${"${thirdStartDate!.toLocal()}".split(' ')[1].split(":")[1]}'
-                                        : 'Third Start Time',
+                                        : (widget.sameDate && !isWithinTolerance(DateTime.parse(widget.secondTime), DateTime.parse(widget.thirdTime), Duration(seconds: 99))
+                                        ? '${_formatTime(DateTime.parse(widget.thirdTime))}'
+                                        : "Third Start Time"),
                                     style: TextStyle(
-                                      color: _thirdStartDateText ? MyApp.black : _thirdTimeLabelColor,
+                                      color: _thirdStartDateText ? MyApp.black : widget.sameDate ? MyApp.black : _thirdTimeLabelColor,
                                     ),
                                   ),
+
                                   const Icon(Icons.access_time),
                                 ],
                               ),
@@ -812,7 +923,7 @@ class _EventState extends State<AddEventForm> {
                 ),
                 const SizedBox(height: 22.0),
                 DropdownButtonFormField<String>(
-                  value: selectedCategory,
+                  value: widget.category,
                   items: categories != null
                       ? categories.map<DropdownMenuItem<String>>((category) {
                     return DropdownMenuItem<String>(
@@ -869,7 +980,7 @@ class _EventState extends State<AddEventForm> {
                           ),
                           const SizedBox(height: 12.0),
                           DropdownButtonFormField<String>(
-                            value: selectedFrequency,
+                            value: rrule != null ? capitalizeFirstLetter(rrule?.frequency.toString() ?? '' ) : selectedFrequency,
                             items: frequencies.map((frequency) {
                               return DropdownMenuItem<String>(
                                 value: frequency,
@@ -916,7 +1027,7 @@ class _EventState extends State<AddEventForm> {
                           ),
                           const SizedBox(height: 12.0),
                           DropdownButtonFormField<String>(
-                            value: selectedTillMonth,
+                            value: rrule != null ? capitalizeFirstLetter(_getMonthNames(rrule?.byMonths)) : selectedTillMonth,
                             items: tillMonth.map((month) {
                               return DropdownMenuItem<String>(
                                 value: month,
@@ -963,6 +1074,7 @@ class _EventState extends State<AddEventForm> {
                           ),
                           const SizedBox(height: 12.0),
                           TextField(
+                            controller: _intervallController,
                             focusNode: _intervallFocus,
                             onTap: () {
                               setState(() {
@@ -1004,7 +1116,7 @@ class _EventState extends State<AddEventForm> {
                       ),
                     const SizedBox(height: 22.0),
                     SizedBox(
-                      width: MediaQuery.sizeOf(context).width,
+                      width: 540,
                       height: 44,
                       child: ElevatedButton(
                         onPressed: () {
@@ -1015,7 +1127,7 @@ class _EventState extends State<AddEventForm> {
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white, backgroundColor: MyApp.greyDark,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
+                          borderRadius: BorderRadius.circular(15.0),
                           ),
                         ),
                         child: Text(showAdditionalFields ? 'Not Repeat' : 'Repeat' ,style: TextStyle(color: Colors.white,),
@@ -1036,7 +1148,29 @@ class _EventState extends State<AddEventForm> {
                             elevation: 3.0,
                           ),
                           child: const Text(
-                            'Add Activity',
+                            'Edit Activity',
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  const SizedBox(height: 12.0),
+                  SizedBox(
+                        width: MediaQuery.sizeOf(context).height -50,
+                        height: 44,
+                        child: ElevatedButton(
+                          onPressed: () => deleteEvent(context),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Color(0xff831d1d),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            elevation: 3.0,
+                          ),
+                          child: const Text(
+                            'Delete Event',
                             style: TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
@@ -1070,18 +1204,16 @@ class _EventState extends State<AddEventForm> {
                           height: 150,
                           fit: BoxFit.fitHeight,
                         ),
-                      ): Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        width: 150,
-                        height: 150,
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.grey[800],
-                        ),
-                      ),
+                      ):
+                        ClipRRect(
+                        borderRadius: BorderRadius.circular(0),
+                    child: Image.network(
+                      widget.imageURL,
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.fitHeight,
+                    ),
+                  )
                     ),
                   ),
                 ),
@@ -1119,6 +1251,28 @@ class _EventState extends State<AddEventForm> {
           ),
         );
       },
+    );
+  }
+
+  bool isWithinTolerance(DateTime dateTime1, DateTime dateTime2, Duration tolerance) {
+    Duration difference = dateTime1.difference(dateTime2).abs();
+
+    return difference <= tolerance;
+  }
+
+  void deleteEvent(context)async{
+    CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
+
+    await creativCollection.doc(widget.category).update({
+      widget.activityName: FieldValue.delete(),
+    });
+
+    deleteGroupsFromUser(widget.activityName);
+
+    Navigator.push(context,
+      MaterialPageRoute(
+          builder: (context) => BottomNavigationBarExample()
+      ),
     );
   }
 
@@ -1227,7 +1381,6 @@ class _EventState extends State<AddEventForm> {
         setState(() {
           data.data()!.forEach((key, value) {
             categories = value;
-            print(categories);
           });
         });
         return "Data retrieved successfully.";
@@ -1258,10 +1411,10 @@ class _EventState extends State<AddEventForm> {
           final ref = firebase_storage.FirebaseStorage.instance.ref().child(path);
           var uploadTask = ref.putFile(_photo!);
           final snapshot = await uploadTask!.whenComplete(() {});
-          final urlDownload = await snapshot.ref.getDownloadURL();
+          var urlDownload = await snapshot.ref.getDownloadURL();
           await addCreativActivity(urlDownload, context);
         } else {
-          await addCreativActivity("https://firebasestorage.googleapis.com/v0/b/cliqueconnect-eb893.appspot.com/o/files%2FcliqueConnect2%20_big.png?alt=media&token=4371317c-3183-4c8e-abae-3ff07f4e31ba", context);
+          await addCreativActivity(widget.imageURL, context);
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1295,13 +1448,34 @@ class _EventState extends State<AddEventForm> {
         final data = snapshot.data() as Map<String, dynamic>;
         final userCourse = data["username"];
 
-        print(userCourse);
         if (userCourse != null) {
           course = userCourse;
         }
       }
     }
     return course;
+  }
+
+  Future<Map<String, dynamic>> getUser(String eventName, String eventCategory) async {
+    List<dynamic> eventList = [];
+    Map<String, dynamic> users = {};
+    final firestore = FirebaseFirestore.instance;
+    final snapshot = await firestore.collection("activities").doc(eventCategory).get();
+
+    if (snapshot.exists) {
+      eventList = snapshot.data()?[eventName] ?? [];
+      if (eventList.isNotEmpty) {
+        users = eventList[7];
+        users.forEach((userName, value) {
+          if (value == true) {
+            users.addEntries([MapEntry(userName, value)]);
+          }
+        });
+      }
+    } else {
+      print("Document does not exist");
+    }
+    return users;
   }
 
   Set<ByWeekDayEntry> _buildByWeekDays(List<DateTime> dates) {
@@ -1338,6 +1512,50 @@ class _EventState extends State<AddEventForm> {
       byMonths.add(monthIndexMap[selectedTillMonth]!);
     }
     return byMonths;
+  }
+
+  void deleteGroupsFromUser(String groupsToDelete) async {
+    if(widget.activityName.toString()==activityNameController.text){
+      print("He net austragen");
+      return;
+    }
+    User? user = FirebaseAuth.instance.currentUser;
+    var userID = user?.uid;
+    try {
+      DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(userID);
+      List delete = await getGroups(groupsToDelete);
+      await userDocRef.update({
+        'groups': FieldValue.arrayRemove(delete),
+      });
+      print('Groups removed successfully from the user.');
+    } catch (e) {
+      print('Error removing groups: $e');
+    }
+  }
+
+  Future<List> getGroups(String search) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final firestore = FirebaseFirestore.instance;
+
+    var userID = user?.uid;
+    List<dynamic> groups = [];
+
+    if (userID != null) {
+      final snapshot = await firestore.collection("users").doc(userID).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final userCourse = data["groups"];
+
+        for (var group in userCourse) {
+          if(group.toString().split("_")[1].contains(search)){
+            groups.add(group);
+          }
+        }
+
+      }
+    }
+    return groups;
   }
 
   Future<void> addCreativActivity(String urlDownload, context) async {
@@ -1404,9 +1622,22 @@ class _EventState extends State<AddEventForm> {
         return;
       }
 
+      if(showAdditionalFields ){
+        if(selectedTillMonth == null || selectedInterval == null|| selectedFrequency== null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Please fill out all repeat information (interval, till and repeat) or press not repeat'),
+              duration: Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+      }
+
       CollectionReference creativCollection = FirebaseFirestore.instance.collection('activities');
 
-      String newActivity = activityNameController.text;
+      String newActivity = widget.activityName;
       _user = FirebaseAuth.instance.currentUser;
 
       final firestore = FirebaseFirestore.instance;
@@ -1416,20 +1647,19 @@ class _EventState extends State<AddEventForm> {
       var myUserName = await userData["username"];
 
       if (newActivity != null && _user != null) {
-        await HelperFunctions.getUserNameSharedPreference().then((val) {
-          DatabaseService(uid: _user!.uid).createGroup(myUserName!, newActivity, selectedCategory!);
-        });
-        Navigator.push(context,
-          MaterialPageRoute(
-              builder: (context) => BottomNavigationBarExample()
-          ),
-        );
+        if(newActivity != activityNameController.text) {
+          await HelperFunctions.getUserNameSharedPreference().then((val) {
+            DatabaseService(uid: _user!.uid).createGroup(
+                myUserName!, activityNameController.text, selectedCategory!);
+          });
+        }
       } else {
         print("Error: _groupName or _user is null");
       }
 
       Map<String, dynamic> users = {};
       users.addEntries([MapEntry(await getUsername(), true)]);
+      users.addAll(await getUser(widget.activityName,widget.category));
 
       Frequency frequency = Frequency.weekly;
       switch (selectedFrequency) {
@@ -1475,7 +1705,7 @@ class _EventState extends State<AddEventForm> {
 
       try {
         final Map<String, dynamic> activityData = {
-          newActivity: [
+          newActivity != activityNameController.text ? activityNameController.text : newActivity: [
             activityNameController.text,
             descriptionController.text,
             Timestamp.fromDate(startDate!),
@@ -1492,7 +1722,7 @@ class _EventState extends State<AddEventForm> {
         };
 
         final Map<String, dynamic> activityDataWithourRules = {
-          newActivity: [
+          newActivity != activityNameController.text ? activityNameController.text : newActivity: [
             activityNameController.text,
             descriptionController.text,
             Timestamp.fromDate(startDate!),
@@ -1507,12 +1737,33 @@ class _EventState extends State<AddEventForm> {
           ],
         };
 
-        if (addRRule != "No Regular Event") {
+        if (addRRule != "No Regular Event" && showAdditionalFields) {
+          if(widget.activityName != activityNameController){
+            await creativCollection.doc(widget.category).update({
+              widget.activityName: FieldValue.delete(),
+            });
+            deleteGroupsFromUser(widget.activityName);
+          }
           await creativCollection.doc(selectedCategory).update(activityData);
         } else {
+          if(widget.activityName != activityNameController){
+            await creativCollection.doc(widget.category).update({
+              widget.activityName: FieldValue.delete(),
+            });
+            deleteGroupsFromUser(widget.activityName);
+          }
           await creativCollection.doc(selectedCategory).update(activityDataWithourRules);
         }
 
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Event(
+              eventName: activityNameController.text,
+              eventCategory: selectedCategory.toString(),
+            ),
+          ),
+        );
         if (mounted) {
           setState(() {
             activityNameController.clear();
@@ -1528,7 +1779,13 @@ class _EventState extends State<AddEventForm> {
         print('Error updating Firestore in addCreativActivity: $e');
       }
     } catch (e) {
-      print('Error in addCreativActivity: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a second start date or press no additional date'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
     }
   }
 }
