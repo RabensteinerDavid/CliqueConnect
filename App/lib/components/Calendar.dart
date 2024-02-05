@@ -98,6 +98,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: MyApp.blueMain),
+        automaticallyImplyLeading: false,
       ),
     );
   }

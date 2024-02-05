@@ -531,6 +531,7 @@ var currentLocation;
         backgroundColor: MyApp.blueMain,
         elevation: 0.0,
         iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: false,
       ),
     );
   }
