@@ -221,13 +221,13 @@ class YourCurrentScreenState extends State<ProfileView> {
             color: MyApp.blueMain,
           ),
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.2,
+            top: MediaQuery.of(context).size.height * 0.16,
             left: 0,
             right: 0,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.8,
+                height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -256,7 +256,7 @@ class YourCurrentScreenState extends State<ProfileView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 60),
+                              const SizedBox(height: 50),
                               Text(
                                 '$username',
                                 style: const TextStyle(
@@ -265,39 +265,92 @@ class YourCurrentScreenState extends State<ProfileView> {
                                     fontWeight: FontWeight.bold,
                                     color: MyApp.blueMain),
                               ),
-                              const SizedBox(height: 40),
+                              const Row(
+                                children: [
+                                  Text(
+                                    'Interests:',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left:0, right: 20),
+                                child: Center(
+                                  child: FutureBuilder<List<String>>(
+                                    future: getInterestsChip(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const CircularProgressIndicator();
+                                      }
+                                      if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      }
+                                      List<String> interests = snapshot.data ?? ["No Interests"];
+                                      return SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: interests.map((String interest) {
+                                            return
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 4),
+                                                child: Text(interest,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                                  ),
+                                                ),
+                                              );
+                                          }).toList(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 60),
                               Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        'icons/hat_rose.png',
-                                        width: 40,
-                                        height: 40,
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$course',
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                color: MyApp.blueMain,
-                                                fontFamily:
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'icons/hat_rose.png',
+                                          width: 40,
+                                          height: 40,
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '$course',
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    color: MyApp.blueMain,
+                                                    fontFamily:
                                                     'DIN-Next-LT-Pro-Regular'),
-                                          ),
-                                          Text(
-                                            '$university',
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                fontFamily:
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                '$university',
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily:
                                                     'DIN-Next-LT-Pro-Regular'),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(height: 10),
                                   Container(
@@ -308,50 +361,45 @@ class YourCurrentScreenState extends State<ProfileView> {
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        'icons/profile_rose.png',
-                                        width: 40,
-                                        height: 40,
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'About Me',
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: MyApp.blueMain,
-                                                fontFamily:
-                                                    'DIN-Next-LT-Pro-Regular'),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.only(left: 16, right: 40, top: 16,bottom: 16),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'icons/profile_rose.png',
+                                          width: 40,
+                                          height: 40,
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'About Me',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: MyApp.blueMain,
+                                                  fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                '$aboutMe',
+                                                textAlign: TextAlign.justify,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontFamily: 'DIN-Next-LT-Pro-Regular',
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            '$aboutMe',
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                fontFamily:
-                                                    'DIN-Next-LT-Pro-Regular'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(height: 20),
-                                  const Row(
-                                    children: [
-                                      Text(
-                                        'Interests:',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            color: MyApp.blueMain,
-                                            fontFamily:
-                                                'DIN-Next-LT-Pro-Regular'),
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                             ],
@@ -454,47 +502,6 @@ class YourCurrentScreenState extends State<ProfileView> {
               ),
             ],
           ),
-      Padding(
-        padding: const EdgeInsets.only(top: 140, left: 20, right: 20),
-        child: Center(
-          child: FutureBuilder<List<String>>(
-            future: getInterestsChip(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              }
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-              List<String> interests = snapshot.data ?? ["No Interests"];
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: interests.map((String interest) {
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: FilterChip(
-                        label: Text(interest),
-                        selected: filters.contains(interest),
-                        onSelected: (bool selected) {
-                          setState(() {
-                            if (selected) {
-                              filters.add(interest);
-                            } else {
-                              filters.remove(interest);
-                            }
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            },
-          ),
-        ),
-      )
         ],
       ),
     );
