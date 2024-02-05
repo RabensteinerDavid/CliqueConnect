@@ -108,19 +108,25 @@ class _EventHomeState extends State<EventHome> {
             height: 30,
           ),
           onPressed: () async {
-            await Navigator.push(
+            bool isNewEventAdded = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const AddEventForm(),
               ),
             );
-            setState(() {
-              initPrefs();
-              userName = getUserName();
-              eventDataAll = getEventData();
-              connectedEvents = getConnectedEventsNames();
-              _updateFilteredEvents();
-            });
+
+            if (isNewEventAdded) {
+              await Future.delayed(Duration(milliseconds: 500)); // Adjust the duration as needed
+              setState(() {
+                print("Reload");
+                isExpanded = false;
+                initPrefs();
+                userName = getUserName();
+                eventDataAll = getEventData();
+                connectedEvents = getConnectedEventsNames();
+                _updateFilteredEvents();
+              });
+            }
           },
         ),
         leadingWidth: 65,

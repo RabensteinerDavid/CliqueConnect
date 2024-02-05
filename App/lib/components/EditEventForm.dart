@@ -1515,10 +1515,6 @@ class _EventState extends State<EditEventForm> {
   }
 
   void deleteGroupsFromUser(String groupsToDelete) async {
-    if(widget.activityName.toString()==activityNameController.text){
-      print("He net austragen");
-      return;
-    }
     User? user = FirebaseAuth.instance.currentUser;
     var userID = user?.uid;
     try {
@@ -1742,7 +1738,9 @@ class _EventState extends State<EditEventForm> {
             await creativCollection.doc(widget.category).update({
               widget.activityName: FieldValue.delete(),
             });
-            deleteGroupsFromUser(widget.activityName);
+            if(!(widget.activityName.toString()==activityNameController.text)){
+              deleteGroupsFromUser(widget.activityName);
+            }
           }
           await creativCollection.doc(selectedCategory).update(activityData);
         } else {
@@ -1750,7 +1748,9 @@ class _EventState extends State<EditEventForm> {
             await creativCollection.doc(widget.category).update({
               widget.activityName: FieldValue.delete(),
             });
-            deleteGroupsFromUser(widget.activityName);
+            if(!(widget.activityName.toString()==activityNameController.text)){
+              deleteGroupsFromUser(widget.activityName);
+            }
           }
           await creativCollection.doc(selectedCategory).update(activityDataWithourRules);
         }

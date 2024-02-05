@@ -1419,11 +1419,7 @@ class _EventState extends State<AddEventForm> {
         await HelperFunctions.getUserNameSharedPreference().then((val) {
           DatabaseService(uid: _user!.uid).createGroup(myUserName!, newActivity, selectedCategory!);
         });
-        Navigator.push(context,
-          MaterialPageRoute(
-              builder: (context) => BottomNavigationBarExample()
-          ),
-        );
+        Navigator.pop(context,true);
       } else {
         print("Error: _groupName or _user is null");
       }
