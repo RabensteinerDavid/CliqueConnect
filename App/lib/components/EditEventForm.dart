@@ -56,7 +56,6 @@ class _EventState extends State<EditEventForm> {
   DateTime? startDate;
   DateTime? secondStartDate;
   DateTime? thirdStartDate;
-
   String? selectedCategory;
 
   var categories;
@@ -92,6 +91,7 @@ class _EventState extends State<EditEventForm> {
   bool _startTimeText = false;
   bool _secondStartDateText = false;
   bool _thirdStartDateText = false;
+  bool changedActivityName = false;
 
   final TextEditingController activityNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -294,6 +294,22 @@ class _EventState extends State<EditEventForm> {
               child: Column(
                 children: [
                 TextField(
+                  onChanged: (newText) {
+                    if (newText.toString()!=widget.activityName) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Take care when switching the activity name, as errors may occur. The new name should be completely changed for it to work.'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                    if(newText.toString()!=widget.activityName){
+                      changedActivityName = true;
+                    }
+                    else{
+                      changedActivityName = false;
+                    }
+                  },
                 controller: activityNameController,
                 focusNode: _nameFocus,
                   onTap: () {
@@ -1400,7 +1416,20 @@ class _EventState extends State<EditEventForm> {
     return result;
   }
 
+  int pressed = 0;
   void savePictureToFirestore(context) async {
+    if(changedActivityName){
+      if(pressed == 0){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Are you sure you want to change the name? Press "Edit activity" to continue. Take care, you might be disconnected.'),
+            duration: Duration(seconds: 4),
+          ),
+        );
+        pressed++;
+        return;
+      }
+    }
     try {
       String nameActivity = activityNameController.text;
       User? user = FirebaseAuth.instance.currentUser;
