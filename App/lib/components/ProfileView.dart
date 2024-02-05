@@ -352,46 +352,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                       ),
                                     ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 20),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: FutureBuilder<List<String>>(
-                                          future: getInterestsChip(),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState == ConnectionState.waiting) {
-                                              return const CircularProgressIndicator();
-                                            }
-                                            if (snapshot.hasError) {
-                                              return Text('Error: ${snapshot.error}');
-                                            }
-                                            List<String> interests = snapshot.data ?? ["No Interests"];
-                                            return Row(
-                                              children: interests.map((String interest) {
-                                                return Padding(
-                                                  padding: const EdgeInsets.all(4.0),
-                                                  child: FilterChip(
-                                                    label: Text(interest),
-                                                    selected: filters.contains(interest),
-                                                    onSelected: (bool selected) {
-                                                      setState(() {
-                                                        if (selected) {
-                                                          filters.add(interest);
-                                                        } else {
-                                                          filters.remove(interest);
-                                                        }
-                                                      });
-                                                    },
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            );
-                                          },
-                                        ),
-                                      ),),
-                                  ),
                                 ],
                               ),
                             ],
@@ -493,7 +453,48 @@ class YourCurrentScreenState extends State<ProfileView> {
                 ],
               ),
             ],
-          )
+          ),
+      Padding(
+        padding: const EdgeInsets.only(top: 140, left: 20, right: 20),
+        child: Center(
+          child: FutureBuilder<List<String>>(
+            future: getInterestsChip(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              }
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+              List<String> interests = snapshot.data ?? ["No Interests"];
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: interests.map((String interest) {
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: FilterChip(
+                        label: Text(interest),
+                        selected: filters.contains(interest),
+                        onSelected: (bool selected) {
+                          setState(() {
+                            if (selected) {
+                              filters.add(interest);
+                            } else {
+                              filters.remove(interest);
+                            }
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            },
+          ),
+        ),
+      )
         ],
       ),
     );
