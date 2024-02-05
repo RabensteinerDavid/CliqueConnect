@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:rrule/rrule.dart';
@@ -8,12 +7,10 @@ import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_clique_connect/components/AnimatedMarkersMap_NEW.dart';
 import 'package:test_clique_connect/components/EditEventForm.dart';
 import '../main.dart';
 import '../pages/chat_page.dart';
 import '../services/database_service.dart';
-import 'EventHome.dart';
 import 'NavigationBar.dart';
 
 class Event extends StatefulWidget {
@@ -55,7 +52,7 @@ class _EventState extends State<Event> {
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
   String icon = "assets/cliqueConnect.png";
-  String buttonText = "Connect";
+  String buttonText = "";
   Color buttonColor = const Color(0xFF220690);
   String groupId = "";
   String admin = "";
