@@ -15,7 +15,6 @@ final filters = <String>{};
 Future<bool> profileIsCreated(bool state) async{
   User? user = FirebaseAuth.instance.currentUser;
   var userID = user?.uid;
-
   final prefs = await SharedPreferences.getInstance();
   return await prefs.setBool(userID!, state);
 }
@@ -44,9 +43,10 @@ class _EventState extends State<CreateProfile> {
 
   File? _photo;
   User? user = FirebaseAuth.instance.currentUser;
-  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
   String? selectedStudyCourse;
   String? universityType;
+
+  firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
 
   Color _nameLabelColor = MyApp.greyDark;
   Color _aboutLabelColor = MyApp.greyDark;
@@ -79,7 +79,7 @@ class _EventState extends State<CreateProfile> {
           _aboutLabelColor = MyApp.greyDark;
           _universityLabelColor = MyApp.greyDark;
           _courseLabelColor = MyApp.greyDark;
-        });
+          });
         },
       child: Scaffold(
         body: Material(
@@ -361,7 +361,6 @@ class _EventState extends State<CreateProfile> {
                 lockAspectRatio: true),
             IOSUiSettings(title: 'Crop',aspectRatioLockEnabled: true)
           ]);
-
       if (cropped != null) {
         setState(() {
           _photo = File(cropped.path);
@@ -556,8 +555,6 @@ class _FilterChipExampleState extends State<FilterChipExample> {
       return "";
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

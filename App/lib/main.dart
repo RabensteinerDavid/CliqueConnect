@@ -8,7 +8,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   runApp(const MyApp());
 }
 
@@ -37,8 +36,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'DINCondensed',
         backgroundColor: blueMain,
-        // Add more customizations with your colors
-        // For example:
         textTheme: const TextTheme(
           titleLarge: TextStyle(color: black),
           titleMedium: TextStyle(color: black),

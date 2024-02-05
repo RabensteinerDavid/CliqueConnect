@@ -27,10 +27,10 @@ class _EventState extends State<Event> {
 
   var rrule;
   late DateTime dateTime;
-  final firestore = FirebaseFirestore.instance;
-
   late bool isExpanded;
   late SharedPreferences prefs;
+
+  final firestore = FirebaseFirestore.instance;
 
   List<dynamic> eventList = [];
   Map<String, dynamic> users = {}; // Map für Benutzernamen und Status --> zum Datenbank-Schreiben (alle Benutzer des Events (true/false))
@@ -48,6 +48,7 @@ class _EventState extends State<Event> {
 
   bool sameDate = false;
   bool moreDatesToView = false;
+  bool showEdit = false;
 
   User? user = FirebaseAuth.instance.currentUser; // Aktueller Benutzer
   String myUserName = ""; // Benutzername des aktuellen Benutzers
@@ -56,7 +57,6 @@ class _EventState extends State<Event> {
   Color buttonColor = const Color(0xFF220690);
   String groupId = "";
   String admin = "";
-  bool showEdit = false;
 
   DateTime dateTimeTwo = DateTime.now();
   DateTime dateTimeThree = DateTime.now();
@@ -134,7 +134,6 @@ class _EventState extends State<Event> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     if(admin.toString() == myUserName.toString()){
@@ -182,7 +181,6 @@ class _EventState extends State<Event> {
               }
             },
             errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-              // An error occurred, show a placeholder
               return Center(
                 child: Container(
                   height: bannerHeight+40,
@@ -229,7 +227,6 @@ class _EventState extends State<Event> {
                         ),
                       ),
                     ),
-
                   Padding(
                     padding: EdgeInsets.only(left: 25.0, top: topPadding, right: 40.0),
                     child: Align(

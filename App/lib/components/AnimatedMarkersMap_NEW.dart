@@ -629,7 +629,7 @@ class _MapItemDetailsState extends State<_MapItemDetails> {
   double _dragStartX = 0.0;
   double _currentX = 0.0;
   double _offset = 0.0;
-  final double _threshold = 20.0; // 50
+  final double _threshold = 20.0;
 
   String? _getMonthNames(Set<int>? monthNumbers) {
     final monthNames = [

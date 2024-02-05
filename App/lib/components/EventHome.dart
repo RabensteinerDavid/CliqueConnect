@@ -116,7 +116,7 @@ class _EventHomeState extends State<EventHome> {
             );
 
             if (isNewEventAdded) {
-              await Future.delayed(Duration(milliseconds: 500)); // Adjust the duration as needed
+              await Future.delayed(Duration(milliseconds: 500));
               setState(() {
                 print("Reload");
                 isExpanded = false;

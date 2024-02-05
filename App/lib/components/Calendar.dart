@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:rrule/rrule.dart';
 import 'package:latlong2/latlong.dart' as latlong;
@@ -9,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../main.dart';
 import 'dart:async';
 import 'Event.dart';
-
 
 class EventData {
   final String title;
@@ -43,6 +41,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   List<String> connectedEventNames = [];
   List<NeatCleanCalendarEvent> _eventList = [];
+
   final List<String> filtersCategory = [];
 
   late List<EventData> eventDataList = [];
@@ -147,8 +146,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                margin: const EdgeInsets.only(
-                    left: 20.0, top: 20.0, bottom: 0),
+                margin: const EdgeInsets.only(left: 20.0, top: 20.0, bottom: 0),
                 child: const Text(
                   "Calendar",
                   style: TextStyle(
@@ -308,7 +306,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
-
   Future<List<EventData>> getMarkersAsFuture() async {
     firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
     final firestore = FirebaseFirestore.instance;
@@ -373,15 +370,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
         endTime: event.endTime,
         description: event.description,
         color: MyApp.blueMain,
-
         //color: event.color,
         //isMultiDay: true,
         isAllDay: false,
         //icon: event.icon,
       ));
     }
-
     return calendarEvents;
   }
-
 }

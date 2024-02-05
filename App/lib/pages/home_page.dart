@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_clique_connect/components/AddEventForm.dart';
-import 'package:test_clique_connect/components/EventHome.dart';
 import 'package:test_clique_connect/main.dart';
 import '../helper/helper_functions.dart';
 import '../services/auth_service.dart';

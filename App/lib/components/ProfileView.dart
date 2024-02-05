@@ -18,9 +18,10 @@ class ProfileView extends StatefulWidget {
 
 class YourCurrentScreenState extends State<ProfileView> {
   User? user = FirebaseAuth.instance.currentUser;
-  final FirebaseAuth auth = FirebaseAuth.instance;
 
+  final FirebaseAuth auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
+
   static String imageURL = '';
   late Future<String> userNameFuture;
   late Future<String> courseFuture;
@@ -81,7 +82,6 @@ class YourCurrentScreenState extends State<ProfileView> {
       return members.contains(user!.uid + '_' + userName);
     } catch (e) {
       print('Error checking if user is joined: $e');
-      // Handle the error accordingly
       return false;
     }
   }
@@ -391,8 +391,8 @@ class YourCurrentScreenState extends State<ProfileView> {
                                                 }
                                                 List<String> interests = snapshot.data ?? ["No Interests"];
                                                 return Wrap(
-                                                  spacing: 4.0, // Adjust spacing between interests
-                                                  runSpacing: .0, // Adjust spacing between lines
+                                                  spacing: 4.0,
+                                                  runSpacing: .0,
                                                   children: interests.map((String interest) {
                                                     return FilterChip(
                                                       label: Text(interest),
@@ -402,14 +402,6 @@ class YourCurrentScreenState extends State<ProfileView> {
                                                         });
                                                       },
                                                     );
-
-                                                    // Text(
-                                                    //   interest,
-                                                    //   style: const TextStyle(
-                                                    //     fontSize: 14,
-                                                    //     fontFamily: 'DIN-Next-LT-Pro-Regular',
-                                                    //   ),
-                                                    // );
                                                   }).toList(),
                                                 );
                                               },

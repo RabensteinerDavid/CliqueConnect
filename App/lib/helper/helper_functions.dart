@@ -14,7 +14,6 @@ class HelperFunctions{
 
   User? user = FirebaseAuth.instance.currentUser;
 
-  // saving data to sharedpreference
   static Future<bool> saveUserLoggedInSharedPreference(bool isUserLoggedIn) async{
 
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -31,8 +30,6 @@ class HelperFunctions{
     return await preferences.setString(sharedPreferenceUserEmailKey, userEmail);
   }
 
-
-  // fetching data from sharedpreference
   static Future<bool?> getUserLoggedInSharedPreference() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return await preferences.getBool(sharedPreferenceUserLoggedInKey);
@@ -82,7 +79,6 @@ class HelperFunctions{
         }
       }
     }
-
     return false;
   }
 

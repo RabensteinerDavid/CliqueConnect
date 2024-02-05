@@ -4,7 +4,6 @@ import 'package:test_clique_connect/components/CreateProfile.dart';
 import '../helper/helper_functions.dart';
 import '../save/Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'NavigationBar.dart';
 
 class AuthGate extends StatefulWidget {
@@ -22,6 +21,7 @@ class _AuthGateState extends State<AuthGate> {
   bool isLogin = true;
   double formHeightPercentage = 0.4;
   double roundEdges = 20.0;
+
   Color primaryColor = const Color(0xff26168C);
   Color textColor = Colors.white;
   Color textColorBlue = const Color(0xff26168C);
@@ -40,7 +40,6 @@ class _AuthGateState extends State<AuthGate> {
   Future<bool?> isProfileCreated() async{
     User? user = FirebaseAuth.instance.currentUser;
     var userID = user?.uid;
-
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(userID!);
   }
@@ -127,15 +126,12 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget buildResetPasswordButton() {
-    return isLogin
-        ? TextButton(
-      onPressed: _resetPassword,
+    return isLogin ? TextButton(onPressed: _resetPassword,
       child: const Text(
         'Reset Password',
         style: TextStyle(color: Colors.grey),
       ),
-    )
-        : const SizedBox();
+    ) : const SizedBox();
   }
 
   Future<void> _resetPassword() async {
@@ -273,8 +269,7 @@ class _AuthGateState extends State<AuthGate> {
           borderRadius: BorderRadius.circular(roundEdges),
         ),
       ),
-      child: Text(
-        isLogin ? 'Sign In' : 'Sign Up',
+      child: Text(isLogin ? 'Sign In' : 'Sign Up',
         style: TextStyle(color: textColor),
       ),
     );
@@ -283,8 +278,7 @@ class _AuthGateState extends State<AuthGate> {
   Widget buildToggleAuthModeButton() {
     return TextButton(
       onPressed: _toggleAuthMode,
-      child: Text(
-        isLogin ? 'Switch to Sign Up' : 'Switch to Login',
+      child: Text(isLogin ? 'Switch to Sign Up' : 'Switch to Login',
         style: TextStyle(color: textColorBlue),
       ),
     );
@@ -295,8 +289,6 @@ class _AuthGateState extends State<AuthGate> {
       isLogin = !isLogin;
     });
   }
-
-
 
   Future<void> _signIn() async {
     String email = emailController.text.trim();

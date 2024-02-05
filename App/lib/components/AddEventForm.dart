@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +11,7 @@ import 'package:rrule/rrule.dart';
 import '../helper/helper_functions.dart';
 import '../main.dart';
 import 'package:path/path.dart';
-
 import '../services/database_service.dart';
-import 'NavigationBar.dart';
 
 class AddEventForm extends StatefulWidget {
   const AddEventForm({Key? key}) : super(key: key);
@@ -74,7 +71,6 @@ class _EventState extends State<AddEventForm> {
   String? selectedFrequency;
   String? selectedTillMonth;
   int? selectedInterval;
-
   File? _photo;
   User? _user;
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ import 'package:rrule/rrule.dart';
 import '../helper/helper_functions.dart';
 import '../main.dart';
 import 'package:path/path.dart';
-
 import '../services/database_service.dart';
 import 'Event.dart';
 import 'NavigationBar.dart';
@@ -30,7 +28,6 @@ class EditEventForm extends StatefulWidget {
   final bool moreDatesToView;
   final bool sameDate;
 
-  // Use a constant RecurrenceRule as the default value
   const EditEventForm({
     Key? key,
     required this.activityName,
@@ -50,7 +47,6 @@ class EditEventForm extends StatefulWidget {
   _EventState createState() => _EventState();
 }
 
-
 class _EventState extends State<EditEventForm> {
 
   DateTime? startDate;
@@ -58,6 +54,7 @@ class _EventState extends State<EditEventForm> {
   DateTime? thirdStartDate;
   String? selectedCategory;
 
+  var rrule;
   var categories;
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _descriptionFocuse = FocusNode();
@@ -103,11 +100,10 @@ class _EventState extends State<EditEventForm> {
   String? selectedFrequency;
   String? selectedTillMonth;
   int? selectedInterval;
-
   File? _photo;
   User? _user;
+
   firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
-  var rrule;
 
   @override
   void initState() {
@@ -130,16 +126,12 @@ class _EventState extends State<EditEventForm> {
     selectedTillMonth = rrule != null ? capitalizeFirstLetter(_getMonthNames(rrule?.byMonths)) : selectedTillMonth;
 
     try {
-      // Validate that the input is not empty and contains only digits
       if (_intervallController.text.isNotEmpty && _intervallController.text.replaceAll(RegExp(r'\D'), '').isNotEmpty) {
-        // Parse the content of _intervallController.text as an integer
         selectedInterval = int.parse(_intervallController.text);
       } else {
-        // Handle the case where the input is empty or not a valid integer
         print('Invalid input for interval');
       }
     } catch (e) {
-      // Handle the case where the text cannot be parsed as an integer
       print('Error parsing interval: $e');
     }
   }
@@ -191,7 +183,6 @@ class _EventState extends State<EditEventForm> {
   String _formatDate(DateTime dateTime) {
     String formattedMonth = dateTime.month < 10 ? '0${dateTime.month}' : '${dateTime.month}';
     String formattedDay = dateTime.day < 10 ? '0${dateTime.day}' : '${dateTime.day}';
-
     return '${dateTime.year}-$formattedMonth-$formattedDay';
   }
 
@@ -214,7 +205,6 @@ class _EventState extends State<EditEventForm> {
         return 'Unknown';
       }
     }).toList();
-
     return selectedMonthNames?.join('') ?? '';
   }
 

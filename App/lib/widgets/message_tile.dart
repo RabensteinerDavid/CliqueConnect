@@ -115,7 +115,7 @@ class _MessageTileState extends State<MessageTile> {
                   }
                 },
               ),
-                const SizedBox(width: 24),
+              const SizedBox(width: 24),
             ],
           ),
         ),
@@ -135,14 +135,14 @@ class _MessageTileState extends State<MessageTile> {
         if (imageName != null) {
           return imageName;
         } else {
-          return ''; // Default image or handle accordingly
+          return '';
         }
       } else {
-        return ''; // Default image or handle accordingly
+        return '';
       }
     } catch (e) {
       print('Error retrieving image URL for user $username: $e');
-      return ''; // Default image or handle accordingly
+      return '';
     }
   }
 
@@ -181,7 +181,6 @@ class _MessageTileState extends State<MessageTile> {
         }
       }
     }
-
     return false;
   }
 }

@@ -14,7 +14,6 @@ class DatabaseService {
     return FirebaseFirestore.instance.collection("users").doc(uid).snapshots();
   }
 
-
   Future<QuerySnapshot> searchByName(String searchField) async {
     return await FirebaseFirestore.instance
         .collection("groups")
@@ -27,7 +26,7 @@ class DatabaseService {
       return await userCollection.doc(uid).get();
     } catch (e) {
       print('Error getting user data: $e');
-      throw e; // You can handle this error in the calling code
+      throw e;
     }
   }
 
@@ -55,7 +54,6 @@ class DatabaseService {
       });
     } catch (e) {
       print('Error creating group: $e');
-      // Handle the error accordingly
     }
   }
 
@@ -69,7 +67,6 @@ class DatabaseService {
       return members.contains(uid + '_' + userName);
     } catch (e) {
       print('Error checking if user is joined: $e');
-      // Handle the error accordingly
       return false;
     }
   }
@@ -92,18 +89,14 @@ class DatabaseService {
         await groupDocRef.update({
           'members': FieldValue.arrayUnion([uid + '_' + userName]),
         });
-
         await userCollection.doc(uid).update({
           'groups': FieldValue.arrayUnion([groupId + '_' + groupName]),
         });
       }
     } catch (e) {
       print('Error toggling group join: $e');
-      // Handle the error accordingly
     }
   }
-
-  // Add error handling to other methods as needed...
 
   Future<void> sendMessage(String groupId, chatMessageData) async {
     try {
@@ -120,11 +113,8 @@ class DatabaseService {
       });
     } catch (e) {
       print('Error sending message: $e');
-      // Handle the error accordingly
     }
   }
-
-  // Update other methods with error handling...
 
   Stream<QuerySnapshot> getChats(String groupId) {
     return FirebaseFirestore.instance

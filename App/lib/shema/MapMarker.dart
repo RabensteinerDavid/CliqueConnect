@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:latlong2/latlong.dart'; // Import LatLng from 'latlong2' package
+import 'package:latlong2/latlong.dart';
 import 'package:rrule/rrule.dart';
 
 class MapMarker {
@@ -9,7 +9,7 @@ class MapMarker {
   final Timestamp start;
   final Timestamp end;
   final String address;
-  final LatLng location; // Assuming LatLng is from the 'latlong2' package
+  final LatLng location;
   final String category;
   final RecurrenceRule? rule;
 
